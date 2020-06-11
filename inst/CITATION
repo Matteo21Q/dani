@@ -1,0 +1,6 @@
+bibentry(bibtype = "Manual",
+         title = "{dani}: Design and Analysis of Non-Inferiority trials",
+         author = c(person("Matteo", "Quartagno")),        
+         year = 2019,
+         url = "https://CRAN.R-project.org/package=dani")
+		 
