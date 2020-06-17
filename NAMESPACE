@@ -1,4 +1,22 @@
-export(sample.size.NI, test.NI, arcsine.margin, power.NI.frontier, type1error.NI.frontier, analyse.durations, plot.durations, summary.durations, fracpoly2fix)
-importFrom("stats", "qnorm", "pnorm", "rbinom")
+import(stats)
+import(boot)
+import(survival)
+import(graphics)
+importFrom("utils","capture.output")
 importFrom("graphics", "abline", "lines", "plot")
 importFrom("Epi", "ci.pd")
+
+export(sample.size.NI, 
+	   test.NI, 
+	   arcsine.margin, 
+	   power.NI.frontier, 
+	   type1error.NI.frontier, 
+	   analyse.durations, 
+	   plot.durations, 
+	   summary.durations, 
+	   fracpoly2fix)
+
+	   
+
+S3method(plot,durations)
+S3method(summary,durations)

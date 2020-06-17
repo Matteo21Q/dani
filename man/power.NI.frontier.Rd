@@ -27,7 +27,7 @@ The sample size of the trial. A vector, the first entry is the sample size of th
 The allocation ratio. Default is 1, i.e. equal allocation between arms. 
 }
  \item{range.of.p0}{
-The range of true control event risks for which we want to explore the power of the design. }
+The range of true control event risks for which we want to explore the power of the design. 
 }
  \item{threshold.modify}{
 The threshold for the difference considered significant enough to change the margin using the non-inferiority frontier. A risk difference if scale="RD", a ratio if scale="RR".
@@ -45,8 +45,8 @@ If the density of a specific outcome is lower than this threshold, this is igore
 Logical. If FALSE no output is printed on screen.
 }
 \item{favourable}{Logical. If TRUE, the outcome is considered favourable.
-                  Default is FALSE, i.e. unfavourable outcome, e.g. death.}
-
+                  Default is FALSE, i.e. unfavourable outcome, e.g. death.
+ }
 }
 \details{
 This function estimates power with a specific sample size for a non-inferiority trial analysed on either the risk difference or risk ratio scale, defining a non-inferiority frontier. The analysis changes the margin to that indicated by the frontier if the difference between expected and observed control risks is more than a certain threshold. 
@@ -61,14 +61,16 @@ A data.frame with estimated powers at each control event risk.
 p0.expected<-0.05 # Expected control event rate
 p1.expected<-p0.expected # Same as expected active event rate
 p1.nontolerable<-0.1  # Maximum tolerable active event rate 
+NI.m<-p1.nontolerable-p0.expected
 r<-1       # Allocation ratio
 range.of.p0<-seq(0.005,0.10,0.005)
-ss<-sample.size.NI(p0.expected, p1.expected, p1.nontolerable)
+ss<-sample.size.NI(p0.expected, p1.expected, NI.m)
 arcsine.frontier<-function(pio0) {
   return(sin(asin(sqrt(pio0))+arcsine.margin(p1.nontolerable,p0.expected))^2-pio0)
 }
 
-res7<-power.NI.frontier(p0.expected,arcsine.frontier, ss, r,range.of.p0)
-
+# Commented out because of CRAN policy on examples. 
+# res7<-power.NI.frontier(p0.expected,arcsine.frontier, ss, r,range.of.p0)
+res7<-power.NI.frontier(p0.expected,arcsine.frontier, ss, r,range.of.p0=c(0.045,0.05))
 
 }

@@ -26,7 +26,7 @@ This function returns the arc-sine difference margin to be used in the trial.
 
 
 \examples{
-p1.nontlerable<-0.1
+p1.nontolerable<-0.1
 p0.expected<-0.05
 NI.margin.AS<-arcsine.margin(p1.nontolerable, p0.expected)
 }

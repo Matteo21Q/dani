@@ -7,7 +7,7 @@
   A function to fit fixed-2 fractional polynomials. These are FP2 with the number of terms fixed at 2, rather than at a maximum of 2. 
 }
 \usage{
-fracpoly2fix <- function (formula, data , family="binomial")  
+fracpoly2fix(formula, data , family="binomial")  
 
 }
 
@@ -33,7 +33,7 @@ sam.sizes=c(500)
 n.sim=50
 family="binomial"
 
-durations<-sample(dur.arms,sam.sizes,rep=T)
+durations<-sample(dur.arms,sam.sizes,rep=TRUE)
 y<-rbinom(sam.sizes,1,0.95)
 
 data.ex<-data.frame(y,durations)

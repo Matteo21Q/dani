@@ -57,13 +57,13 @@ dur.arms=c(8,10,12,14,16,18,20)
 sam.sizes=c(500)
 NI.margin.RD<-0.1
 
-durations<-sample(dur.arms,sam.sizes,rep=T)
+durations<-sample(dur.arms,sam.sizes,rep=TRUE)
 y<-rbinom(sam.sizes,1,0.95-(20-durations)*0.01)
 
 data.ex<-data.frame(y,durations)
 
 res1<-analyse.durations(y, durations, family="binomial", 
-                                se.method="delta", step=1, scale="RD", 
+                                se.method="delta", all.durations=8:20, scale="RD", 
                                 NI.margin.RD, M.boot=NULL, n.cpus=1)
 
 }

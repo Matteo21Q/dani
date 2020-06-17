@@ -480,6 +480,7 @@ analyse.durations <- function (outcomes, durations, family="binomial",
                 NI.margin = NI.margin, se.method = se.method, family = family,
                 scale = scale, low.bound.dur = low.bound.dur, 
                 up.bound.dur = up.bound.dur )
+  class(results)<-c("durations", "list")
   return(results)
   
 }

@@ -36,7 +36,9 @@ The output is a vector ss, containing the sample sizes for the control and activ
   p1.expected<-p0.expected # Same as expected active event rate
   NI.marg.RD<-0.05  # Non-inferiority margin on risk difference scale
   NI.marg.RR<-NI.marg.OR<-2  # Non-inferiority margin on risk or odds ratio scale
-  NI.marg.AS<-arcsine.margin(p1.expected+NI.marg.RD, p0.expected)  # Non-inferiority margin on arc-sine difference scale
+  # Non-inferiority margin on arc-sine difference scale:
+    NI.marg.AS<-arcsine.margin(p1.expected+NI.marg.RD, p0.expected) 
+
   r<-1       # Allocation ratio
   power<-0.9 # Power
   alph<-0.025 # Significance level
