@@ -3,6 +3,7 @@ plot.durations <- function (x, ylim=NULL,
                                      lwd=3, main="Duration-Response Curve", 
                                      xaxt="n", yaxt="n", type="outcome", 
                                      predict.target=NULL, ...) {
+  NI.margin<-x$NI.margin
   if(is.null(predict.target)){
     predict.target<-ifelse(x$family=="survival", "risk", "resp")
   }
@@ -20,47 +21,47 @@ plot.durations <- function (x, ylim=NULL,
   if (x$family=="binomial") {
     if (x$scale=="RD") {
       acceptability<- function(x) {
-        return(0*x+y.dur.est[length(y.dur.est)]-x$NI.margin)
+        return(0*x+y.dur.est[length(y.dur.est)]-NI.margin)
       }
     } else if (x$scale=="RR") {
       acceptability<- function(x) {
-        return(0*x+y.dur.est[length(y.dur.est)]*x$NI.margin)
+        return(0*x+y.dur.est[length(y.dur.est)]*NI.margin)
       }
     } else if (x$scale=="rate") {
       acceptability<- function(x) {
-        return(0*x+x$NI.margin)
+        return(0*x+NI.margin)
       }
     } else if (x$scale=="AF") {
       acceptability<- function(x) {
-        return(y.dur.est[length(y.dur.est)]-x$NI.margin(x))
+        return(y.dur.est[length(y.dur.est)]-NI.margin(x))
       }
     }
   } else if (x$family=="gaussian") {
     if (x$scale=="diff") {
       acceptability<- function(x) {
-        return(0*x+y.dur.est[length(y.dur.est)]-x$NI.margin)
+        return(0*x+y.dur.est[length(y.dur.est)]-NI.margin)
       }
     } else if (x$scale=="ratio") {
       acceptability<- function(x) {
-        return(0*x+y.dur.est[length(y.dur.est)]*x$NI.margin)
+        return(0*x+y.dur.est[length(y.dur.est)]*NI.margin)
       }
     } else if (x$scale=="target") {
       acceptability<- function(x) {
-        return(0*x+x$NI.margin)
+        return(0*x+NI.margin)
       }
     } else if (x$scale=="AF") {
       acceptability<- function(x) {
-        return(y.dur.est[length(y.dur.est)]-x$NI.margin(x))
+        return(y.dur.est[length(y.dur.est)]-NI.margin(x))
       }
     }
   } else if (x$family=="survival") {
       if (x$scale=="HR") {
       acceptability<- function(x) {
-        return(0*x+y.dur.est[length(y.dur.est)]*x$NI.margin)
+        return(0*x+y.dur.est[length(y.dur.est)]*NI.margin)
       }
     } else if (x$scale=="AF") {
       acceptability<- function(x) {
-        return(y.dur.est[length(y.dur.est)]*x$NI.margin(x))
+        return(y.dur.est[length(y.dur.est)]*NI.margin(x))
       }
     }
   }
@@ -118,15 +119,14 @@ plot.durations <- function (x, ylim=NULL,
     if (is.null(ylim)) ylim=c(min(x$low.bounds.CI)-0.05*abs(min(x$low.bounds.CI)),
                               max(x$up.bounds.CI)+0.05*abs(max(x$up.bounds.CI)))
     if (x$scale=="AF"){
-      NI.marg<-x$NI.margin
-      plot(x.dur,NI.marg(x.dur), xlim=c(min(x.dur), max(x.dur)), ylim=ylim,
+      plot(x.dur,NI.margin(x.dur), xlim=c(min(x.dur), max(x.dur)), ylim=ylim,
             xaxt="n", yaxt="n", xlab = "Duration", ylab=ylab, type="l", 
             lty=1, col="red", main="Difference from longest duration", ...)
     } else {
       plot(NULL, xlim=c(min(x.dur), max(x.dur)), ylim=ylim,
             xaxt="n", yaxt="n", xlab = "Duration", ylab=ylab, 
             lty=1, col="red", main="Difference from longest duration", ...)
-      abline(h=x$NI.margin, col="red")
+      abline(h=NI.margin, col="red")
     }
     
     axis(side=1, at=x$all.durations, labels=x$all.durations)
