@@ -8,7 +8,7 @@ A function for calculating sample size of a non-inferiority trial.
 }
 \usage{
 sample.size.NI(p0.expected, p1.expected, NI.margin, sig.level=0.025, 
-               power=0.9, r=1, scale="RD", print.out=TRUE, favourable=FALSE)  
+               power=0.9, r=1, scale="RD", print.out=TRUE)  
 }
 \arguments{
 \item{p0.expected}{Expected event risk in the control arm.}
@@ -19,8 +19,7 @@ sample.size.NI(p0.expected, p1.expected, NI.margin, sig.level=0.025,
 \item{r}{Allocation ratio, i.e. ratio between sample sizes in the active and control goups. Deafault is 1.}
 \item{scale}{The scale on which we define the non-inferiority trial. Can be one of "RD" (Risk      difference), "RR" (risk ratio), "OR" (odds ratio) or "AS" (arc-sine difference).}
 \item{print.out}{Logical. If FALSE, no output is printed.}
-\item{favourable}{Logical. If TRUE, the outcome is considered favourable.
-                  Default is FALSE, i.e. unfavourable outcome, e.g. death.}
+
 }
 \details{
  This is a function to calculate sample size needed to test non-inferiority of an active treatment against the control within a specific NI margin. The margin can be specified on a number of different scales. 
