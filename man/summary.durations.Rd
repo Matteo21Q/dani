@@ -31,8 +31,8 @@ y<-rbinom(sam.sizes,1,0.95-(20-durations)*0.01)
 
 data.ex<-data.frame(y,durations)
 
-res1<-analyse.durations(y, durations, family="binomial", 
-                                se.method="delta", all.durations=8:20, scale="RD", 
-                                NI.margin.RD, M.boot=NULL, n.cpus=1)
-summary.durations(res1)
+res1<-analyse.durations(outcomes=y, durations=durations, family="binomial",
+                        se.method="delta", all.durations=8:20, scale="RD", 
+                        NI.margin=NI.margin.RD, M.boot=NULL, n.cpus=1)
+summary(res1)
 }

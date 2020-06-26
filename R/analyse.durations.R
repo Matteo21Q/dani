@@ -1,6 +1,17 @@
-analyse.durations <- function (outcomes, durations, family="binomial", 
+analyse.durations <- function (formula=NULL, data=NULL, outcomes=NULL, durations=NULL, family="binomial", 
                                se.method="bootstrap", all.durations=unique(durations), scale="RD", 
                                NI.margin, M.boot=NULL, n.cpus=1, sig.level=0.025) {
+  
+  if ((is.null(formula)|is.null(data))&(is.null(outcomes)|is.null(durations))) {
+    stop("One of formula+data or outcomes+durations necessary\n")
+  }
+  if ((!is.null(formula)&!is.null(data))&(!is.null(outcomes)|!is.null(durations))) {
+    cat("Ignoring outcomes+durations and using formula+data interface\n")
+  }
+  
+  if(is.null(durations)) durations <- data[,all.vars(formula[[3]])]
+  if(is.null(outcomes)) outcomes <- data[,all.vars(formula[[2]])]
+  
   min.dur<-min(durations)
   n.dur<-length(all.durations)
   max.dur<-max(durations)
@@ -42,10 +53,10 @@ analyse.durations <- function (outcomes, durations, family="binomial",
       # Store predictions on the logodds scale at each of the n.arms durations:
       preds.logodds.fp<-predict(fit, newdata=data.frame(durations=all.durations))
       vcov.fit.fp<-vcov(fit)   # Store variance covariance matrix of parameters
-      up.bounds.CI<-rep(NA,length(poss.durations))
-      low.bounds.CI<-rep(NA,length(poss.durations))
+      up.bounds.CI<-rep(NA,length(all.durations))
+      low.bounds.CI<-rep(NA,length(all.durations))
       
-      for (j in 1:(length(poss.durations))) {
+      for (j in 1:(length(all.durations))) {
         
         if (scale=="RD"||scale=="AF") {
           
@@ -109,11 +120,11 @@ analyse.durations <- function (outcomes, durations, family="binomial",
         min.dur<-min(all.durations)
         invisible(capture.output(y.dur.est<-predict(object=fit.i,newdata=data.frame(durations=x.dur), type="resp")))
         if ((scale=="RD")||(scale=="AF")) {
-          invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=all.durations[n.dur]), type="resp")-predict(fit.i, newdata=data.frame(durations=poss.durations), type="resp")))
+          invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=all.durations[n.dur]), type="resp")-predict(fit.i, newdata=data.frame(durations=all.durations), type="resp")))
         } else if (scale=="RR") {
-          invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=poss.durations), type="resp")/predict(fit.i, newdata=data.frame(durations=all.durations[n.dur]), type="resp")))
+          invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=all.durations), type="resp")/predict(fit.i, newdata=data.frame(durations=all.durations[n.dur]), type="resp")))
         } else if (scale=="rate") {
-          invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=poss.durations), type="resp")))
+          invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=all.durations), type="resp")))
         }
         
         #Define acceptability curve. 
@@ -157,11 +168,22 @@ analyse.durations <- function (outcomes, durations, family="binomial",
       }
       up.bounds.CI<-NULL
       low.bounds.CI<-NULL
-      for (indx in 2:length(results$t0)) {
+      for (indx in 2:(length(results$t0)-1)) {
         res.ci2<-boot.ci(results, conf=1-sig.level*2, type="bca", index=indx)
         up.bounds.CI<-c(up.bounds.CI, res.ci2$bca[5])
         low.bounds.CI<-c(low.bounds.CI, res.ci2$bca[4])
         
+      }
+      if (scale=="rate") {
+        res.ci2<-boot.ci(results, conf=1-sig.level*2, type="bca", index=length(results$t0))
+        up.bounds.CI<-c(up.bounds.CI, res.ci2$bca[5])
+        low.bounds.CI<-c(low.bounds.CI, res.ci2$bca[4])
+      } else if (scale=="RR") {
+        up.bounds.CI<-c(up.bounds.CI, 1)
+        low.bounds.CI<-c(low.bounds.CI, 1)
+      } else {
+        up.bounds.CI<-c(up.bounds.CI, 0)
+        low.bounds.CI<-c(low.bounds.CI, 0)
       }
       
       
@@ -175,17 +197,17 @@ analyse.durations <- function (outcomes, durations, family="binomial",
       if ((scale=="RD")) {
         if ((up.bounds.CI[t]-NI.margin)<0) {
           flag=0
-          min.duration.i<-poss.durations[t]
+          min.duration.i<-all.durations[t]
         }
       } else if ((scale=="RR")|(scale=="rate")) {
         if ((low.bounds.CI[t]-NI.margin)>0) {
           flag=0
-          min.duration.i<-poss.durations[t]
+          min.duration.i<-all.durations[t]
         }
       }else if (scale=="AF") {
-        if ((up.bounds.CI[t]-NI.margin(poss.durations[t]))<0) {
+        if ((up.bounds.CI[t]-NI.margin(all.durations[t]))<0) {
           flag=0
-          min.duration.i<-poss.durations[t]
+          min.duration.i<-all.durations[t]
         }
       }
       t=t+1
@@ -197,10 +219,10 @@ analyse.durations <- function (outcomes, durations, family="binomial",
       # Store predictions on the logodds scale at each of the n.arms durations:
       preds.hr.fp<-predict(fit, newdata=data.frame(durations=all.durations), type = "risk")
       vcov.fit.fp<-vcov(fit)   # Store variance covariance matrix of parameters
-      up.bounds.CI<-rep(NA,length(poss.durations))
-      low.bounds.CI<-rep(NA,length(poss.durations))
+      up.bounds.CI<-rep(NA,length(all.durations))
+      low.bounds.CI<-rep(NA,length(all.durations))
       
-      for (j in 1:(length(poss.durations))) {
+      for (j in 1:(length(all.durations))) {
         
         if (scale=="HR"||scale=="AF") {
           
@@ -236,7 +258,7 @@ analyse.durations <- function (outcomes, durations, family="binomial",
         # Predict duration-response curve and associated pointwise CI
         invisible(capture.output(y.dur.est<-predict(object=fit.i,newdata=data.frame(durations=x.dur), type="risk")))
         if ((scale=="HR")||(scale=="AF")) {
-          invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=poss.durations), type="risk")/predict(fit.i, newdata=data.frame(durations=all.durations[n.dur]), type="risk")))
+          invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=all.durations), type="risk")/predict(fit.i, newdata=data.frame(durations=all.durations[n.dur]), type="risk")))
         } 
         
         acceptability<-function(x) {
@@ -273,12 +295,15 @@ analyse.durations <- function (outcomes, durations, family="binomial",
       }
       up.bounds.CI<-NULL
       low.bounds.CI<-NULL
-      for (indx in 2:length(results$t0)) {
+      for (indx in 2:(length(results$t0)-1)) {
         res.ci2<-boot.ci(results, conf=1-sig.level*2, type="bca", index=indx)
         up.bounds.CI<-c(up.bounds.CI, res.ci2$bca[5])
         low.bounds.CI<-c(low.bounds.CI, res.ci2$bca[4])
         
       }
+      up.bounds.CI<-c(up.bounds.CI, 1)
+      low.bounds.CI<-c(low.bounds.CI, 1)
+     
     }
       
       # What is point where predicted lower CI first crosses acceptability curve?
@@ -288,12 +313,12 @@ analyse.durations <- function (outcomes, durations, family="binomial",
         if (scale=="HR") {
           if ((up.bounds.CI[t]-NI.margin)<0) {
             flag=0
-            min.duration.i<-poss.durations[t]
+            min.duration.i<-all.durations[t]
           }
         }else if (scale=="AF") {
-          if ((up.bounds.CI[t]-NI.margin(poss.durations[t]))<0) {
+          if ((up.bounds.CI[t]-NI.margin(all.durations[t]))<0) {
             flag=0
-            min.duration.i<-poss.durations[t]
+            min.duration.i<-all.durations[t]
           }
         }
         t=t+1
@@ -305,10 +330,10 @@ analyse.durations <- function (outcomes, durations, family="binomial",
         # Store predictions on the logodds scale at each of the n.arms durations:
         preds.fp<-predict(fit, newdata=data.frame(durations=all.durations))
         vcov.fit.fp<-vcov(fit)   # Store variance covariance matrix of parameters
-        up.bounds.CI<-rep(NA,length(poss.durations))
-        low.bounds.CI<-rep(NA,length(poss.durations))
+        up.bounds.CI<-rep(NA,length(all.durations))
+        low.bounds.CI<-rep(NA,length(all.durations))
         
-        for (j in 1:(length(poss.durations))) {
+        for (j in 1:(length(all.durations))) {
           
           if (scale=="diff"||scale=="AF") {
             
@@ -371,11 +396,11 @@ analyse.durations <- function (outcomes, durations, family="binomial",
           # Predict duration-response curve and associated pointwise CI
           invisible(capture.output(y.dur.est<-predict(object=fit.i,newdata=data.frame(durations=x.dur))))
           if ((scale=="diff")||(scale=="AF")) {
-            invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=all.durations[n.dur]))-predict(fit.i,newdata=data.frame(durations=poss.durations))))
+            invisible(capture.output(y.durations<-predict(fit.i, newdata=data.frame(durations=all.durations[n.dur]))-predict(fit.i,newdata=data.frame(durations=all.durations))))
           } else if (scale=="ratio") {
-            invisible(capture.output(y.durations<-predict(fit.i,newdata=data.frame(durations=poss.durations))/predict(fit.i,newdata=data.frame(durations=all.durations[n.dur]))))
+            invisible(capture.output(y.durations<-predict(fit.i,newdata=data.frame(durations=all.durations))/predict(fit.i,newdata=data.frame(durations=all.durations[n.dur]))))
           } else if (scale=="target") {
-            invisible(capture.output(y.durations<-predict(fit.i,newdata=data.frame(durations=poss.durations))))
+            invisible(capture.output(y.durations<-predict(fit.i,newdata=data.frame(durations=all.durations))))
           }
           
           acceptability<-function(x) {
@@ -415,13 +440,23 @@ analyse.durations <- function (outcomes, durations, family="binomial",
         }
         up.bounds.CI<-NULL
         low.bounds.CI<-NULL
-        for (indx in 2:length(results$t0)) {
+        for (indx in 2:(length(results$t0)-1)) {
           res.ci2<-boot.ci(results, conf=1-sig.level*2, type="bca", index=indx)
           up.bounds.CI<-c(up.bounds.CI, res.ci2$bca[5])
           low.bounds.CI<-c(low.bounds.CI, res.ci2$bca[4])
           
         }
-        
+        if (scale=="target") {
+          res.ci2<-boot.ci(results, conf=1-sig.level*2, type="bca", index=length(results$t0))
+          up.bounds.CI<-c(up.bounds.CI, res.ci2$bca[5])
+          low.bounds.CI<-c(low.bounds.CI, res.ci2$bca[4])
+        } else if (scale=="ratio") {
+          up.bounds.CI<-c(up.bounds.CI, 1)
+          low.bounds.CI<-c(low.bounds.CI, 1)
+        } else {
+          up.bounds.CI<-c(up.bounds.CI, 0)
+          low.bounds.CI<-c(low.bounds.CI, 0)
+        }
         
         
       }
@@ -429,21 +464,21 @@ analyse.durations <- function (outcomes, durations, family="binomial",
       # What is point where predicted lower CI first crosses acceptability curve?
       flag=t=1
       min.duration.i<-max.dur
-      while ((t<length(poss.durations))&(flag==1)) {
+      while ((t<length(all.durations))&(flag==1)) {
         if ((scale=="diff")) {
           if ((up.bounds.CI[t]-NI.margin)<0) {
             flag=0
-            min.duration.i<-poss.durations[t]
+            min.duration.i<-all.durations[t]
           }
         } else if ((scale=="ratio")|(scale=="target")) {
           if ((low.bounds.CI[t]-NI.margin)>0) {
             flag=0
-            min.duration.i<-poss.durations[t]
+            min.duration.i<-all.durations[t]
           }
         }else if (scale=="AF") {
-          if ((up.bounds.CI[t]-NI.margin(poss.durations[t]))<0) {
+          if ((up.bounds.CI[t]-NI.margin(all.durations[t]))<0) {
             flag=0
-            min.duration.i<-poss.durations[t]
+            min.duration.i<-all.durations[t]
           }
         }
         t=t+1

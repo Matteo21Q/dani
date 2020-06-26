@@ -8,18 +8,25 @@ Function to analyse a DURATIONS randomised trial.
 A function that can be used to analyse a DURATIONS randomised trial design using one of several possible analysis methods. 
 }
 \usage{
-analyse.durations(outcomes, durations, family="binomial", 
-                  se.method="bootstrap", all.durations=unique(durations),
+analyse.durations(formula=NULL, data=NULL, outcomes=NULL, durations=NULL,
+                  family="binomial", se.method="bootstrap", 
+                  all.durations=unique(durations),
                   scale="RD", NI.margin, M.boot=NULL, n.cpus=1, 
                   sig.level=0.025)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
+\item{formula}{
+  The formula for the outcome model. Variable indicating duration has to be put within brackets and precededby dur, e.g. dur(durations).
+}
+\item{data}{
+A data.frame with all data.
+}
   \item{outcomes}{
-  The outcome(s) of the analysis model. If the outcome is binary or continuous, this is expected to be a vector, if it is time-to-event it is a data frame with survival time and event indicator. 
+  The outcome(s) of the analysis model. If the outcome is binary or continuous, this is expected to be a vector, if it is time-to-event it is a data frame with survival time and event indicator. Used only when formula and data are not specified. 
 }
   \item{durations}{
-  A vector with the durations randomised. 
+  A vector with the durations randomised. Used only when formula and data are not specified. 
 }
   \item{family}{
   The type of outcome. Can be one of "binomial", "survival" or "gaussian". 
@@ -61,10 +68,11 @@ durations<-sample(dur.arms,sam.sizes,rep=TRUE)
 y<-rbinom(sam.sizes,1,0.95-(20-durations)*0.01)
 
 data.ex<-data.frame(y,durations)
+myformula<-as.formula(y~dur(durations))
 
-res1<-analyse.durations(y, durations, family="binomial", 
-                                se.method="delta", all.durations=8:20, scale="RD", 
-                                NI.margin.RD, M.boot=NULL, n.cpus=1)
+res1<-analyse.durations(formula=myformula, data=data.ex, family="binomial",
+                        se.method="delta", all.durations=8:20, scale="RD", 
+                        NI.margin=NI.margin.RD, M.boot=NULL, n.cpus=1)
 
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

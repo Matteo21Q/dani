@@ -92,7 +92,7 @@ plot.durations <- function (x, ylim=NULL,
          labels=x$all.durations)
     axis(side=1, at=x$min.dur.boot, labels=x$min.dur.boot,
          col.axis="red", col.ticks = "red")
-    plot(x.dur,acceptability(x.dur), type="l", add=T, col="red")
+    lines(x.dur,acceptability(x.dur), type="l", col="red")
     segments(x$low.bound.dur,ylim[1], 
              x$up.bound.dur, ylim[1], lwd=2)
     segments(x$up.bound.dur,ylim[1], 
