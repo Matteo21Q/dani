@@ -42,6 +42,10 @@ summary.durations <- function (object, ...) {
   cat("Recommended duration with selected NI margin: ", object$min.duration, "\n")
   if (!is.null(object$min.dur.boot)) cat("Or, using Bootstrap Duration CI: ",
                                                   object$min.dur.boot, "\n")
+  results<-data.frame(arms,best.est,object$low.bounds.CI,object$up.bounds.CI)
+  opt.dur<-object$min.dur.boot
+  output<-list(results=results, opt.dur=opt.dur)
+  invisible(output)
 }
 
   
