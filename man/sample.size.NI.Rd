@@ -8,7 +8,7 @@ A function for calculating sample size of a non-inferiority trial.
 }
 \usage{
 sample.size.NI(p0.expected, p1.expected, NI.margin, sig.level=0.025, 
-               power=0.9, r=1, scale="RD", print.out=TRUE)  
+               power=0.9, r=1, scale="RD", print.out=TRUE, var.type="AA")  
 }
 \arguments{
 \item{p0.expected}{Expected event risk in the control arm.}
@@ -19,6 +19,7 @@ sample.size.NI(p0.expected, p1.expected, NI.margin, sig.level=0.025,
 \item{r}{Allocation ratio, i.e. ratio between sample sizes in the active and control goups. Deafault is 1.}
 \item{scale}{The scale on which we define the non-inferiority trial. Can be one of "RD" (Risk      difference), "RR" (risk ratio), "OR" (odds ratio) or "AS" (arc-sine difference).}
 \item{print.out}{Logical. If FALSE, no output is printed.}
+\item{var.type}{A string that indicates whether the variance in the sample size calculation is calculate dunder the null or the alternative for the two terms in the formula: the first is that multiplied by z_alpha, the second that multiplied by z_beta. Can be either "AA", "NA" or "NN". "AA" is appropriate for the Wald test, "NA" for the score test. Defaults to "AA".}
 
 }
 \details{
