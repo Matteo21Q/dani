@@ -1,6 +1,6 @@
 analyse.durations <- function (formula=NULL, data=NULL, outcomes=NULL, durations=NULL, family="binomial", 
                                se.method="bootstrap", all.durations=unique(durations), scale="RD", 
-                               NI.margin, M.boot=NULL, n.cpus=1, sig.level=0.025) {
+                               NI.margin, M.boot=NULL, parallel="snow", n.cpus=1, sig.level=0.025) {
   
   if ((is.null(formula)|is.null(data))&(is.null(outcomes)|is.null(durations))) {
     stop("One of formula+data or outcomes+durations necessary\n")
@@ -158,7 +158,7 @@ analyse.durations <- function (formula=NULL, data=NULL, outcomes=NULL, durations
         return(output)
       }
       
-      results<-boot(data.mfp,find.min.dur,M.boot, parallel = "multicore", ncpus=n.cpus)
+      results<-boot(data.mfp,find.min.dur,M.boot, parallel = parallel, ncpus=n.cpus)
       if (length(unique(results$t[,1])) > 1) {
         res.ci<-boot.ci(results, conf=1-sig.level*2, type="perc", index=1)
         min.duration<- res.ci$perc[5]
@@ -285,7 +285,7 @@ analyse.durations <- function (formula=NULL, data=NULL, outcomes=NULL, durations
         return(output)
       }
       
-      results<-boot(data.mfp,find.min.dur,M.boot, parallel = "multicore", ncpus=n.cpus)
+      results<-boot(data.mfp,find.min.dur,M.boot, parallel = parallel, ncpus=n.cpus)
       if (length(unique(results$t[,1])) > 1) {
         res.ci<-boot.ci(results, conf=1-sig.level*2, type="perc", index=1)
         min.duration<- res.ci$perc[5]
@@ -430,7 +430,7 @@ analyse.durations <- function (formula=NULL, data=NULL, outcomes=NULL, durations
           return(output)
         }
         
-        results<-boot(data.mfp,find.min.dur,M.boot, parallel = "multicore", ncpus=n.cpus)
+        results<-boot(data.mfp,find.min.dur,M.boot, parallel = parallel, ncpus=n.cpus)
         if (length(unique(results$t[,1])) > 1) {
           res.ci<-boot.ci(results, conf=1-sig.level*2, type="perc", index=1)
           min.duration<- res.ci$perc[5]

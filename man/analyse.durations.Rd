@@ -11,7 +11,7 @@ A function that can be used to analyse a DURATIONS randomised trial design using
 analyse.durations(formula=NULL, data=NULL, outcomes=NULL, durations=NULL,
                   family="binomial", se.method="bootstrap", 
                   all.durations=unique(durations),
-                  scale="RD", NI.margin, M.boot=NULL, n.cpus=1, 
+                  scale="RD", NI.margin, M.boot=NULL, parallel="snow", n.cpus=1, 
                   sig.level=0.025)
 }
 %- maybe also 'usage' for other objects documented here.
@@ -45,6 +45,9 @@ A data.frame with all data.
 }
   \item{M.boot}{
   Number of bootstrap samples if using se.method="bootstrap". 
+}
+ \item{parallel}{
+  If using bootstrap, this gives the chance to parallelise calculations. Use parallel="snow" with windows, or parallel="multicore" with Linux. See help page for the boot function.  
 }
   \item{n.cpus}{
   If using bootstrap, this gives the chance to parallelise over n.cpus cpus. 
