@@ -2,9 +2,12 @@ import(stats)
 import(boot)
 import(survival)
 import(graphics)
+import(DescTools)
+import(ratesci)
+import(exact2x2)
+import(marginaleffects)
 importFrom("utils","capture.output")
 importFrom("graphics", "abline", "lines", "plot")
-importFrom("Epi", "ci.pd")
 
 export(sample.size.NI, 
 	   test.NI, 

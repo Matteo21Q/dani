@@ -10,7 +10,7 @@ power.NI.frontier <- function(p0.expected, p1.expected, NI.frontier, sample.size
               1, p1.expected <= 1, p0.expected >= 0, p1.expected >= 0,
             r > 0, is.function(NI.frontier), length(formals(NI.frontier))==1,
             is.vector(sample.size),sample.size[1]>0, sample.size[2]>0,
-            threshold.modify>0, threshold.relevance>0)
+            threshold.modify>=0, threshold.relevance>0)
   if (is.null(alt.hyp.frontier)) {
     alt.hyp.frontier<-function(p) {
       return(p)

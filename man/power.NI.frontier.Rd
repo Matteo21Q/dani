@@ -76,7 +76,7 @@ arcsine.frontier<-function(pio0) {
 }
 
 # Commented out because of CRAN policy on examples. 
-# res7<-power.NI.frontier(p0.expected, p1.expected, arcsine.frontier, ss, r,range.of.p0)
-res7<-power.NI.frontier(p0.expected, p1.expected, arcsine.frontier, ss, r,range.of.p0=c(0.045,0.05))
+# res7<-power.NI.frontier(p0.expected=p0.expected, p1.expected=p1.expected, NI.frontier=arcsine.frontier, sample.size=ss, r=r,range.of.p0=range.of.p0)
+res7<-power.NI.frontier(p0.expected=p0.expected, p1.expected=p1.expected, NI.frontier=arcsine.frontier, sample.size=ss, r=r,range.of.p0=c(0.045,0.05))
 
 }

@@ -8,8 +8,8 @@ A function for calculating sample size of a non-inferiority trial.
 }
 \usage{
 sample.size.NI(p0.expected, p1.expected, NI.margin, sig.level=0.025, 
-               power=0.9, r=1, scale="RD", print.out=TRUE, var.type="AA",
-               unfavourable=T)  
+               power=0.9, r=1, scale="RD", print.out=TRUE, test.type="Wald",
+               unfavourable=T, cont.corr=FALSE)  
 }
 \arguments{
 \item{p0.expected}{Expected event risk in the control arm.}

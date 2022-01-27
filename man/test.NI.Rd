@@ -8,7 +8,8 @@
 }
 \usage{
   test.NI(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD", 
-          print.out=TRUE, favourable=FALSE )  
+          print.out=TRUE, unfavourable=TRUE, test.type="Wald",
+          M.boot=2000, BB.adj=0.0001 )  
 }
 \arguments{
   \item{e0}{Number of events in the control arm.}
@@ -19,17 +20,18 @@
   \item{sig.level}{One-sided significance level for testing. Default is 0.025, i.e. 2.5\%.}
   \item{scale}{The scale on which we define the non-inferiority margin. Can be one of "RD" (Risk      difference), "RR" (risk ratio) or "AS" (arc-sine difference).}
   \item{print.out}{Logical. If FALSE, no output is printed.}
-  \item{favourable}{Logical. If TRUE, the outcome is considered favourable.
-                  Default is FALSE, i.e. unfavourable outcome, e.g. death.}
-
+  \item{unfavourable}{Logical. If FALSE, the outcome is considered favourable.
+                  Default is TRUE, i.e. unfavourable outcome, e.g. death.}
+  \item{test.type}{A character string defining the method to be used for calculation of the confidence interval. For the risk difference, methods available include "Wald", "Wald.cc" (with continuity correction), "Hauck.Anderson", "Gart.Nam", "Newcombe10", "Newcombe11", "Haldane", "Jeffrey.Perks", "Agresti.Caffo", "Miettinen.Nurminen", "Farrington.Manning", "logistic", "bootstrap", "Agresti.Min", "Brown.Li.Jeffreys", "Chan.Zhang", "BLNM", "midp", "Berger.Boos", "MUE.Lin", "MUE.parametric.bootstrap"}
+  \item{M.boot}{ Number of bootstrap samples for "bootstrap and "MUE.parametric.bootstrap" methods}
+  \item{BB.adj}{Adjustment factor for "Berger.Boos" method.}
 }
 \details{
   This is a function to test non-inferiority of an active treatment against the control within a specific NI margin. The margin can be specified on a number of different scales. 
 }
 
 \value{
-  The output is a list, containing the estimate, standard error, cofidence interval (two-sided 2*alpha level), Z statistic and p-value. For the risk difference scale, the CI is provided both with the standard normal approximation and using Newcombe 10 method, as per function ci.pd in package Epi.
-  
+  The output is a list, containing the estimate, standard error, cofidence interval (two-sided 2*alpha level), Z statistic and p-value.
 }
 
 \examples{
