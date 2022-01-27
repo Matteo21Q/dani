@@ -8,18 +8,21 @@ A function for calculating sample size of a non-inferiority trial.
 }
 \usage{
 sample.size.NI(p0.expected, p1.expected, NI.margin, sig.level=0.025, 
-               power=0.9, r=1, scale="RD", print.out=TRUE, var.type="AA")  
+               power=0.9, r=1, scale="RD", print.out=TRUE, var.type="AA",
+               unfavourable=T)  
 }
 \arguments{
 \item{p0.expected}{Expected event risk in the control arm.}
 \item{p1.expected}{Expected event risk in the active arm.}
 \item{NI.margin}{Non-inferiority margin. Can be either risk difference, risk ratio, odds ratio or arc-sine difference.}
 \item{sig.level}{One-sided significance level for testing. Default is 0.025, i.e. 2.5\%.}
-\item{power}{Power of the trial, i.e. one minus type-II error of the study. Default is 0.9, i.e.90\%.  }
-\item{r}{Allocation ratio, i.e. ratio between sample sizes in the active and control goups. Deafault is 1.}
-\item{scale}{The scale on which we define the non-inferiority trial. Can be one of "RD" (Risk      difference), "RR" (risk ratio), "OR" (odds ratio) or "AS" (arc-sine difference).}
+\item{power}{Power of the trial, i.e. one minus type-II error of the study. Default is 0.9, i.e. 90\%.  }
+\item{r}{Allocation ratio, i.e. ratio between sample sizes in the active and control goups. Default is 1.}
+\item{scale}{The scale on which we define the non-inferiority trial, i.e. the population-level summary measure to summarise information on the outcome. Can be one of "RD" (Risk      difference), "RR" (risk ratio), "OR" (odds ratio) or "AS" (arc-sine difference).}
 \item{print.out}{Logical. If FALSE, no output is printed.}
-\item{var.type}{A string that indicates whether the variance in the sample size calculation is calculate dunder the null or the alternative for the two terms in the formula: the first is that multiplied by z_alpha, the second that multiplied by z_beta. Can be either "AA", "NA" or "NN". "AA" is appropriate for the Wald test, "NA" for the score test. Defaults to "AA".}
+\item{test.type}{A string that indicates the type of test to be assumed for the sample size calculation. Currently, three options are supported: "Wald", "score" and "local".}
+\item{unfavourable}{A logical variable. If TRUE, the outcome is considered unfavourable. This is used to check that the NI margin specified is meaningful.}
+\item{cont.corr}{A logical variable. If TRUE, a continuity correction is applied. This is currently supported for the risk difference scale only.}
 
 }
 \details{
