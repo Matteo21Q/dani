@@ -29,7 +29,6 @@ test.NI <- function(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD",
     se <- se.n <- sqrt(e1/n1*(1-e1/n1)/n1+e0/n0*(1-e0/n0)/n0)
     estimate <- estimate.n <- e1/n1-e0/n0
     Z <- (estimate - NIm)/se
-    p <- pnorm(Z)
     if (test.type=="Wald") {
       CI <- c(estimate-qnorm(1-sig.level)*se,estimate+qnorm(1-sig.level)*se)
     } else if (test.type=="Wald.cc") {
@@ -38,83 +37,39 @@ test.NI <- function(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD",
               estimate+(qnorm(1-sig.level)*se+(1/n0+1/n1)/2))
       } else if (test.type=="Newcombe10") {
       CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "score")[2:3]
-      estimate.n<-sum(CI)/2
-      se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-      Z <- (estimate.n - NIm)/se.n
-      p <- pnorm(Z)
-      
+
       } else if (test.type=="Newcombe11") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "scorecc")[2:3]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="Gart.Nam") {
         CI <- scasci(e1,n1,e0,n0, level=(1-sig.level*2))$estimates[c(1,3)]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="Agresti.Caffo") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "ac")[2:3]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="Haldane") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "hal")[2:3]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="Hauck.Anderson") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "ha")[2:3]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="Jeffreys.Perks") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "jp")[2:3]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="Miettinen.Nurminen") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "mn")[2:3]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="Farrington.Manning") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "mee")[2:3]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="Brown.Li.Jeffreys") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "blj")[2:3]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="BLNM") {
         CI1 <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "blj")[2:3]
         CI2 <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "mn")[2:3]
         CI <- CI1/3 + 2 * CI2/3
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type=="logistic") {
         y<-c(rep(1, e1),rep(0, n1-e1),rep(1, e0), rep(0, n0-e0))
         treat<-factor(c(rep(1,n1), rep(0, n0)))
@@ -122,11 +77,7 @@ test.NI <- function(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD",
         fit<-glm(y~treat, data=dd, family = binomial)
         fit.std <- summary(marginaleffects(fit))
         CI <- as.numeric(fit.std[7:8])
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if ( test.type == "bootstrap") {
         y<-c(rep(1, e1),rep(0, n1-e1),rep(1, e0), rep(0, n0-e0))
         treat<-factor(c(rep(1,n1), rep(0, n0)))
@@ -138,43 +89,23 @@ test.NI <- function(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD",
         } 
         res.b<-boot(dd, rdif, R=M.boot)
         CI<-boot.ci(res.b, type="perc")$percent[4:5]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type == "Agresti.Min") {
         fit<-uncondExact2x2(e0,n0,e1,n1, method="score", tsmethod = "square", conf.int = T)
         CI <- as.numeric(fit$conf.int)
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type == "Chan.Zhang") {
         fit<-uncondExact2x2(e0,n0,e1,n1, method="score", tsmethod = "central", conf.int = T)
         CI <- as.numeric(fit$conf.int)
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type == "midp") {
         fit<-uncondExact2x2(e0,n0,e1,n1, method="score", tsmethod = "square", midp=T, conf.int = T)
         CI <- as.numeric(fit$conf.int)
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type == "Berger.Boos") {
         fit<-uncondExact2x2(e0,n0,e1,n1, method="score", tsmethod = "square", gamma=BB.adj, conf.int = T)
         CI <- as.numeric(fit$conf.int)
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-        
+
       } else if (test.type == "MUE.Lin") {
         p0.tilde<-ifelse(((e0>0)&&(e0<n0)),(qbeta(0.5,e0,n0-e0+1)+qbeta(0.5,e0+1,n0-e0))/2,
                            ifelse(e0==0,(1-0.5^(1/n0))/2,(1+0.5^(1/n0))/2))
@@ -207,11 +138,8 @@ test.NI <- function(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD",
         ci.u.u<-min(which(probs.mat[,5]>=(1-sig.level)))
         ci.u<-(probs.mat[ci.u.l,4]*(probs.mat[ci.u.u,5]-(1-sig.level))+probs.mat[ci.u.u,4]*(-probs.mat[ci.u.l,5]+1-sig.level))/(probs.mat[ci.u.u,5]-probs.mat[ci.u.l,5])
         CI<-c(ci.l,ci.u)
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-      } else if (test.type == "MUE.parametric.bootstrap") {
+  
+              } else if (test.type == "MUE.parametric.bootstrap") {
         p0.tilde<-ifelse(((e0>0)&&(e0<n0)),(qbeta(0.5,e0,n0-e0+1)+qbeta(0.5,e0+1,n0-e0))/2,
                          ifelse(e0==0,(1-0.5^(1/n0))/2,(1+0.5^(1/n0))/2))
         p1.tilde<-ifelse(((e1>0)&&(e1<n1)),(qbeta(0.5,e1,n1-e1+1)+qbeta(0.5,e1+1,n1-e1))/2,
@@ -239,12 +167,13 @@ test.NI <- function(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD",
         res.b<-boot(dd, rdif, R = M.boot, sim = "parametric",
                     ran.gen = rg, mle = c(p0.tilde,n0,p1.tilde,n1))
         CI<-boot.ci(res.b, type="perc")$percent[4:5]
-        estimate.n<-sum(CI)/2
-        se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
-        Z <- (estimate.n - NIm)/se.n
-        p <- pnorm(Z)
-      }
-  
+        
+              }
+    estimate.n<-sum(CI)/2
+    se.n<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
+    Z <- ifelse(unfavourable==T,(estimate.n - NIm)/se.n,(-estimate.n + NIm)/se.n)
+    p <- pnorm(Z)
+    
     if (print.out==T) cat("Risk difference:\nMethod = ",test.type,",\n Estimate: ", estimate.n, "\nStandard error: ", se.n, "\nConfidence interval (Two-sided ", (1-sig.level*2)*100,"%): (", CI[1], ",", CI[2], ")\np-value:", p, ".\n" )
     
   } else if (scale == "RR") {
