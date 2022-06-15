@@ -17,7 +17,7 @@ test.NI <- function(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD",
                                       (test.type == "Farrington.Manning") || (test.type == "logistic") ||
                                       (test.type == "bootstrap") || (test.type=="Agresti.Min") ||
                                       (test.type == "Brown.Li.Jeffreys") || (test.type=="Chan.Zhang") ||
-                                      (test.type == "BLNM") ||
+                                      (test.type == "BLNM") ||(test.type == "Mee") ||
                                       (test.type == "midp") || (test.type=="Berger.Boos") ||
                                       (test.type == "MUE.Lin") || (test.type == "MUE.parametric.bootstrap")))
   stopifnot(is.logical(unfavourable), !is.na(unfavourable))
@@ -59,9 +59,12 @@ test.NI <- function(n0, n1, e0, e1, NI.margin, sig.level=0.025, scale="RD",
       } else if (test.type=="Miettinen.Nurminen") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "mn")[2:3]
 
-      } else if (test.type=="Farrington.Manning") {
+      } else if (test.type=="Mee") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "mee")[2:3]
 
+      } else if (test.type=="Farrington.Manning") {
+        CI <- farrington.manning(c(rep(TRUE, e1), rep(FALSE, n1-e1)),c(rep(TRUE, e0), rep(FALSE, n0-e0)), delta=NI.margin, alpha = sig.level, alternative = "greater")$conf.int
+        
       } else if (test.type=="Brown.Li.Jeffreys") {
         CI <- BinomDiffCI(e1, n1, e0, n0, conf.level = (1-sig.level*2), method = "blj")[2:3]
 
