@@ -1,12 +1,13 @@
 Package: dani
 Type: Package
 Title: Design and Analysis of Non-Inferiority Trials
-Version: 0.3-1
-Date: 2022-01-24
+Version: 1.0-0
+Date: 2023-07-13
 Author: Matteo Quartagno
 Maintainer: Matteo Quartagno <m.quartagno@ucl.ac.uk>
-Description: Provides tools to help the design and analysis of resilient non-inferiority trials. These include functions for sample size 
- calculations and analyses of trials, using either a risk difference, risk ratio or arc-sine difference margin, and functions to run simulations to 
- design a trial with the methods described in Quartagno et al. (2019) <arXiv:1905.00241>.  
+Description: Provides tools to help with the design and analysis of non-inferiority trials. These include functions for doing sample size 
+ calculations and for analysing non-inferiority trials, using a variety of outcome types and population-level sumamry measures. It also features 
+ functions to make trials more resilient by using the concept of non-inferiority frontiers, as described in Quartagno et al. (2019) <arXiv:1905.00241>. 
+Finally it includes function to design and analyse MAMS-ROCI (aka DURATIONS) trials. 
 License: GPL-2
-Imports: boot, survival, graphics, DescTools,  ratesci, exact2x2, marginaleffects
+Imports: boot, survival, graphics, DescTools,  ratesci, exact2x2, marginaleffects, mfp

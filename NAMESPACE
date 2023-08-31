@@ -6,20 +6,27 @@ import(DescTools)
 import(ratesci)
 import(exact2x2)
 import(marginaleffects)
+import(mfp)
 importFrom("utils","capture.output")
 importFrom("graphics", "abline", "lines", "plot")
-
-export(sample.size.NI, 
-	   test.NI, 
-	   arcsine.margin, 
-	   power.NI.frontier, 
-	   type1error.NI.frontier, 
-	   analyse.durations, 
-	   plot.durations, 
-	   summary.durations, 
+export(samplesize.NI.binary,
+       samplesize.NI.survival,
+       samplesize.NI.continuous,
+       samplesize.NIfrontier.binary,
+       samplesize.ROCI.binary,	   
+	   test.NI.binary,
+	   test.NI.continuous,
+       test.NI.survival,
+       test.NIfrontier.binary,
+       test.ROCI.binary,	   
+	   arcsine.margin,
+       compare.NIfrontier.binary,
+       compare.NIfrontier.survival,	   
+	   power.NIfrontier.binary,
+       power.ROCI.binary,	   
+	   plot.ROCI, 
+	   summary.ROCI,
+       fracpoly1fix,	   
 	   fracpoly2fix)
-
-	   
-
-S3method(plot,durations)
-S3method(summary,durations)
+S3method(plot,ROCI)
+S3method(summary,ROCI)
