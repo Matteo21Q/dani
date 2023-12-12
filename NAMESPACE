@@ -19,14 +19,13 @@ export(samplesize.NI.binary,
        test.NI.survival,
        test.NIfrontier.binary,
        test.ROCI.binary,	   
-	   arcsine.margin,
+	   convertmargin.binary,
+	   convertmargin.continuous,
+	   convertmargin.survival,
        compare.NIfrontier.binary,
-       compare.NIfrontier.survival,	   
-	   power.NIfrontier.binary,
-       power.ROCI.binary,	   
+       compare.NIfrontier.survival,
+       compare.NIfrontier.continuous,	   
 	   plot.ROCI, 
-	   summary.ROCI,
-       fracpoly1fix,	   
-	   fracpoly2fix)
+	   summary.ROCI)
 S3method(plot,ROCI)
 S3method(summary,ROCI)

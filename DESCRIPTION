@@ -2,7 +2,7 @@ Package: dani
 Type: Package
 Title: Design and Analysis of Non-Inferiority Trials
 Version: 1.0-0
-Date: 2023-07-13
+Date: 2023-12-12
 Author: Matteo Quartagno
 Maintainer: Matteo Quartagno <m.quartagno@ucl.ac.uk>
 Description: Provides tools to help with the design and analysis of non-inferiority trials. These include functions for doing sample size 
