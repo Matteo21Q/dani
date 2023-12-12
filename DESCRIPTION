@@ -8,6 +8,6 @@ Maintainer: Matteo Quartagno <m.quartagno@ucl.ac.uk>
 Description: Provides tools to help with the design and analysis of non-inferiority trials. These include functions for doing sample size 
  calculations and for analysing non-inferiority trials, using a variety of outcome types and population-level sumamry measures. It also features 
  functions to make trials more resilient by using the concept of non-inferiority frontiers, as described in Quartagno et al. (2019) <arXiv:1905.00241>. 
-Finally it includes function to design and analyse MAMS-ROCI (aka DURATIONS) trials. 
+ Finally it includes function to design and analyse MAMS-ROCI (aka DURATIONS) trials. 
 License: GPL-2
 Imports: boot, survival, graphics, DescTools,  ratesci, exact2x2, marginaleffects, mfp
