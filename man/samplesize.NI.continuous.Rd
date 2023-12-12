@@ -10,7 +10,8 @@ A function for calculating sample size of a non-inferiority trial whose primary 
 samplesize.NI.continuous(mean.control, mean.experim, sd, NI.margin, 
                          sig.level = 0.025, power = 0.9, r = 1, 
                          summary.measure = "mean.difference", print.out = TRUE, 
-                         test.type=NULL, higher.better=T)   
+                         test.type=NULL, higher.better=T,
+                         round=T, ltfu=0)   
 }
 \arguments{
 \item{mean.control}{Assumed mean in the control arm.}
@@ -28,6 +29,8 @@ samplesize.NI.continuous(mean.control, mean.experim, sd, NI.margin,
   \item{test.type}{A character string defining the method to be used for sampel size calculations. For the mean difference, methods available include "Z.test" and "t.test".
   For the mean ratio, methods available include "Fiellers" test, "log.t.test" or "log.Z.test".
  }
+ \item{round}{A logical variable. If TRUE, sample sizes are rounded to the next integer, using the ceiling function. Otherwise, they are left unrounded.}
+\item{ltfu}{A numeric variable with the expected proportion of patients lost to follow-up. Default is 0.}
 
 }
 \details{

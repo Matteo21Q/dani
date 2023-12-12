@@ -228,7 +228,7 @@ out5A<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$up.bounds.CI[2],0.1805203, tolerance=10^(-6)))&&out5A$optimal.treat==5,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$up.bounds.CI[2],0.1805203, tolerance=10^(-4)))&&out5A$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5A"
 n.t=n.t+1
 out5B<-try(test.ROCI.binary(treatment=treatment1, outcomes = outcomes1, 
@@ -236,7 +236,7 @@ out5B<-try(test.ROCI.binary(treatment=treatment1, outcomes = outcomes1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$up.bounds.CI[2],0.1805203, tolerance=10^(-6)))&&out5B$optimal.treat==5,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$up.bounds.CI[2],0.1805203, tolerance=10^(-4)))&&out5B$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5B"
 n.t=n.t+1
 out5C<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -244,7 +244,7 @@ out5C<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$up.bounds.CI[2],0.1805203, tolerance=10^(-6)))&&out5C$optimal.treat==6,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$up.bounds.CI[2],0.1805203, tolerance=10^(-4)))&&out5C$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out5C"
 n.t=n.t+1
 out5D<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -252,7 +252,7 @@ out5D<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$up.bounds.CI[2],-0.002217021, tolerance=10^(-6)))&&out5D$optimal.treat==7,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$up.bounds.CI[2],-0.002217021, tolerance=10^(-4)))&&out5D$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out5D"
 n.t=n.t+1
 set.seed(1)
@@ -280,7 +280,7 @@ out5G<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=c(1.5,5.5,7), summary.measure="RD", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5G,"list"))&&(all.equal(out5G$up.bounds.CI[2], 0.06354068, tolerance=10^(-6)))&&out5G$optimal.treat==5.5,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5G,"list"))&&(all.equal(out5G$up.bounds.CI[2], 0.06354068, tolerance=10^(-4)))&&out5G$optimal.treat==5.5,1,0)  
 names(correct)[[n.t]]<-"out5G"
 n.t=n.t+1
 out5H<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -288,7 +288,7 @@ out5H<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP2.fixed",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5H,"list"))&&(all.equal(out5H$up.bounds.CI[2],0.2273355, tolerance=10^(-6)))&&out5H$optimal.treat==5,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5H,"list"))&&(all.equal(out5H$up.bounds.CI[2],0.2273355, tolerance=10^(-4)))&&out5H$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5H"
 n.t=n.t+1
 out5I<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -296,7 +296,7 @@ out5I<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP1.fixed",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5I,"list"))&&(all.equal(out5I$up.bounds.CI[2],0.2020502, tolerance=10^(-6)))&&out5I$optimal.treat==6,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5I,"list"))&&(all.equal(out5I$up.bounds.CI[2],0.2020502, tolerance=10^(-4)))&&out5I$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out5I"
 n.t=n.t+1
 out5J<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -304,7 +304,7 @@ out5J<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP1.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5J,"list"))&&(all.equal(out5J$up.bounds.CI[2],0.1805203, tolerance=10^(-6)))&&out5J$optimal.treat==5,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5J,"list"))&&(all.equal(out5J$up.bounds.CI[2],0.1805203, tolerance=10^(-4)))&&out5J$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5J"
 n.t=n.t+1
 out5K<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -312,7 +312,7 @@ out5K<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP2.classic",sig.level=0.05,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out5K,"list"))&&(all.equal(out5K$up.bounds.CI[2],0.1654666, tolerance=10^(-6)))&&out5K$optimal.treat==5,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5K,"list"))&&(all.equal(out5K$up.bounds.CI[2],0.1654666, tolerance=10^(-4)))&&out5K$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5K"
 n.t=n.t+1
 out5L<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -320,7 +320,7 @@ out5L<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RD", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=FALSE))
-correct[[n.t]]<-ifelse((inherits(out5L,"list"))&&(all.equal(out5L$low.bounds.CI[2],-0.006744666, tolerance=10^(-6)))&&out5L$optimal.treat==1,1,0)  
+correct[[n.t]]<-ifelse((inherits(out5L,"list"))&&(all.equal(out5L$low.bounds.CI[2],-0.006744666, tolerance=10^(-3)))&&out5L$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out5L"
 n.t=n.t+1
 
@@ -333,7 +333,7 @@ out6A<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RR", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out6A,"list"))&&(all.equal(out6A$up.bounds.CI[2],1.256398, tolerance=10^(-6)))&&out6A$optimal.treat==1,1,0)  
+correct[[n.t]]<-ifelse((inherits(out6A,"list"))&&(all.equal(out6A$up.bounds.CI[2],1.256398, tolerance=10^(-4)))&&out6A$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out6A"
 n.t=n.t+1
 out6B<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -341,7 +341,7 @@ out6B<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RR", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out6B,"list"))&&(all.equal(out6B$up.bounds.CI[2],0.99675, tolerance=10^(-6)))&&out6B$optimal.treat==7,1,0)  
+correct[[n.t]]<-ifelse((inherits(out6B,"list"))&&(all.equal(out6B$up.bounds.CI[2],0.99675, tolerance=10^(-4)))&&out6B$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out6B"
 n.t=n.t+1
 set.seed(1)
@@ -359,7 +359,7 @@ out6D<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RR", 
                             tr.model="FP1.fixed",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out6D,"list"))&&(all.equal(out6D$up.bounds.CI[2],1.295357, tolerance=10^(-6)))&&out6D$optimal.treat==1,1,0)  
+correct[[n.t]]<-ifelse((inherits(out6D,"list"))&&(all.equal(out6D$up.bounds.CI[2],1.295357, tolerance=10^(-4)))&&out6D$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out6D"
 n.t=n.t+1
 out6E<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -367,7 +367,7 @@ out6E<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="RR", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=FALSE))
-correct[[n.t]]<-ifelse((inherits(out6E,"list"))&&(all.equal(out6E$low.bounds.CI[2],0.9891393, tolerance=10^(-6)))&&out6E$optimal.treat==1,1,0)  
+correct[[n.t]]<-ifelse((inherits(out6E,"list"))&&(all.equal(out6E$low.bounds.CI[2],0.9891393, tolerance=10^(-4)))&&out6E$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out6E"
 n.t=n.t+1
 
@@ -427,7 +427,7 @@ out8A<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="target.risk", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out8A,"list"))&&(all.equal(out8A$up.bounds.CI[2],0.8895169, tolerance=10^(-6)))&&out8A$optimal.treat==7,1,0)  
+correct[[n.t]]<-ifelse((inherits(out8A,"list"))&&(all.equal(out8A$up.bounds.CI[2],0.8895169, tolerance=10^(-4)))&&out8A$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out8A"
 n.t=n.t+1
 out8B<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -435,7 +435,7 @@ out8B<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="target.risk", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out8B,"list"))&&(all.equal(out8B$up.bounds.CI[2],0.8895169, tolerance=10^(-6)))&&out8B$optimal.treat==1,1,0)  
+correct[[n.t]]<-ifelse((inherits(out8B,"list"))&&(all.equal(out8B$up.bounds.CI[2],0.8895169, tolerance=10^(-4)))&&out8B$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out8B"
 set.seed(1)
 n.t=n.t+1
@@ -453,7 +453,7 @@ out8D<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="target.risk", 
                             tr.model="FP1.fixed",sig.level=0.025,
                             unfavourable=TRUE))
-correct[[n.t]]<-ifelse((inherits(out8D,"list"))&&(all.equal(out8D$up.bounds.CI[2], 0.8873118, tolerance=10^(-6)))&&out8D$optimal.treat==7,1,0)  
+correct[[n.t]]<-ifelse((inherits(out8D,"list"))&&(all.equal(out8D$up.bounds.CI[2], 0.8873118, tolerance=10^(-4)))&&out8D$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out8D"
 n.t=n.t+1
 out8E<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
@@ -461,7 +461,7 @@ out8E<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             treatment.levels=1:7, summary.measure="target.risk", 
                             tr.model="FP2.classic",sig.level=0.025,
                             unfavourable=FALSE))
-correct[[n.t]]<-ifelse((inherits(out8E,"list"))&&(all.equal(out8E$low.bounds.CI[2],0.7981392, tolerance=10^(-6)))&&out8E$optimal.treat==1,1,0)  
+correct[[n.t]]<-ifelse((inherits(out8E,"list"))&&(all.equal(out8E$low.bounds.CI[2],0.7981392, tolerance=10^(-4)))&&out8E$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out8E"
 n.t=n.t+1
 

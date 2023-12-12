@@ -13,7 +13,8 @@ samplesize.ROCI.binary(p.expected.curve, NI.margin, minimisation=T, unfavourable
                               summary.measure="RD", tr.model="FP2.fixed", 
                               M.boot=NULL, parallel="no", n.cpus=1, 
                               bootCI.type="bca", sig.level=0.025, n.per.arm=100,
-                              power=0.8, print.out=T, varest.boot="CI.bc")
+                              power=0.8, print.out=T, varest.boot="CI.bc",
+                              round=T, ltfu=0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -69,6 +70,8 @@ The targeted power level.
 }
   \item{n.per.arm}{
 The number of patients per arm used in the estimation of variance on a data set of expected outcomes. Default is 100.}
+\item{round}{A logical variable. If TRUE, sample sizes are rounded to the next integer, using the ceiling function. Otherwise, they are left unrounded.}
+\item{ltfu}{A numeric variable with the expected proportion of patients lost to follow-up. Default is 0.}
 }
 \details{
 This function estimates the estimated sample size to target both optimal and acceptable power for a ROCI trial. It requires as input the expected treatment response curve under which to power the trial, the NI margins and a specification of all the methods. The function creates a data set of expected outcomes (e.g. if risk in one arm is 0.7, it creates 70 records with event=1 and 30 with event=0) and fits the model for the treatment-response curve on this data set. It then estimates the variance of the summary measure of interest and uses this to do a sample size calculation based on simple formula from normal theory for non-inferiority with a continuous outcome. 

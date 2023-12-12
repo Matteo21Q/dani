@@ -153,6 +153,30 @@ correct[[n.t]]<-ifelse((inherits(out4K, "try-error"))&&(grepl("!is.na(higher.bet
 names(correct)[[n.t]]<-"out4K"
 n.t=n.t+1
 
+# Check that it works when round incorrectly specified:
+out4L<-try(samplesize.NI.continuous(20,20,40,-10, round=NA))
+correct[[n.t]]<-ifelse((inherits(out4L, "try-error"))&&(grepl("!is.na(round) is not TRUE", out4L[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4L"
+n.t=n.t+1
+out4M<-try(samplesize.NI.continuous(20,20,40,-10, round="pippo"))
+correct[[n.t]]<-ifelse((inherits(out4M, "try-error"))&&(grepl("is.logical(round) is not TRUE", out4M[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4M"
+n.t=n.t+1
+
+# Check that it stops for unacceptable values of loss to follow up:
+out4N<-try(samplesize.NI.continuous(20,20,40,-10,ltfu = "0.9"))
+correct[[n.t]]<-ifelse((inherits(out4N, "try-error"))&&(grepl("is.numeric(ltfu) is not TRUE", out4N[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4N"
+n.t=n.t+1
+out4O<-try(samplesize.NI.continuous(20,20,40,-10, ltfu=-1))
+correct[[n.t]]<-ifelse((inherits(out4O, "try-error"))&&(grepl("ltfu >= 0 is not TRUE", out4O[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4O"
+n.t=n.t+1
+out4P<-try(samplesize.NI.continuous(20,20,40,-10,ltfu=1))
+correct[[n.t]]<-ifelse((inherits(out4P, "try-error"))&&(grepl("ltfu < 1 is not TRUE", out4P[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4P"
+n.t=n.t+1
+
 #####################################################
 # Fifth set of checks:
 # Now check sample size calculations for certain values on difference scale. These are compared against results from tutorial paper from Julious
@@ -222,6 +246,18 @@ out5K<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, s
                                     higher.better=T))
 correct[[n.t]]<-ifelse((inherits(out5K,"numeric"))&&(all.equal(out5K[2],171)),1,0) # Checked against prop.test
 names(correct)[[n.t]]<-"out5K"
+n.t=n.t+1
+out5L<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 1, 
+                                    summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
+                                    higher.better=T, round=F))
+correct[[n.t]]<-ifelse((inherits(out5L,"numeric"))&&(all.equal(out5L[2],170.1188, tolerance=10^(-5))),1,0) 
+names(correct)[[n.t]]<-"out5L"
+n.t=n.t+1
+out5M<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 1, 
+                                    summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
+                                    higher.better=T, ltfu=0.1))
+correct[[n.t]]<-ifelse((inherits(out5M,"numeric"))&&(all.equal(out5M[2],190)),1,0) 
+names(correct)[[n.t]]<-"out5M"
 n.t=n.t+1
 
 #####################################################

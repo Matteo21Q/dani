@@ -1,6 +1,6 @@
 samplesize.NIfrontier.binary <- function(p.control.expected, p.experim.target=NULL, NI.frontier, sig.level=0.025,
                                      summary.measure="RD", print.out=TRUE, unfavourable=TRUE, 
-                                     power=0.9, r=1) {
+                                     power=0.9, r=1, round=T, ltfu=0) {
   
   stopifnot(is.numeric(p.control.expected), p.control.expected>0, p.control.expected<1)
   stopifnot(is.numeric(sig.level), sig.level>0, sig.level<0.5)
@@ -11,12 +11,14 @@ samplesize.NIfrontier.binary <- function(p.control.expected, p.experim.target=NU
   stopifnot(is.logical(unfavourable), !is.na(unfavourable))
   stopifnot(is.numeric(power), power < 1, power > 0)
   stopifnot(is.numeric(r), r > 0)
+  stopifnot(is.logical(round), !is.na(round))
+  stopifnot(is.numeric(ltfu), ltfu < 1, ltfu >= 0)
   
 
   ss0<-samplesize.NI.binary(p.control.expected, p.experim.target,  
                                       NI.margin=NI.frontier(p.control.expected), sig.level, 
                                       power, r, summary.measure, print.out=FALSE, test.type="score", 
-                                      unfavourable) 
+                                      unfavourable, round=F, ltfu=0) 
   n.control<-ss0[1]
   n.experim<-ss0[2]
   e.control<-round(n.control*p.control.expected)
@@ -32,6 +34,6 @@ samplesize.NIfrontier.binary <- function(p.control.expected, p.experim.target=NU
   ss<-samplesize.NI.continuous(p0, p1, sqrt((fit.ed$se)^2*n.experim), 
                                NI.margin=NI.m, sig.level, 
                                power, r, summary.measure="mean.difference", print.out, 
-                               test.type=NULL, higher.better=!unfavourable) 
+                               test.type=NULL, higher.better=!unfavourable, round=round, ltfu=ltfu) 
   return(ss)
 }

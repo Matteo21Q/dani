@@ -347,7 +347,7 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
       CI<-test[c(1,3)]
       estimate<-test[2]
     } else if (test.type=="score.cc") {
-      test<-scoreci(e.experim,n.experim,e.control,n.control,contrast = "RR", level = 1-2*sig.level, cc=T)$estimates
+      test<-ratesci::scoreci(e.experim,n.experim,e.control,n.control,contrast = "RR", level = 1-2*sig.level, cc=T)$estimates
       CI<-test[c(1,3)]
       estimate<-test[2]
     } else if (test.type=="Bailey") {
@@ -587,7 +587,7 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
       CI<-as.numeric(test[c(1,3)])
       estimate<-as.numeric(test[2])
     } else if (test.type=="score.cc") {
-      test<-scoreci(e.experim,n.experim,e.control,n.control,contrast = "OR", level = 1-2*sig.level, cc=T)$estimates
+      test<-ratesci::scoreci(e.experim,n.experim,e.control,n.control,contrast = "OR", level = 1-2*sig.level, cc=T)$estimates
       CI<-as.numeric(test[c(1,3)])
       estimate<-as.numeric(test[2])
     }  else if (test.type=="MLE") {

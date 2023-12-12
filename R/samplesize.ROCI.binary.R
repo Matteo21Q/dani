@@ -1,7 +1,8 @@
 samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, minimisation=T, unfavourable=T,
                               se.method="bootstrap", treatment.levels, summary.measure="RD", 
                               tr.model="FP2.fixed", M.boot=NULL, parallel="no", n.cpus=1, bootCI.type="bca", sig.level=0.025,
-                              n.per.arm=100, power=0.8, print.out=T, varest.boot="CI.bc") {
+                              n.per.arm=100, power=0.8, print.out=T, varest.boot="CI.bc",
+                              round=T, ltfu=0) {
   
   stopifnot(is.numeric(p.expected.curve), all(p.expected.curve < 1), all(p.expected.curve > 0))
   stopifnot(is.numeric(treatment.levels), length(treatment.levels)==length(p.expected.curve))
@@ -25,6 +26,8 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, minimisation=T,
   stopifnot(is.numeric(n.per.arm), n.per.arm > 10)
   stopifnot(is.character(summary.measure),(( summary.measure == "RD" ) || ( summary.measure == "RR" ) || ( summary.measure == "OR" ) || ( summary.measure == "target.risk" )))
   stopifnot(is.logical(print.out), !is.na(print.out))
+  stopifnot(is.logical(round), !is.na(round))
+  stopifnot(is.numeric(ltfu), ltfu < 1, ltfu >= 0)
   stopifnot(is.logical(minimisation), !is.na(minimisation))
   if (!is.null(M.boot)) stopifnot(is.numeric(M.boot), M.boot>1)
   stopifnot(is.character(se.method), se.method%in%c("bootstrap", "delta"))
@@ -109,8 +112,16 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, minimisation=T,
   }
   var.1<-var.n.fp*n.tot       # Estimate of variance using delta method
   
-  ss.total<-ceiling((qnorm(sig.level)+qnorm(1-power))^2*var.1/(expected.sm-NI.marg)^2)         # total sample size using delta
-  ss.perarm<-ceiling(ss.total/n.arms)            # sample size per arm using delta
+  ss <- ((qnorm(sig.level)+qnorm(1-power))^2*var.1/(expected.sm-NI.marg)^2)/(1-ltfu)
+  
+  if (isTRUE(round)) {
+    ss.total<-ceiling(ss)         # total sample size 
+    ss.perarm<-ceiling(ss.total/n.arms)            # sample size per arm 
+  } else {
+    ss.total<-ss         # total sample size 
+    ss.perarm<-ss.total          # sample size per arm 
+    
+  }
   ss.total.optimal<-ss.total[optimal.i]
   ss.perarm.optimal<-ss.perarm[optimal.i]
   ss.total.acceptable<-min(ss.total)
@@ -118,7 +129,9 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, minimisation=T,
 
   if (print.out==T) {
     
-    cat("The total sample sizes needed (across all arms) for the specified expected curves and NI margins are: \nOptimal power: ", ss.total.optimal,
+    cat("The total sample sizes needed (across all arms) for the specified 
+        expected curves and NI margins, accounting for ", ltfu*100, "% loss 
+        to follow-up, are: \nOptimal power: ", ss.total.optimal,
         "\nAcceptable power (conservative estimate): ", ss.total.acceptable, ".\n")
     
   }

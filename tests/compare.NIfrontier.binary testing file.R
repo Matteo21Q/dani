@@ -117,7 +117,7 @@ n.t=n.t+1
 
 # Check behavior for NI margin = 0 (superiority): should stop and say any frontier is equally powerful
 out4D<-try(compare.NIfrontier.binary(p.control.expected=0.1,p.experim.target=0.1,p.range=c(0.01,0.2),NI.margin=0, summary.measure="RD"))
-correct[[n.t]]<-ifelse((inherits(out4D, "try-error"))&&(grepl("A Non-inferiority margin of 0 for the risk difference means this is a superiority trial.", out4D[1] , fixed=T )),1,0) 
+correct[[n.t]]<-ifelse((inherits(out4D, "try-error"))&&(grepl("A Non-inferiority margin of 0 for the risk (or arcsine) difference means this is a superiority trial.", out4D[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4D"
 n.t=n.t+1
 out4E<-try(compare.NIfrontier.binary(p.control.expected=0.1,p.experim.target=0.1,p.range=c(0.01,0.2),NI.margin=1, summary.measure="RR"))
@@ -134,7 +134,7 @@ n.t=n.t+1
 # Check if it stops as expected for summary measure different from "RD", "OR" or "RR"
 
 out5A<-try(compare.NIfrontier.binary(p.control.expected=0.1,p.experim.target=0.1,p.range=c(0.1,0.9),NI.margin=2, summary.measure="pippo"))
-correct[[n.t]]<-ifelse((inherits(out5A, "try-error"))&&(grepl("summary.measure should be one of either RD (risk difference), RR (risk ratio) or OR (odds ratio).", out5A[1] , fixed=T )),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5A, "try-error"))&&(grepl("summary.measure should be one of either RD (risk difference), RR (risk ratio), AS (arcsine difference) or OR (odds ratio)", out5A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out5A"
 n.t=n.t+1
 
@@ -143,19 +143,19 @@ n.t=n.t+1
 # Check results for few p different from 0. (all should work and return difference as the best frontier, except the last one which should return ratio):
 
 out6A<-try(compare.NIfrontier.binary(p.control.expected=0.1,p.experim.target=0.1,p.range=c(0.01,0.3),NI.margin=0.05, summary.measure="RD"))
-correct[[n.t]]<-ifelse((inherits(out6A,"data.frame"))&&(isTRUE(all.equal(as.numeric(out6A[100,]),c(0.3000000, 0.3500000, 0.4500000, 0.4050000, 0.3201562, 0.4031129, 0.3647259), tolerance=10^(-6)))),1,0) 
+correct[[n.t]]<-ifelse((inherits(out6A,"data.frame"))&&(isTRUE(all.equal(as.numeric(out6A[100,]),c(0.3000000, 0.3500000, 0.4500000, 0.4050000, 0.3716438, 0.3201562, 0.4031129, 0.3647259, 0.3373282), tolerance=10^(-6)))),1,0) 
 names(correct)[[n.t]]<-"out6A"
 n.t=n.t+1
 out6B<-try(compare.NIfrontier.binary(p.control.expected=0.8,p.experim.target=0.8,p.range=c(0.01,0.99),NI.margin=0.05, summary.measure="RD"))
-correct[[n.t]]<-ifelse((inherits(out6B,"data.frame"))&&(isTRUE(all.equal(as.numeric(out6B[100,]),c(0.99, 1.04, 1.051875,0.9929204,0.3061046, 0.3155012, 0.2707735), tolerance=10^(-6)))),1,0)
+correct[[n.t]]<-ifelse((inherits(out6B,"data.frame"))&&(isTRUE(all.equal(as.numeric(out6B[100,]),c(0.99, 1.04, 1.051875,0.9929204, 0.9988295, 0.3061046, 0.3155012, 0.2707735, 0.2750149), tolerance=10^(-6)))),1,0)
 names(correct)[[n.t]]<-"out6B"
 n.t=n.t+1
 out6C<-try(compare.NIfrontier.binary(p.control.expected=0.1,p.experim.target=0.1,p.range=c(0.01,0.99),NI.margin=-0.05, summary.measure="RD"))
-correct[[n.t]]<-ifelse((inherits(out6C,"data.frame"))&&(isTRUE(all.equal(as.numeric(out6C[100,]),c(0.99, 0.94, 0.495, 0.9791209,1.223806 ,0.9737171, 1.250981), tolerance=10^(-6)))),1,0)
+correct[[n.t]]<-ifelse((inherits(out6C,"data.frame"))&&(isTRUE(all.equal(as.numeric(out6C[100,]),c(0.99, 0.94, 0.495, 0.9791209, 0.9619187, 1.223806 ,0.9737171, 1.250981,  1.2389527), tolerance=10^(-6)))),1,0)
 names(correct)[[n.t]]<-"out6C"
 n.t=n.t+1
 out6D<-try(compare.NIfrontier.binary(p.control.expected=0.2,p.experim.target=0.1,p.range=c(0.01,0.99),NI.margin=0.05, summary.measure="RD"))
-correct[[n.t]]<-ifelse((inherits(out6D,"data.frame"))&&(isTRUE(all.equal(as.numeric(out6D[100,]),c(0.99,  1.04,1.2375,0.9924812, 1.153126, 1.304035, 1.118985), tolerance=10^(-6)))),1,0)
+correct[[n.t]]<-ifelse((inherits(out6D,"data.frame"))&&(isTRUE(all.equal(as.numeric(out6D[100,]),c(0.99,  1.04,1.2375,0.9924812, 0.9983835, 1.153126, 1.304035, 1.118985,1.1231724), tolerance=10^(-6)))),1,0)
 names(correct)[[n.t]]<-"out6D"
 n.t=n.t+1
 

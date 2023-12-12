@@ -1,6 +1,6 @@
 samplesize.NI.continuous <- function (mean.control, mean.experim, sd, NI.margin, sig.level = 0.025, 
                                    power = 0.9, r = 1, summary.measure = "mean.difference", print.out = TRUE, 
-                                   test.type=NULL, higher.better=T) 
+                                   test.type=NULL, higher.better=T, round=T, ltfu=0) 
 {
   
   stopifnot(is.numeric(mean.control))
@@ -9,6 +9,8 @@ samplesize.NI.continuous <- function (mean.control, mean.experim, sd, NI.margin,
   stopifnot(is.numeric(sig.level), sig.level < 0.5, sig.level > 0)
   stopifnot(is.numeric(power), power < 1, power > 0)
   stopifnot(is.numeric(r), r > 0)
+  stopifnot(is.logical(round), !is.na(round))
+  stopifnot(is.numeric(ltfu), ltfu < 1, ltfu >= 0)
   stopifnot(is.character(summary.measure), summary.measure %in%c("mean.difference", "mean.ratio"))
   if (is.null(test.type)) {
     test.type<-ifelse(summary.measure=="mean.difference", "t.test", "Fiellers" )
@@ -51,7 +53,7 @@ samplesize.NI.continuous <- function (mean.control, mean.experim, sd, NI.margin,
     
     if (test.type=="log.t.test"||test.type=="t.test") {
       check<-0
-      n.try<-ceiling(n)
+      n.try<-ifelse(isTRUE(round),ceiling(n),n)
       while ((check==0)&&(n.try<ceiling(n)+10000)) {
         power.est<-1-pt(qt(1-sig.level, n.try-2), n.try-2, abs((mean.alt*sqrt(n.try))/(sd)))
         if (power.est>=power) {
@@ -64,13 +66,21 @@ samplesize.NI.continuous <- function (mean.control, mean.experim, sd, NI.margin,
       }
     }
     
-    ss <- c(nC <- ceiling(ceiling(n* r) ), nE <- ceiling(n))
+    n = n/(1-ltfu)
+    if (isTRUE(round)) {
+      ss <- c(nC <- ceiling(ceiling(n* r) ), nE <- ceiling(n))
+    } else {
+      ss <- c(nC <- n* r , nE <- n)
+    }
     
   } else {
     if (r!=1) stop("Fiellers method currently supported for equal allocation only (r=1).\n")
     output<-capture.output(n.ratio(m=1, rho=NI.margin, Power=power, CV0=sd/mean.control, rho.star=mean.experim/mean.control,
                                         alpha=2*sig.level))
     ss<-rep(as.numeric(substr(output[2], 42,nchar(output[2])-1 )),2)
+    ss<-ceiling(ss/(1-ltfu))
+    
+    if (!isTRUE(round)) warning("round=F not allowed for method Fiellers. Rounding estimated sample sizes instead. ")
     }
   
  
@@ -79,7 +89,8 @@ samplesize.NI.continuous <- function (mean.control, mean.experim, sd, NI.margin,
         sig.level * 100, "%.\nMean in control arm =", 
         mean.control, "\nMean in experimental arm =", 
         mean.experim, "\nNon-acceptable mean in experimental arm (null H) =",
-        mean.exp.null,"\n"
+        mean.exp.null,"%\nExpected loss to follow-up: ",
+        ltfu*100, "%\n"
     )
     if (summary.measure == "mean.difference") {
       cat("The sample size required to test non-inferiority within a", 

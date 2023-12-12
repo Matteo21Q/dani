@@ -4,17 +4,20 @@
 #### package. 31-08-2023      ####
 ##################################
 
-# CHeck if necessary packages are all installed:
+# CHeck if necessary packages are all installed and load them:
 list.of.packages <- c("mfp", "marginaleffects", "survival", "coxphw",
                       "survRM2", "DescTools", "boot", "flexsurv", "numDeriv",
                       "mratios", "BSDA", "ratesci", "DescrTab2", "exact2x2",
                       "contingencytables", "PropCIs")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
+lapply(list.of.packages, require, character.only = TRUE)
 
 # Source all files
 setwd("C:/Users/rmjlmqu/GitHub/dani/R")
-source("arcsine.margin.R")
+source("convertmargin.binary.R")
+source("convertmargin.continuous.R")
+source("convertmargin.survival.R")
 source("Auxiliary functions.R")
 source("compare.NIfrontier.binary.R")
 source("compare.NIfrontier.continuous.R")
@@ -33,7 +36,10 @@ source("test.NI.continuous.R")
 source("test.NI.survival.R")
 
 # Run all scripts
-setwd("C:/Users/rmjlmqu/OneDrive - University College London/Documents/Non-inferiority trials/dani testings")
+setwd("C:/Users/rmjlmqu/GitHub/dani/tests")
+source("convertmargin.binary testing file.R")
+source("convertmargin.continuous testing file.R")
+source("convertmargin.survival testing file.R")
 source("compare.NIfrontier.binary testing file.R")
 source("compare.NIfrontier.continuous testing file.R")
 source("compare.NIfrontier.survival testing file.R")
@@ -48,9 +54,10 @@ source("test.NI.survival testing file.R")
 source("test.NIfrontier.binary testing file.R")
 source("test.ROCI.binary testing file.R")
 
-results<-c(c.NIf.b, c.NIf.c, c.NIf.s, ss.NI.b, ss.NI.c, ss.NI.s, ss.NIf.b,
+results<-c(cm.b, cm.c, cm.s, c.NIf.b, c.NIf.c, c.NIf.s, ss.NI.b, ss.NI.c, ss.NI.s, ss.NIf.b,
            ss.ROCI.b, t.NI.b, t.NI.c, t.NI.s, t.NIf.b, t.ROCI.b)
-name.results<-c("compare.NIfrontier.binary", "compare.NIfrontier.continuous", 
+name.results<-c("convertmargin.binary", "convertmargin.continuous", "convertmargin.survival",
+                "compare.NIfrontier.binary", "compare.NIfrontier.continuous", 
                 "compare.NIfrontier.survival", "samplesize.NI.binary", 
                 "samplesize.NI.continuous", "samplesize.NI.survival", 
                 "samplesize.NIfrontier.binary", "samplesize.ROCI.binary", 

@@ -10,7 +10,8 @@ A function for calculating sample size of a non-inferiority trial whose primary 
 samplesize.NI.binary(p.control.expected, p.experim.target, NI.margin, 
                      sig.level = 0.025, power = 0.9, r = 1, 
                      summary.measure = "RD", print.out = TRUE, 
-                     test.type="score", unfavourable=T, cont.corr=F)  
+                     test.type="score", unfavourable=T, cont.corr=F,
+                     round=T, ltfu=0)  
 }
 \arguments{
 \item{p.control.expected}{Expected event risk in the control arm.}
@@ -24,6 +25,8 @@ samplesize.NI.binary(p.control.expected, p.experim.target, NI.margin,
 \item{test.type}{A string that indicates the type of test to be assumed for the sample size calculation. Currently, three options are supported: "Wald", "score" and "local".}
 \item{unfavourable}{A logical variable. If TRUE, the outcome is considered unfavourable. This is used to check that the NI margin specified is meaningful.}
 \item{cont.corr}{A logical variable. If TRUE, a continuity correction is applied. This is currently supported for the risk difference scale only.}
+\item{round}{A logical variable. If TRUE, sample sizes are rounded to the next integer, using the ceiling function. Otherwise, they are left unrounded.}
+\item{ltfu}{A numeric variable with the expected proportion of patients lost to follow-up. Default is 0.}
 }
 \details{
  This is a function to calculate sample size needed to test non-inferiority of an active treatment against the control within a specific NI margin. The margin can be specified on a number of different scales. 

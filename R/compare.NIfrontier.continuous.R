@@ -12,15 +12,10 @@ compare.NIfrontier.continuous<-function(mean.control.expected, mean.experim.targ
   if ((NI.margin==0)&&(summary.measure=="difference")) stop ("A Non-inferiority margin of 0 for the mean difference means this is a superiority trial. Hence, all summary measures will have same power.")
   if ((NI.margin==1)&&(summary.measure=="ratio")) stop ("A Non-inferiority margin of 1 for the mean ratio means this is a superiority trial. Hence, all summary measures will have same power.")
 
-  if (summary.measure=="ratio") {
-    mean.experim.null<-NI.margin*mean.control.expected
-    ratio.margin<-NI.margin
-    difference.margin<-mean.experim.null-mean.control.expected
-  } else {
-    mean.experim.null<-NI.margin+mean.control.expected
-    difference.margin<-NI.margin
-    ratio.margin<-mean.experim.null/mean.control.expected
-  }
+  ratio.margin<-convertmargin.continuous(mean.control.expected, NI.margin, summary.measure, "ratio")
+  difference.margin<-convertmargin.continuous(mean.control.expected, NI.margin, summary.measure, "difference")
+  
+  mean.experim.null<-difference.margin+mean.control.expected
   
   if (is.null(mean.experim.target)) mean.experim.target<-mean.control.expected
   if (!(((mean.experim.target>mean.experim.null)&&(mean.control.expected>=mean.experim.null))||((mean.experim.target<mean.experim.null)&&(mean.control.expected<=mean.experim.null)))) stop ("The alternative hypothesis does not imply non-inferiority of the experimental treatment")

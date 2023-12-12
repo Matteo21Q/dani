@@ -8,7 +8,7 @@ A function to estimate sample size of a trial designed with a non-inferiority fr
 \usage{
 samplesize.NIfrontier.binary(p.control.expected, p.experim.target=NULL, NI.frontier, sig.level=0.025,
                                      summary.measure="RD", print.out=TRUE, unfavourable=TRUE, 
-                                     power=0.9, r=1)
+                                     power=0.9, r=1, round=T, ltfu=0)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -20,7 +20,8 @@ samplesize.NIfrontier.binary(p.control.expected, p.experim.target=NULL, NI.front
 \item{r}{Allocation ratio, i.e. ratio between sample sizes in the active and control goups. Default is 1.}
 \item{summary.measure}{The population-level summary measure to be estimated, i.e. the scale on which we define the non-inferiority margin. Can be one of "RD" (Risk Difference), "RR" (Risk Ratio), "OR" (Odds Ratio) or "AS" (Arc-Sine difference).}
 \item{print.out}{Logical. If FALSE, no output is printed.}
-
+\item{round}{A logical variable. If TRUE, sample sizes are rounded to the next integer, using the ceiling function. Otherwise, they are left unrounded.}
+\item{ltfu}{A numeric variable with the expected proportion of patients lost to follow-up. Default is 0.}
 
 }
 \details{

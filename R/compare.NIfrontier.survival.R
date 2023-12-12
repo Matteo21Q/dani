@@ -28,30 +28,23 @@ compare.NIfrontier.survival<-function(rate.control.expected=NULL, rate.experim.t
     p.control.expected<-pexp(t.expected,rate.control.expected)
   }
   
-  if (summary.measure=="HR") {
-    HR.margin<-NI.margin
-    rate.experim.null<-HR.margin*rate.control.expected
-  } else if (summary.measure=="DRMST") {
-    DRMST.margin<-NI.margin
-    rate.experim.null<-uniroot(RMST.margin, c(1E-6, 20), tol = 0.000001, 
-            lambda=rate.control.expected, tau=tau.RMST, 
-            target=DRMST.margin)$root
-  } else {
-    DS.margin<-NI.margin
-    rate.experim.null<-uniroot(Diff.margin, c(1E-6, 20), tol = 0.000001, 
-            lambda=rate.control.expected, t=t.DS, 
-            target=DS.margin)$root
-  }
+  HR.margin<-convertmargin.survival(rate.control.expected, t.expected, 
+                                    NI.margin.original=NI.margin, 
+                                    summary.measure.original=summary.measure, 
+                                    summary.measure.target="HR",
+                                    tau.RMST=tau.RMST, t.DS=t.DS)
+  DRMST.margin<-convertmargin.survival(rate.control.expected, t.expected, 
+                                       NI.margin.original=NI.margin, 
+                                       summary.measure.original=summary.measure, 
+                                       summary.measure.target="DRMST",
+                                       tau.RMST=tau.RMST, t.DS=t.DS)
+  DS.margin<-convertmargin.survival(rate.control.expected, t.expected, 
+                                    NI.margin.original=NI.margin, 
+                                    summary.measure.original=summary.measure, 
+                                    summary.measure.target="DS",
+                                    tau.RMST=tau.RMST, t.DS=t.DS)
   
-  if (summary.measure!="DRMST") {
-    DRMST.margin<-RMST.margin(rate.experim.null, rate.control.expected, tau.RMST,0)
-  }
-  if (summary.measure!="DS") {
-    DS.margin<-Diff.margin(rate.experim.null, rate.control.expected, t.DS,0)
-  }
-  if (summary.measure!="HR") {
-    HR.margin<-rate.experim.null/rate.control.expected
-  }
+  rate.experim.null<-HR.margin*rate.control.expected
   
   if (is.null(rates.range)) {
     rates.range<-c(max(0.000001,rate.control.expected-0.3), rate.control.expected+0.3)

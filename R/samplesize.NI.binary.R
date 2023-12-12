@@ -1,6 +1,6 @@
 samplesize.NI.binary <- function (p.control.expected, p.experim.target, NI.margin, sig.level = 0.025, 
                             power = 0.9, r = 1, summary.measure = "RD", print.out = TRUE, test.type="score",
-                            unfavourable=T, cont.corr=F) 
+                            unfavourable=T, cont.corr=F, round=T, ltfu=0) 
 {
   
   stopifnot(is.numeric(p.control.expected), p.control.expected < 1, p.control.expected > 0)
@@ -14,6 +14,8 @@ samplesize.NI.binary <- function (p.control.expected, p.experim.target, NI.margi
   stopifnot(is.character(test.type), test.type %in% c("Wald", "score", "local"))
   stopifnot(is.logical(unfavourable), !is.na(unfavourable))
   stopifnot(is.logical(cont.corr), !is.na(cont.corr))
+  stopifnot(is.logical(round), !is.na(round))
+  stopifnot(is.numeric(ltfu), ltfu < 1, ltfu >= 0)
   if (summary.measure%in%c("RR", "OR")&&NI.margin<=0) stop("NI margin should be >0 when summary measure is a ratio (OR or RR)")
   if (summary.measure=="RD"&&abs(NI.margin)>=1) stop("NI margin should be <1 in absolute value when summary measure is RD")
   
@@ -92,7 +94,13 @@ samplesize.NI.binary <- function (p.control.expected, p.experim.target, NI.margi
   
   n = (qnorm(1 - sig.level)*sqrt(var.1) + qnorm(power)*sqrt(var.2))^2 * (1/(mean.alt)^2)
 
+  n = n/(1-ltfu)
+  
+  if (isTRUE(round)) {
     ss <- c(nC <- ceiling(ceiling(n* r) ), nE <- ceiling(n))
+  } else {
+    ss <- c(nC <- n* r , nE <- n)
+  }
   
   if (cont.corr==T) {
     if (summary.measure=="RD") {
@@ -105,7 +113,7 @@ samplesize.NI.binary <- function (p.control.expected, p.experim.target, NI.margi
     }
   }
   
-  ss<-ceiling(ss)
+  if (isTRUE(round))   ss<-ceiling(ss)
   
   if (print.out == T) {
     cat("Method: ", test.type,
@@ -113,7 +121,8 @@ samplesize.NI.binary <- function (p.control.expected, p.experim.target, NI.margi
         sig.level * 100, "%.\nExpected control event risk =", 
         p.control.expected * 100, "%\nExpected experimental arm event risk (alternative H) =", 
         p.experim.target * 100, "%\nNon-acceptable experimental arm event risk (null H) =",
-        p1.exp.null*100,"%\n"
+        p1.exp.null*100,"%\nExpected loss to follow-up: ",
+        ltfu*100, "%\n"
         )
     if (summary.measure == "RD") {
       cat("The sample size required to test non-inferiority within a", 

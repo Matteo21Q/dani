@@ -189,6 +189,31 @@ correct[[n.t]]<-ifelse((inherits(out4W, "try-error"))&&(grepl("varest.boot %in%"
 names(correct)[[n.t]]<-"out4W"
 n.t=n.t+1
 
+# Check that it works when round incorrectly specified:
+out4X<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), round = NA))
+correct[[n.t]]<-ifelse((inherits(out4X, "try-error"))&&(grepl("!is.na(round) is not TRUE", out4X[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4X"
+n.t=n.t+1
+out4O<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), round = "pippo"))
+correct[[n.t]]<-ifelse((inherits(out4O, "try-error"))&&(grepl("is.logical(round) is not TRUE", out4O[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4O"
+n.t=n.t+1
+
+# Check that it stops for unacceptable values of loss to follow up:
+out4P<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = "0.9"))
+correct[[n.t]]<-ifelse((inherits(out4P, "try-error"))&&(grepl("is.numeric(ltfu) is not TRUE", out4P[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4P"
+n.t=n.t+1
+out4Q<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = -0.9))
+correct[[n.t]]<-ifelse((inherits(out4Q, "try-error"))&&(grepl("ltfu >= 0 is not TRUE", out4Q[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4Q"
+n.t=n.t+1
+out4R<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = 1))
+correct[[n.t]]<-ifelse((inherits(out4R, "try-error"))&&(grepl("ltfu < 1 is not TRUE", out4R[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4R"
+n.t=n.t+1
+
+
 #####################################################
 # Fifth set of checks:
 # Now check sample size calculations for certain values on RD scale. 
