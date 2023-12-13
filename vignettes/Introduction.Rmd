@@ -41,8 +41,11 @@ This vignette gives an introductory illustration of the features of `dani`, and 
 Most of the functions in this package are named as A.B.C, where:
 
 A. Refers to the main scope of the function. It can be either convertmargin, compare, samplesize or test to do tasks 1-4 above. 
+
 B. Refers to the type of NI trial. It can either be NI (standard two-arm), NIfrontier or ROCI. Note this is not specified in the convertmargin functions, as they are not specific to just one type of NI trial.
+
 C. Refers to the type of primary outcome and can either be binary, survival or continuous.
+
 
 For example, function samplesize.NI.survival does sample size calculations for a standard two-arm non-inferiority trial with survival outcome, while function test.ROCI.binary analyses a MAMS-ROCI trial with binary outcome. 
 
