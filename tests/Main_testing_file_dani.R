@@ -15,7 +15,7 @@ lapply(list.of.packages, require, character.only = TRUE)
 
 # Install and download package or source all files
 
-if (packageVersion('dani')!='1.0.0') install_github("Matteo21Q/dani")     
+if (packageVersion('dani')!='1.0.0') install_github("Matteo21Q/dani", build_vignettes = TRUE, force=TRUE)     
 library(dani)
 
 # setwd("C:/Users/rmjlmqu/GitHub/dani/R")
