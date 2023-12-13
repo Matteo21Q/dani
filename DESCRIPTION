@@ -11,3 +11,5 @@ Description: Provides tools to help with the design and analysis of non-inferior
  Finally it includes function to design and analyse MAMS-ROCI (aka DURATIONS) trials. 
 License: GPL-2
 Imports: boot, survival, graphics, DescTools,  ratesci, exact2x2, marginaleffects, mfp
+Suggests: knitr, rmarkdown
+VignetteBuilder: knitr
