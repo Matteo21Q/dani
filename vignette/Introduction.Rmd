@@ -1,0 +1,270 @@
+---
+title: "Introduction"
+output:
+  rmarkdown::html_vignette:
+    css: "css/vignette.css"
+vignette: >
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteIndexEntry{Introduction}
+  %\VignetteEncoding{UTF-8}
+---
+
+---
+
+```{r setup, include=FALSE, cache=FALSE}
+library(knitr)
+set.seed(123)
+options(width=87)
+opts_chunk$set(background="#ffffff", comment="#", collapse=FALSE,
+               fig.width=9, fig.height=9, warning=FALSE,
+               message=FALSE)
+```
+
+This vignette is intended to provide a first introduction to the R package `dani`, which provides tools to help with the design and analysis of non-inferiority trials.
+In particular, the package provides functions to:
+
+1. Design/Analysis: convert the non-inferiority margin between different summary measures;
+2. Design: compare the power of non-inferiority trials when the non-inferiority margin is specified using different summary measures;
+3. Design: do sample size calculations for non-inferiority trials, allowing for a variety of summary measures and analysis methods;
+4. Analysis: Test for non-inferiority.
+
+The `dani` package offers a set of tools to facilitate each of these steps for three different types of non-inferiority trials:
+
+1. Standard two-arm non-inferiority trials;
+2. 2-arm non-inferiority trials using non-Inferiority frontiers (Quartagno et al, 2023) to protect against mis-judgement of expected design parameters;
+3. MAMS-ROCI trials (Ghorani et al, 2023) to optimise some continuous aspect of treatment administration (e.g. duration, dose or frequency).
+
+This vignette gives an introductory illustration of the features of `dani`, and the package documentation should be used to find more detailed information.
+
+## Package structure
+
+Most of the functions in this package are named as A.B.C, where:
+
+A. Refers to the main scope of the function. It can be either convertmargin, compare, samplesize or test to do tasks 1-4 above. 
+B. Refers to the type of NI trial. It can either be NI (standard two-arm), NIfrontier or ROCI. Note this is not specified in the convertmargin functions, as they are not specific to just one type of NI trial.
+C. Refers to the type of primary outcome and can either be binary, survival or continuous.
+
+For example, function samplesize.NI.survival does sample size calculations for a standard two-arm non-inferiority trial with survival outcome, while function test.ROCI.binary analyses a MAMS-ROCI trial with binary outcome. 
+
+## Non-inferiority margin conversion
+
+The convertmargin functions allow one to convert a non-inferiority margin set on a specific population-level summary measure to another one implying same null control and experimental event risks. 
+For example, let's assume we elicited from experts that the non-inferiority margin for a trial with binary outcome should be a 5 percentage points risk difference but then, for whatever reason, it is established that odds ratios would better represent treatment effects. 
+In order to obtain the non-inferiority margin on the odds ratio scale that matches the one we obtained as a risk difference, we need to run the following code: 
+
+```{r}
+> convertmargin.binary(p.control.expected = 0.05,
++                      NI.margin.original = 0.05,
++                      summary.measure.original = "RD", 
++                      summary.measure.target = "OR")
+[1] 2.111111
+```
+
+So, for an expected control event risk of $5/%$, the corresponding non-inferiority margin on the odds ratio scale is 2.11. 
+The function for binary data supports four different summary measures: (absolute) Risk Difference ("RD"), Risk Ratio (RR"), Odds Ratio ("OR") and ArcSine difference ("AS"). 
+The function for continuous data is quite similar, and only supports mean difference ("difference") and mean ratio ("ratio") for the time being:
+
+
+```{r}
+> convertmargin.continuous(mean.control.expected = 2,
++                          NI.margin.original = 1,
++                          summary.measure.original = "difference", 
++                          summary.measure.target = "ratio")
+[1] 1.5
+```
+
+The above code indicates that the equivalent of a non-inferiority margin of 1 as a difference of means corresponds to a margin of 1.5 for a ratio of means, if the control mean is 2.
+Finally, the function for converting a margin with a time-to-event, or survival, outcome, supports three sumamry measures: Hazard Ratio ("HR"), Difference in restricted Mean Survival Time ("DRMST") or Difference in Surviving proportion ("DS").
+This function requires slightly different input: if using either DRMST or DS, the related horizon times (tau.RMST or t.DS) must be specified. Additionally, the function allows both for provision of the event rate in the control arm (lambda) or the control risk (p.control.expected) at a certain time (t.expected).
+Of note, this function assumes event times follow an exponential distribution with fixed rate lambda for the time being. 
+```{r}
+> convertmargin.survival(rate.control.expected = 0.2,
++                          NI.margin.original = 1.2,
++                          summary.measure.original = "HR", 
++                          summary.measure.target = "DRMST",
++                          tau.RMST = 3)
+[1] 0.1174096```
+
+## Non-inferiority frontiers comparison
+
+In non-inferiority trials, the summary measure that we choose to quantify the treatment effect has implications for the power of the study. 
+One way to visualise this is to plot the non-inferiority frontier (Quartagno et al, 2020) associated with a certain summary measure: this is a plot showing the non tolerable event risk (for a binary outcome) in the experimental arm for each possible value of control event risk when using a specific margin. 
+The compare functions do exactly this and, on top of plotting the various frontiers with a specific set of design parameters, additionally calculate which summary measure is guaranteed to have more power.  
+The summary measures supported are the same as for the convertmargin functions. For example, for a binary outcome, if the expectation is that the event risk is going to be $5/%$ and that the margin in such case should be a 5 percentage points risk difference, the various frontier could be obtained as follows:
+```{r}
+> compare.NIfrontier.binary(p.control.expected = 0.05,
++                           p.experim.target = 0.05,
++                           p.range=c(0.01,0.15),
++                           NI.margin=0.05,
++                           summary.measure="RD")
+....................................................................................................
+Risk difference Margin = 0.05.
+Risk ratio Margin = 2.
+Odds ratio Margin = 2.111111.
+Arcsine Difference Margin = 0.09623715
+Expected risk in control arm: 0.05
+The Risk Difference summary measure for testing non-inferiority is the most powerful. The Arcsine Difference summary measure comes second followed by the Odds Ratio summary measure. The Risk Ratio is the least powerful summary measure.
+      
+The non-inferiority frontier plot shows the distance of various frontiers from the expected point (solid circle).
+
+Green line: Risk Difference frontier.
+Blue line: Odds Ratio frontier.
+Black line: Risk Ratio frontier.
+Orange line: Arcsine difference frontier.
+The black cross represents the frontier point, i.e. the point that defines the point null at the expected control risk.
+The dashed line represents the line of equality, i.e. the line where control and experimental risks are the same.```
+
+## Sample size calculations
+
+An important part of designing a clinical trial, is calculating its required sample size. Having chosen all design parameters, including what summary measure to use to quantify treatment effect, we can do proper calculations using the samplesize functions. 
+There are functions for all types of outcomes and trial type. Input required for functions for standard 2-arm trials include: 
+
+1. Expected parameters in the control arm (risk for binary outcomes, mean and sd for continuous outcomes, either risk at a certain time or fixed event rate for survival outcomes);
+2. Target parameters in the experimental arm: these define the alternative hypothesis under which we want to power the trial. For non-inferiority studies these most often correspond to the control arm parameters, but they can also be different, provided they fall into the non-inferiority region.  
+3. Non-inferiority margin: this has to be specified on a specific summary.measure. Measures supported are the same discussed for the convertmargin functions. 
+4. Operating characteristics: the target level of power and type 1 error rate (sig.level) that one wants to achieve;
+5. test.type: the type of test one wants to use in the final analysis. For example, for binary data, options include "score", "Wald" or "local".
+6. Other: amount of expected loss to follow-up (lftu, numeric), whether results have to be rounded to nearest integer (round, logical), whether results should be printed on screen (print.out, logical), allocation ratio (r, numeric), whether the outcome is favourable or not (unfavourable, logical, for binary and survival, higher.better, logical, for continuous outcomes).
+
+Example code and output for a sample size calculation using the function for binary outcomes is shown below:
+```{r}
+> samplesize.NI.binary(p.control.expected = 0.1,
++                      p.experim.target = 0.1,
++                      NI.margin = 0.05,
++                      test.type = "Wald")
+Method:  Wald 
+Power: 90 %
+One-sided significance level: 2.5 %.
+Expected control event risk = 10 %
+Expected experimental arm event risk (alternative H) = 10 %
+Non-acceptable experimental arm event risk (null H) = 15 %
+Expected loss to follow-up:  0 %
+The sample size required to test non-inferiority within a 5 % risk difference NI margin is:
+ 757  individuals in the control group.
+ 757  individuals in the experimental treatment group.
+[1] 757 757```
+
+The functions for sample size calculations for NI frontier and ROCI designs are similar but require further input. For NI frontier, the user is requested to pass the frontier as a function. For ROCI, there are several additional pramaters:
+
+a. p.expected.curve: rather than the expectation at a single time point, the user needs to provide expectation at all arms;
+b. treatment.levels: these are the treatment levels that patients may be randomised to;
+c. minimisation: thsi si a logical variable that indicates whether the goal of the trial is to find the minimum effective value of treatment (as it is usually with durations) or the maximum one (as with, eg, frequencies).
+d. se.method: the method used to estimate standard errors: either "delta" or "bootstrap";
+e. tr.model: the model for the treatment-response curve. Can be a fractional polynomial of either degree 1 or 2, either performed in a classic way (adding one further power only if tehre is evidence it improves fit) or fixing the number fo powers. See help ile for details;
+f. Other: Additional parameters if using the bootstrap method, including type of bootstrap CI calculation method (bootCI.type), number of bootstrap samples (M.boot) and whetehr to use paralell computing (parallel, character). 
+
+An example code and output is shown below: 
+```{r}
+> samplesize.ROCI.binary(p.expected.curve = rep(0.05,7),
++                        NI.margin = rep(0.05,6),
++                        minimisation = TRUE,
++                        se.method = "delta",
++                        treatment.levels = c(8,10,12,14,16,18,20),
++                        summary.measure = "RD",
++                        tr.model = "FP2.classic")
+The total sample sizes needed (across all arms) for the specified 
+        expected curves and NI margins, accounting for  0 % loss 
+        to follow-up, are: 
+Optimal power:  1343 
+Acceptable power (conservative estimate):  38 ```
+ 
+## Analysis / testing for non-inferiority
+
+Finally, the package provides functions to test for non-inferiority. While many of the possible tests are available in other packages, the goal of the test functions in `dani` is to provde a wrapper that allows one to choose their preferred test type and summary measure. 
+Also, it focuses on non-inferiority questions, providing related p-values, rather than ones related to superiority-type questions. 
+Outcomes are returned in different ways depending on their type. Binary outcomes are returned as number of events (e.control and e.experim) and patients (n.control and n.experim) in both arms. Continuous outcomes are returned as vectors of observations in control (y.control) and experimental (y.experim) arms. 
+Survival outcomes are returned through three vectors, one for the observed time (time), one for the event indicator (event) and one for treatment indicator (treat). Most other inputs are passed similarly to the samplesize functions. These include summary.measure (same ones are supported), test.type and significance level. 
+There are currently over 30 tests supported for binary data, 11 for survival and 9 for continuous. Help files provide further details. Not all test types estimate a p-value directly. When this is not the case, the p-value can be estimated recursively (option recursive.p.estim = TRUE), by testing at different significance levels. 
+If recursive.p.estim=FALSE, the p-value for methods where it is not directly estimated, is estimated based on normal approximations. 
+This is an example code and output for testing for non-inferiority with binary data: 
+
+```{r}
+> test.NI.binary(n.control = 100,
++                n.experim = 100,
++                e.control = 10,
++                e.experim = 10,
++                NI.margin = 0.1,
++                test.type="Newcombe10")
+Testing for non-inferiority.
+Summary measure: Risk difference.
+Non-inferiority margin = 0.1.
+Method: Newcombe10.
+Estimate = 0
+Confidence interval (Two-sided 95%): (-0.08680254,0.08680254)
+p-value = 0.01197418.
+The confidence interval does not cross the null ( RD = 0.1 ), and hence we have evidence of non-inferiority.
+Note: with the test =  Newcombe10  for summary measure =  RD , p-value and standard error are only approximations based on a Z test with given logarithm of estimate and CI.```
+
+Once again, the functions for MAMS-ROCI trials require slightly different inputs and provide slightly different output. 
+Aside from differences we already highlighted for samplesize functions, the main one is the way the outcomes are provided. There are two possible ways: either by providing a vector of outcomes (outcomes, numeric) and one of treatment indicators (treatment, numeric). Or through the usual data+formual interface, where the formula should indicate what is the treatment variable as follows: 
+
+```{r}
+duration.arms=c(8,10,12,14,16,18,20)
+sam.sizes=c(700)
+NI.margin.RD<-0.1
+
+durations<-rep(duration.arms, each=100)
+y<-rbinom(sam.sizes,1,0.05+(20-durations)*0.01)
+
+data.ex<-data.frame(y,durations)
+myformula<-as.formula(y~treat(durations))
+
+res1<-test.ROCI.binary(formula=myformula, data=data.ex, 
+                        se.method="delta", treatment.levels=8:20, 
+                        summary.measure="RD", NI.margin=NI.margin.RD)
+```
+
+Results can be summarised and plotted with standard sumamry and plot functions as follows:
+```{r}
+> summary(res1)
+Family =  binomial 
+ Model fit: 
+
+Call:
+glm(formula = outcomes ~ I((treatment/10)^-2) + I((treatment/10)^3), 
+    family = "binomial", data = data.mfp)
+
+Coefficients:
+                     Estimate Std. Error z value Pr(>|z|)   
+(Intercept)          -1.75105    0.56322  -3.109  0.00188 **
+I((treatment/10)^-2)  0.43682    0.42248   1.034  0.30116   
+I((treatment/10)^3)  -0.15523    0.09076  -1.710  0.08718 . 
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+(Dispersion parameter for binomial family taken to be 1)
+
+    Null deviance: 548.50  on 699  degrees of freedom
+Residual deviance: 525.81  on 697  degrees of freedom
+AIC: 531.81
+
+Number of Fisher Scoring iterations: 5
+
+Difference from control treatment level ( 20 ):
+20  -  20 :  0 ( NA ,  NA )
+20  -  19 :  0.01 ( 0.004 ,  0.017 )
+20  -  18 :  0.021 ( 0.007 ,  0.035 )
+20  -  17 :  0.033 ( 0.01 ,  0.056 )
+20  -  16 :  0.045 ( 0.013 ,  0.077 )
+20  -  15 :  0.058 ( 0.017 ,  0.099 )
+20  -  14 :  0.071 ( 0.021 ,  0.121 )
+20  -  13 :  0.085 ( 0.028 ,  0.142 )
+20  -  12 :  0.099 ( 0.038 ,  0.161 )
+20  -  11 :  0.115 ( 0.052 ,  0.179 )
+20  -  10 :  0.134 ( 0.071 ,  0.197 )
+20  -  9 :  0.157 ( 0.093 ,  0.221 )
+20  -  8 :  0.188 ( 0.105 ,  0.271 )
+Recommended treatment level with selected NI margin:  15 .
+> plot(res1)```
+
+###### References
+
+Ghorani, E., Quartagno, M., Blackhall, F., et al.
+REFINE-Lung implements a novel multi-arm randomised trial design to address possible immunotherapy overtreatment, The Lancet Oncology, 24(5), 2023, https://doi.org/10.1016/S1470-2045(23)00095-5.
+
+Quartagno, M., Chan, M., Turkova, A. et al. 
+The Smooth Away From Expected (SAFE) non-inferiority frontier: theory and implementation with an application to the D3 trial. Trials 24, 556 (2023). https://doi.org/10.1186/s13063-023-07586-5
+
+Quartagno, M., Walker, A.S., Babiker, A.G. et al. 
+Handling an uncertain control group event risk in non-inferiority trials: non-inferiority frontiers and the power-stabilising transformation. Trials 21, 145 (2020). https://doi.org/10.1186/s13063-020-4070-4
+---

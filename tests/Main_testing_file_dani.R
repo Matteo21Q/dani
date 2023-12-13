@@ -1,7 +1,7 @@
 ##################################
 #### Main testing file for    ####
 #### all functions in the dani####
-#### package. 31-08-2023      ####
+#### package. 13-12-2023      ####
 ##################################
 
 # CHeck if necessary packages are all installed and load them:
@@ -13,27 +13,31 @@ new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"
 if(length(new.packages)) install.packages(new.packages)
 lapply(list.of.packages, require, character.only = TRUE)
 
-# Source all files
-setwd("C:/Users/rmjlmqu/GitHub/dani/R")
-source("convertmargin.binary.R")
-source("convertmargin.continuous.R")
-source("convertmargin.survival.R")
-source("Auxiliary functions.R")
-source("compare.NIfrontier.binary.R")
-source("compare.NIfrontier.continuous.R")
-source("compare.NIfrontier.survival.R")
-source("plot.ROCI.R")
-source("samplesize.ROCI.binary.R")
-source("samplesize.NIfrontier.binary.R")
-source("samplesize.NI.binary.R")
-source("samplesize.NI.continuous.R")
-source("samplesize.NI.survival.R")
-source("summary.ROCI.R")
-source("test.ROCI.binary.R")
-source("test.NIfrontier.binary.R")
-source("test.NI.binary.R")
-source("test.NI.continuous.R")
-source("test.NI.survival.R")
+# Install and download package or source all files
+
+if (packageVersion('dani')!='1.0.0') install_github("Matteo21Q/dani")     
+library(dani)
+
+# setwd("C:/Users/rmjlmqu/GitHub/dani/R")
+# source("convertmargin.binary.R")
+# source("convertmargin.continuous.R")
+# source("convertmargin.survival.R")
+# source("Auxiliary functions.R")
+# source("compare.NIfrontier.binary.R")
+# source("compare.NIfrontier.continuous.R")
+# source("compare.NIfrontier.survival.R")
+# source("plot.ROCI.R")
+# source("samplesize.ROCI.binary.R")
+# source("samplesize.NIfrontier.binary.R")
+# source("samplesize.NI.binary.R")
+# source("samplesize.NI.continuous.R")
+# source("samplesize.NI.survival.R")
+# source("summary.ROCI.R")
+# source("test.ROCI.binary.R")
+# source("test.NIfrontier.binary.R")
+# source("test.NI.binary.R")
+# source("test.NI.continuous.R")
+# source("test.NI.survival.R")
 
 # Run all scripts
 setwd("C:/Users/rmjlmqu/GitHub/dani/tests")
