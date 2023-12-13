@@ -53,11 +53,10 @@ For example, let's assume we elicited from experts that the non-inferiority marg
 In order to obtain the non-inferiority margin on the odds ratio scale that matches the one we obtained as a risk difference, we need to run the following code: 
 
 ```{r}
-> convertmargin.binary(p.control.expected = 0.05,
-+                      NI.margin.original = 0.05,
-+                      summary.measure.original = "RD", 
-+                      summary.measure.target = "OR")
-[1] 2.111111
+convertmargin.binary(p.control.expected = 0.05,
+                      NI.margin.original = 0.05,
+                      summary.measure.original = "RD", 
+                      summary.measure.target = "OR")
 ```
 
 So, for an expected control event risk of $5/%$, the corresponding non-inferiority margin on the odds ratio scale is 2.11. 
@@ -66,11 +65,10 @@ The function for continuous data is quite similar, and only supports mean differ
 
 
 ```{r}
-> convertmargin.continuous(mean.control.expected = 2,
-+                          NI.margin.original = 1,
-+                          summary.measure.original = "difference", 
-+                          summary.measure.target = "ratio")
-[1] 1.5
+convertmargin.continuous(mean.control.expected = 2,
+                          NI.margin.original = 1,
+                          summary.measure.original = "difference", 
+                          summary.measure.target = "ratio")
 ```
 
 The above code indicates that the equivalent of a non-inferiority margin of 1 as a difference of means corresponds to a margin of 1.5 for a ratio of means, if the control mean is 2.
@@ -78,12 +76,12 @@ Finally, the function for converting a margin with a time-to-event, or survival,
 This function requires slightly different input: if using either DRMST or DS, the related horizon times (tau.RMST or t.DS) must be specified. Additionally, the function allows both for provision of the event rate in the control arm (lambda) or the control risk (p.control.expected) at a certain time (t.expected).
 Of note, this function assumes event times follow an exponential distribution with fixed rate lambda for the time being. 
 ```{r}
-> convertmargin.survival(rate.control.expected = 0.2,
-+                          NI.margin.original = 1.2,
-+                          summary.measure.original = "HR", 
-+                          summary.measure.target = "DRMST",
-+                          tau.RMST = 3)
-[1] 0.1174096```
+convertmargin.survival(rate.control.expected = 0.2,
+                          NI.margin.original = 1.2,
+                          summary.measure.original = "HR", 
+                          summary.measure.target = "DRMST",
+                          tau.RMST = 3)
+```
 
 ## Non-inferiority frontiers comparison
 
@@ -92,27 +90,12 @@ One way to visualise this is to plot the non-inferiority frontier (Quartagno et 
 The compare functions do exactly this and, on top of plotting the various frontiers with a specific set of design parameters, additionally calculate which summary measure is guaranteed to have more power.  
 The summary measures supported are the same as for the convertmargin functions. For example, for a binary outcome, if the expectation is that the event risk is going to be $5/%$ and that the margin in such case should be a 5 percentage points risk difference, the various frontier could be obtained as follows:
 ```{r}
-> compare.NIfrontier.binary(p.control.expected = 0.05,
-+                           p.experim.target = 0.05,
-+                           p.range=c(0.01,0.15),
-+                           NI.margin=0.05,
-+                           summary.measure="RD")
-....................................................................................................
-Risk difference Margin = 0.05.
-Risk ratio Margin = 2.
-Odds ratio Margin = 2.111111.
-Arcsine Difference Margin = 0.09623715
-Expected risk in control arm: 0.05
-The Risk Difference summary measure for testing non-inferiority is the most powerful. The Arcsine Difference summary measure comes second followed by the Odds Ratio summary measure. The Risk Ratio is the least powerful summary measure.
-      
-The non-inferiority frontier plot shows the distance of various frontiers from the expected point (solid circle).
-
-Green line: Risk Difference frontier.
-Blue line: Odds Ratio frontier.
-Black line: Risk Ratio frontier.
-Orange line: Arcsine difference frontier.
-The black cross represents the frontier point, i.e. the point that defines the point null at the expected control risk.
-The dashed line represents the line of equality, i.e. the line where control and experimental risks are the same.```
+compare.NIfrontier.binary(p.control.expected = 0.05,
+                           p.experim.target = 0.05,
+                           p.range=c(0.01,0.15),
+                           NI.margin=0.05,
+                           summary.measure="RD")
+```
 
 ## Sample size calculations
 
@@ -128,21 +111,11 @@ There are functions for all types of outcomes and trial type. Input required for
 
 Example code and output for a sample size calculation using the function for binary outcomes is shown below:
 ```{r}
-> samplesize.NI.binary(p.control.expected = 0.1,
-+                      p.experim.target = 0.1,
-+                      NI.margin = 0.05,
-+                      test.type = "Wald")
-Method:  Wald 
-Power: 90 %
-One-sided significance level: 2.5 %.
-Expected control event risk = 10 %
-Expected experimental arm event risk (alternative H) = 10 %
-Non-acceptable experimental arm event risk (null H) = 15 %
-Expected loss to follow-up:  0 %
-The sample size required to test non-inferiority within a 5 % risk difference NI margin is:
- 757  individuals in the control group.
- 757  individuals in the experimental treatment group.
-[1] 757 757```
+samplesize.NI.binary(p.control.expected = 0.1,
+                      p.experim.target = 0.1,
+                      NI.margin = 0.05,
+                      test.type = "Wald")
+```
 
 The functions for sample size calculations for NI frontier and ROCI designs are similar but require further input. For NI frontier, the user is requested to pass the frontier as a function. For ROCI, there are several additional pramaters:
 
@@ -155,18 +128,14 @@ f. Other: Additional parameters if using the bootstrap method, including type of
 
 An example code and output is shown below: 
 ```{r}
-> samplesize.ROCI.binary(p.expected.curve = rep(0.05,7),
-+                        NI.margin = rep(0.05,6),
-+                        minimisation = TRUE,
-+                        se.method = "delta",
-+                        treatment.levels = c(8,10,12,14,16,18,20),
-+                        summary.measure = "RD",
-+                        tr.model = "FP2.classic")
-The total sample sizes needed (across all arms) for the specified 
-        expected curves and NI margins, accounting for  0 % loss 
-        to follow-up, are: 
-Optimal power:  1343 
-Acceptable power (conservative estimate):  38 ```
+samplesize.ROCI.binary(p.expected.curve = rep(0.05,7),
+                        NI.margin = rep(0.05,6),
+                        minimisation = TRUE,
+                        se.method = "delta",
+                        treatment.levels = c(8,10,12,14,16,18,20),
+                        summary.measure = "RD",
+                        tr.model = "FP2.classic")
+ ```
  
 ## Analysis / testing for non-inferiority
 
@@ -179,21 +148,13 @@ If recursive.p.estim=FALSE, the p-value for methods where it is not directly est
 This is an example code and output for testing for non-inferiority with binary data: 
 
 ```{r}
-> test.NI.binary(n.control = 100,
-+                n.experim = 100,
-+                e.control = 10,
-+                e.experim = 10,
-+                NI.margin = 0.1,
-+                test.type="Newcombe10")
-Testing for non-inferiority.
-Summary measure: Risk difference.
-Non-inferiority margin = 0.1.
-Method: Newcombe10.
-Estimate = 0
-Confidence interval (Two-sided 95%): (-0.08680254,0.08680254)
-p-value = 0.01197418.
-The confidence interval does not cross the null ( RD = 0.1 ), and hence we have evidence of non-inferiority.
-Note: with the test =  Newcombe10  for summary measure =  RD , p-value and standard error are only approximations based on a Z test with given logarithm of estimate and CI.```
+test.NI.binary(n.control = 100,
+                n.experim = 100,
+                e.control = 10,
+                e.experim = 10,
+                NI.margin = 0.1,
+                test.type="Newcombe10")
+```
 
 Once again, the functions for MAMS-ROCI trials require slightly different inputs and provide slightly different output. 
 Aside from differences we already highlighted for samplesize functions, the main one is the way the outcomes are provided. There are two possible ways: either by providing a vector of outcomes (outcomes, numeric) and one of treatment indicators (treatment, numeric). Or through the usual data+formual interface, where the formula should indicate what is the treatment variable as follows: 
@@ -216,46 +177,8 @@ res1<-test.ROCI.binary(formula=myformula, data=data.ex,
 
 Results can be summarised and plotted with standard sumamry and plot functions as follows:
 ```{r}
-> summary(res1)
-Family =  binomial 
- Model fit: 
-
-Call:
-glm(formula = outcomes ~ I((treatment/10)^-2) + I((treatment/10)^3), 
-    family = "binomial", data = data.mfp)
-
-Coefficients:
-                     Estimate Std. Error z value Pr(>|z|)   
-(Intercept)          -1.75105    0.56322  -3.109  0.00188 **
-I((treatment/10)^-2)  0.43682    0.42248   1.034  0.30116   
-I((treatment/10)^3)  -0.15523    0.09076  -1.710  0.08718 . 
----
-Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
-
-(Dispersion parameter for binomial family taken to be 1)
-
-    Null deviance: 548.50  on 699  degrees of freedom
-Residual deviance: 525.81  on 697  degrees of freedom
-AIC: 531.81
-
-Number of Fisher Scoring iterations: 5
-
-Difference from control treatment level ( 20 ):
-20  -  20 :  0 ( NA ,  NA )
-20  -  19 :  0.01 ( 0.004 ,  0.017 )
-20  -  18 :  0.021 ( 0.007 ,  0.035 )
-20  -  17 :  0.033 ( 0.01 ,  0.056 )
-20  -  16 :  0.045 ( 0.013 ,  0.077 )
-20  -  15 :  0.058 ( 0.017 ,  0.099 )
-20  -  14 :  0.071 ( 0.021 ,  0.121 )
-20  -  13 :  0.085 ( 0.028 ,  0.142 )
-20  -  12 :  0.099 ( 0.038 ,  0.161 )
-20  -  11 :  0.115 ( 0.052 ,  0.179 )
-20  -  10 :  0.134 ( 0.071 ,  0.197 )
-20  -  9 :  0.157 ( 0.093 ,  0.221 )
-20  -  8 :  0.188 ( 0.105 ,  0.271 )
-Recommended treatment level with selected NI margin:  15 .
-> plot(res1)```
+summary(res1)
+plot(res1)```
 
 ###### References
 
