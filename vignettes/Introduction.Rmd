@@ -135,7 +135,7 @@ samplesize.ROCI.binary(p.expected.curve = rep(0.05,7),
                         treatment.levels = c(8,10,12,14,16,18,20),
                         summary.measure = "RD",
                         tr.model = "FP2.classic")
- ```
+```
  
 ## Analysis / testing for non-inferiority
 
@@ -178,7 +178,8 @@ res1<-test.ROCI.binary(formula=myformula, data=data.ex,
 Results can be summarised and plotted with standard sumamry and plot functions as follows:
 ```{r}
 summary(res1)
-plot(res1)```
+plot(res1)
+```
 
 ###### References
 
