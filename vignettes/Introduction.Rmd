@@ -53,6 +53,7 @@ For example, let's assume we elicited from experts that the non-inferiority marg
 In order to obtain the non-inferiority margin on the odds ratio scale that matches the one we obtained as a risk difference, we need to run the following code: 
 
 ```{r}
+library(dani)
 convertmargin.binary(p.control.expected = 0.05,
                       NI.margin.original = 0.05,
                       summary.measure.original = "RD", 
