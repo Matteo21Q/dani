@@ -8,9 +8,12 @@
   Functions for testing non-inferiority when the outcome is continuous. It allows for a number of tests on different summary measures: difference of means or ratio of means. 
 }
 \usage{
-  test.NI.continuous(y.control, y.experim,  NI.margin, sig.level=0.025, summary.measure="mean.difference", 
-                           print.out=TRUE, higher.better=TRUE, test.type=NULL,
-                           M.boot=2000, sd.control=NULL, sd.experim=NULL)  
+  test.NI.continuous(y.control=NULL, y.experim=NULL,  NI.margin, sig.level=0.025, 
+                               summary.measure="mean.difference", 
+                               formula=NULL, data=NULL, control.level=0,
+                               print.out=TRUE, higher.better=TRUE, test.type=NULL,
+                               M.boot=2000, bootCI.type="bca", sd.control=NULL, 
+                               sd.experim=NULL)  
 }
 \arguments{
   \item{y.control}{Vector of measurements in the control arm.}
@@ -18,6 +21,13 @@
   \item{NI.margin}{Non-inferiority margin, expressed as the specified summary measure.}
   \item{sig.level}{One-sided significance level for testing. Default is 0.025, i.e. 2.5\%.}
   \item{summary.measure}{The population-level summary measure to be estimated, i.e. the scale on which we define the non-inferiority margin. Can be one of "mean.difference" (Difference of Means) or "mean.ratio" (Ratio of Means).}
+    \item{formula}{
+  The formula for the outcome model. The variable indicating treatment has to be put within brackets and preceded by treat, e.g. treat(treatment).
+}
+\item{data}{
+A data.frame with all data.
+}
+    \item{control.level}{Defines the control level in the treatment variable when using the formula and data interface. Defaults to 0.}
   \item{print.out}{Logical. If FALSE, no output is printed.}
   \item{higher.better}{Logical. If FALSE, the outcome is considered 
   unfavourable, i.e. higher scores indicate worse outcomes.
@@ -26,6 +36,9 @@
   For the mean ratio, methods available include "Fiellers" test, "lm" (marginalisation after using linear regression) or the three methods using bootstrap: "bootstrap.basic", "bootstrap.bca" or "bootstrap.percentile".
  }
   \item{M.boot}{ Number of bootstrap samples, e.g. for "bootstrap"" and "MUE.parametric.bootstrap" methods.}
+      \item{bootCI.type}{
+  Method for computing the confidence intervals if using a bootstrap method. It can be either "norm", "basic", "perc" or "bca". Default is "bca", which is the recommended option when possible. 
+}
   \item{sd.control}{The assumed standard deviation of the control arm if using a Z test.}
   \item{sd.experim}{The assumed standard deviation of the experimental arm if using a Z test.}
 }

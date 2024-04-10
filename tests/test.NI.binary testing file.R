@@ -22,43 +22,43 @@ n.t<-1
 # First set of checks:
 # Check that it stops for non acceptable values of n.control, n.experim, e.control, e.experim:
 
-out1A<-try(test.NI.binary("100", 100, 15, 15,  0.05))
+out1A<-try(test.NI.binary(n.control="100", n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1A, "try-error"))&&(grepl("is.numeric(n.control) is not TRUE", out1A[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1A"
 n.t=n.t+1
-out1B<-try(test.NI.binary(100, "100", 15, 15,  0.05))
+out1B<-try(test.NI.binary(n.control=100, n.experim="100", e.control=15, e.experim=15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1B, "try-error"))&&(grepl("is.numeric(n.experim) is not TRUE", out1B[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1B"
 n.t=n.t+1
-out1C<-try(test.NI.binary(100, 100, "15", 15,  0.05))
+out1C<-try(test.NI.binary(n.control=100, n.experim=100, e.control="15", e.experim=15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1C, "try-error"))&&(grepl("is.numeric(e.control) is not TRUE", out1C[1], fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1C"
 n.t=n.t+1
-out1D<-try(test.NI.binary(100, 100, 15, "15",  0.05))
+out1D<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim="15",  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1D, "try-error"))&&(grepl("is.numeric(e.experim) is not TRUE", out1D[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1D"
 n.t=n.t+1
-out1E<-try(test.NI.binary(0, 100, 15, 15,  0.05))
+out1E<-try(test.NI.binary(n.control=0, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1E, "try-error"))&&(grepl("n.control > 0 is not TRUE", out1E[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1E"
 n.t=n.t+1
-out1F<-try(test.NI.binary(100, 0, 15, 15,  0.05))
+out1F<-try(test.NI.binary(n.control=100, n.experim=0, e.control=15, e.experim=15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1F, "try-error"))&&(grepl("n.experim > 0 is not TRUE", out1F[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1F"
 n.t=n.t+1
-out1G<-try(test.NI.binary(100, 100, -1, 15,  0.05))
+out1G<-try(test.NI.binary(n.control=100, n.experim=100, e.control=-15, e.experim=15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1G, "try-error"))&&(grepl("e.control >= 0 is not TRUE", out1G[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1G"
 n.t=n.t+1
-out1H<-try(test.NI.binary(100, 100, 15, -1,  0.05))
+out1H<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=-15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1H, "try-error"))&&(grepl("e.experim >= 0 is not TRUE", out1H[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1H"
 n.t=n.t+1
-out1I<-try(test.NI.binary(10, 100, 15, 15,  0.05))
+out1I<-try(test.NI.binary(n.control=10, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1I, "try-error"))&&(grepl("n.control >= e.control is not TRUE", out1I[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1I"
 n.t=n.t+1
-out1J<-try(test.NI.binary(100, 10, 15, 15,  0.05))
+out1J<-try(test.NI.binary(n.control=100, n.experim=10, e.control=15, e.experim=15,  NI.margin=0.05))
 correct[[n.t]]<-ifelse((inherits(out1J, "try-error"))&&(grepl("n.experim >= e.experim is not TRUE", out1J[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1J"
 n.t=n.t+1
@@ -67,55 +67,55 @@ n.t=n.t+1
 # Second set of checks:
 # Check that it stops for non-acceptable margins:
 
-out2A<-try(test.NI.binary(100, 100, 15, 15,  "0.05"))
+out2A<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin="0.05"))
 correct[[n.t]]<-ifelse((inherits(out2A, "try-error"))&&(grepl("is.numeric(NI.margin) is not TRUE", out2A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2A"
 n.t=n.t+1
-out2B<-try(test.NI.binary(100, 100, 15, 15,  -0.05))
+out2B<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=-0.05))
 correct[[n.t]]<-ifelse((inherits(out2B, "try-error"))&&(grepl("When outcome is unfavourable, a risk difference NI margin needs to be positive.", out2B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2B"
 n.t=n.t+1
-out2C<-try(test.NI.binary(100, 100, 15, 15,  0.05, unfavourable = F))
+out2C<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, unfavourable = F))
 correct[[n.t]]<-ifelse((inherits(out2C, "try-error"))&&(grepl("When outcome is favourable, a risk difference NI margin needs to be negative.", out2C[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2C"
 n.t=n.t+1
-out2D<-try(test.NI.binary(100, 100, 15, 15,  1.05))
+out2D<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=1.05))
 correct[[n.t]]<-ifelse((inherits(out2D, "try-error"))&&(grepl("NI.margin cannot be greater than 1", out2D[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2D"
 n.t=n.t+1
-out2E<-try(test.NI.binary(100, 100, 15, 15,  -1.05, unfavourable=F))
+out2E<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=-1.05, unfavourable=F))
 correct[[n.t]]<-ifelse((inherits(out2E, "try-error"))&&(grepl("NI.margin cannot be lower than -1", out2E[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2E"
 n.t=n.t+1
-out2F<-try(test.NI.binary(100, 100, 15, 15,  0.2, summary.measure = "RR"))
+out2F<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.2, summary.measure = "RR"))
 correct[[n.t]]<-ifelse((inherits(out2F, "try-error"))&&(grepl("When outcome is unfavourable, a NI margin on the risk ratio scale needs to be >1.", out2F[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2F"
 n.t=n.t+1
-out2G<-try(test.NI.binary(100, 100, 15, 15,  1.2, summary.measure = "RR", unfavourable = F))
+out2G<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=1.2, summary.measure = "RR", unfavourable = F))
 correct[[n.t]]<-ifelse((inherits(out2G, "try-error"))&&(grepl("When outcome is favourable, a NI margin on the risk ratio scale needs to be <1.", out2G[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2G"
 n.t=n.t+1
-out2H<-try(test.NI.binary(100, 100, 15, 15,  0.2, summary.measure = "OR"))
+out2H<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.2, summary.measure = "OR"))
 correct[[n.t]]<-ifelse((inherits(out2H, "try-error"))&&(grepl("When outcome is unfavourable, a NI margin on the odds ratio scale needs to be >1.", out2H[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2H"
 n.t=n.t+1
-out2I<-try(test.NI.binary(100, 100, 15, 15,  1.2, summary.measure = "OR", unfavourable = F))
+out2I<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=1.2, summary.measure = "OR", unfavourable = F))
 correct[[n.t]]<-ifelse((inherits(out2I, "try-error"))&&(grepl("When outcome is favourable, a NI margin on the odds ratio scale needs to be <1.", out2I[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2I"
 n.t=n.t+1
-out2J<-try(test.NI.binary(100, 100, 15, 15,  -0.05, summary.measure = "AS"))
+out2J<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=-0.05, summary.measure = "AS"))
 correct[[n.t]]<-ifelse((inherits(out2J, "try-error"))&&(grepl("When outcome is unfavourable, a NI margin on the arc-sine difference scale needs to be >0.", out2J[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2J"
 n.t=n.t+1
-out2K<-try(test.NI.binary(100, 100, 15, 15,  0.05, summary.measure = "AS", unfavourable = F))
+out2K<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, summary.measure = "AS", unfavourable = F))
 correct[[n.t]]<-ifelse((inherits(out2K, "try-error"))&&(grepl("When outcome is favourable, a NI margin on the arc-sine difference scale needs to be <0.", out2K[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2K"
 n.t=n.t+1
-out2L<-try(test.NI.binary(100, 100, 15, 15,  0, summary.measure = "RR", unfavourable = F))
+out2L<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0, summary.measure = "RR", unfavourable = F))
 correct[[n.t]]<-ifelse((inherits(out2L, "try-error"))&&(grepl("A risk ratio margin must be >0.", out2L[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2L"
 n.t=n.t+1
-out2M<-try(test.NI.binary(100, 100, 15, 15,  0, summary.measure = "OR", unfavourable = F))
+out2M<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0, summary.measure = "OR", unfavourable = F))
 correct[[n.t]]<-ifelse((inherits(out2M, "try-error"))&&(grepl("A odds ratio margin must be >0.", out2M[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2M"
 n.t=n.t+1
@@ -124,15 +124,15 @@ n.t=n.t+1
 # Third set of checks:
 # Check that it stops for unacceptable values of significance level:
 
-out3A<-try(test.NI.binary(100, 100, 15, 15,  0.05, sig.level="0.025"))
+out3A<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, sig.level="0.025"))
 correct[[n.t]]<-ifelse((inherits(out3A, "try-error"))&&(grepl("is.numeric(sig.level) is not TRUE", out3A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3A"
 n.t=n.t+1
-out3B<-try(test.NI.binary(100, 100, 15, 15,  0.05,  sig.level=-0.1))
+out3B<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05,  sig.level=-0.1))
 correct[[n.t]]<-ifelse((inherits(out3B, "try-error"))&&(grepl("sig.level > 0 is not TRUE", out3B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3B"
 n.t=n.t+1
-out3C<-try(test.NI.binary(100, 100, 15, 15,  0.05,  sig.level=0.7))
+out3C<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05,  sig.level=0.7))
 correct[[n.t]]<-ifelse((inherits(out3C, "try-error"))&&(grepl("sig.level < 0.5 is not TRUE", out3C[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3C"
 n.t=n.t+1
@@ -141,67 +141,87 @@ n.t=n.t+1
 # Fourth set of checks:
 # Check with other wrong arguments:
 
-out4A<-try(test.NI.binary(100, 100, 15, 15,  0.05, summary.measure = "pippo"))
+out4A<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, summary.measure = "pippo"))
 correct[[n.t]]<-ifelse((inherits(out4A, "try-error"))&&(grepl("summary.measure ==", out4A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4A"
 n.t=n.t+1
 
 # Check that it works when print.out incorrectly specified:
-out4B<-try(test.NI.binary(100, 100, 15, 15,  0.05,  print.out = NA))
+out4B<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05,  print.out = NA))
 correct[[n.t]]<-ifelse((inherits(out4B, "try-error"))&&(grepl("!is.na(print.out) is not TRUE", out4B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4B"
 n.t=n.t+1
 
 # Check that it works when test.type incorrectly specified:
-out4C<-try(test.NI.binary(100, 100, 15, 15,  0.05, test.type = NA))
+out4C<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, test.type = NA))
 correct[[n.t]]<-ifelse((inherits(out4C, "try-error"))&&(grepl("is.character(test.type) is not TRUE", out4C[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4C"
 n.t=n.t+1
-out4D<-try(test.NI.binary(100, 100, 15, 15,  0.05,  test.type = "pippo"))
+out4D<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05,  test.type = "pippo"))
 correct[[n.t]]<-ifelse((inherits(out4D, "try-error"))&&(grepl("test.type %in% c", out4D[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4D"
 n.t=n.t+1
 
 # Check that it works when unfavourable incorrectly specified:
-out4E<-try(test.NI.binary(100, 100, 15, 15,  0.05,  unfavourable = "pippo"))
+out4E<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05,  unfavourable = "pippo"))
 correct[[n.t]]<-ifelse((inherits(out4E, "try-error"))&&(grepl("is.logical(unfavourable) is not TRUE", out4E[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4E"
 n.t=n.t+1
-out4F<-try(test.NI.binary(100, 100, 15, 15,  0.05, unfavourable = NA))
+out4F<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, unfavourable = NA))
 correct[[n.t]]<-ifelse((inherits(out4F, "try-error"))&&(grepl("!is.na(unfavourable) is not TRUE", out4F[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4F"
 n.t=n.t+1
 
 # Check that M.boot has acceptable value:
-out4G<-try(test.NI.binary(100, 100, 15, 15,  0.05, test.type="bootstrap", M.boot="2000"))
+out4G<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, test.type="bootstrap", M.boot="2000"))
 correct[[n.t]]<-ifelse((inherits(out4G, "try-error"))&&(grepl("is.numeric(M.boot) is not TRUE", out4G[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4G"
 n.t=n.t+1
-out4H<-try(test.NI.binary(100, 100, 15, 15,  0.05, test.type="bootstrap", M.boot=1))
+out4H<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, test.type="bootstrap", M.boot=1))
 correct[[n.t]]<-ifelse((inherits(out4H, "try-error"))&&(grepl("M.boot > 1 is not TRUE", out4H[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4H"
 n.t=n.t+1
 
 # Check that BB.adj has acceptable value:
-out4I<-try(test.NI.binary(100, 100, 15, 15,  0.05, test.type="Berger.Boos", BB.adj="0.00001"))
+out4I<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, test.type="Berger.Boos", BB.adj="0.00001"))
 correct[[n.t]]<-ifelse((inherits(out4I, "try-error"))&&(grepl("is.numeric(BB.adj) is not TRUE", out4I[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4I"
 n.t=n.t+1
-out4J<-try(test.NI.binary(100, 100, 15, 15,  0.05, test.type="Berger.Boos", BB.adj=-0.00001))
+out4J<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05,test.type="Berger.Boos", BB.adj=-0.00001))
 correct[[n.t]]<-ifelse((inherits(out4J, "try-error"))&&(grepl("BB.adj > 0 is not TRUE", out4J[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4J"
 n.t=n.t+1
 
 # Check that it works when recursive.p.estim incorrectly specified:
-out4K<-try(test.NI.binary(100, 100, 15, 15,  0.05,  recursive.p.estim = "pippo"))
+out4K<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05,  recursive.p.estim = "pippo"))
 correct[[n.t]]<-ifelse((inherits(out4K, "try-error"))&&(grepl("is.logical(recursive.p.estim) is not TRUE", out4K[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4K"
 n.t=n.t+1
-out4L<-try(test.NI.binary(100, 100, 15, 15,  0.05, recursive.p.estim = NA))
+out4L<-try(test.NI.binary(n.control=100, n.experim=100, e.control=15, e.experim=15,  NI.margin=0.05, recursive.p.estim = NA))
 correct[[n.t]]<-ifelse((inherits(out4L, "try-error"))&&(grepl("!is.na(recursive.p.estim) is not TRUE", out4L[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4L"
 n.t=n.t+1
 
+# Check what happens for wrongly specified formula/data:
+dat<-data.frame(y=rbinom(100,1,0.5), treat=rbinom(100,1,0.5))
+out4M<-try(test.NI.binary(formula=3, data=dat,  NI.margin=0.05))
+correct[[n.t]]<-ifelse((inherits(out4M, "try-error"))&&(grepl("inherits(formula", out4M[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4M"
+n.t=n.t+1
+out4N<-try(test.NI.binary(formula="y~treat(treat)", data=3, NI.margin=0.05))
+correct[[n.t]]<-ifelse((inherits(out4N, "try-error"))&&(grepl("is.data.frame(data) is not TRUE", out4N[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4N"
+n.t=n.t+1
+dat2<-data.frame(y=rbinom(100,1,0.5), treat=sample(0:3,100,T))
+out4O<-try(test.NI.binary(formula="y~treat(treat)", data=dat2, NI.margin=0.05))
+correct[[n.t]]<-ifelse((inherits(out4O, "try-error"))&&(grepl(" nlevels(treatment) == 2 is not TRUE", out4O[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4O"
+n.t=n.t+1
+dat3<-data.frame(y=rbinom(100,1,0.5), treat=sample(2:3,100,T))
+out4P<-try(test.NI.binary(formula="y~treat(treat)", data=dat3, NI.margin=0.05))
+correct[[n.t]]<-ifelse((inherits(out4P, "try-error"))&&(grepl("any(treatment == control.level)", out4P[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4P"
+n.t=n.t+1
 #####################################################
 # Fifth set of checks:
 # Now check test for certain values on RD scale. These are compared against various comparators
@@ -378,21 +398,21 @@ n.t <- n.t + 1
 out5AC <- try(test.NI.binary(n.control=1000, n.experim=1001, e.control=120, e.experim=10,  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
                              print.out=TRUE, unfavourable=T, test.type="logistic",
                              M.boot=2000, BB.adj=0.0001))
-correct[[n.t]] <- ifelse((inherits(out5AC, "list")) && (all.equal(out5AC$CI[2], -0.08894625, tolerance=10^(-4))), 1, 0) # No comparator
+correct[[n.t]] <- ifelse((inherits(out5AC, "list")) && (all.equal(out5AC$CI[2], -0.08894788, tolerance=10^(-4))), 1, 0) # No comparator
 names(correct)[[n.t]] <- "out5AC"
 n.t <- n.t + 1
 set.seed(1)
 out5AD <- try(test.NI.binary(n.control=100, n.experim=101, e.control=12, e.experim=0,  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
                              print.out=TRUE, unfavourable=TRUE, test.type="bootstrap",
                              M.boot=2000, BB.adj=0.0001))
-correct[[n.t]] <- ifelse((inherits(out5AD, "list")) && (all.equal(out5AD$CI[2], -0.05883821, tolerance=10^(-6))), 1, 0) # No comparator
+correct[[n.t]] <- ifelse((inherits(out5AD, "list")) && (all.equal(out5AD$CI[2], -0.06382979, tolerance=10^(-6))), 1, 0) # No comparator
 names(correct)[[n.t]] <- "out5AD"
 n.t <- n.t + 1
 set.seed(1)
 out5AE <- try(test.NI.binary(n.control=1000, n.experim=1001, e.control=120, e.experim=10,  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
                              print.out=TRUE, unfavourable=T, test.type="bootstrap",
-                             M.boot=2000, BB.adj=0.0001))
-correct[[n.t]] <- ifelse((inherits(out5AE, "list")) && (all.equal(out5AE$CI[2], -0.08994119, tolerance=10^(-6))), 1, 0) # No comparator
+                             M.boot=2005, BB.adj=0.0001))
+correct[[n.t]] <- ifelse((inherits(out5AE, "list")) && (all.equal(out5AE$CI[2], -0.08968069, tolerance=10^(-6))), 1, 0) # No comparator
 names(correct)[[n.t]] <- "out5AE"
 n.t <- n.t + 1
 out5AF <- try(test.NI.binary(n.control=10, n.experim=11, e.control=2, e.experim=0,  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
@@ -458,17 +478,40 @@ n.t <- n.t + 1
 set.seed(1)
 out5AP <- try(test.NI.binary(n.control=100, n.experim=101, e.control=12, e.experim=0,  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
                              print.out=TRUE, unfavourable=TRUE, test.type="MUE.parametric.bootstrap",
-                             M.boot=2000, BB.adj=0.0001))
+                             M.boot=2000, BB.adj=0.0001, bootCI.type = "perc"))
 correct[[n.t]] <- ifelse((inherits(out5AP, "list")) && (all.equal(out5AP$CI[2], -0.0497923, tolerance=10^(-6))), 1, 0) # Checked against BiomDiffCI
 names(correct)[[n.t]] <- "out5AP"
 n.t <- n.t + 1
 set.seed(1)
 out5AQ <- try(test.NI.binary(n.control=1000, n.experim=1001, e.control=120, e.experim=10,  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
                              print.out=TRUE, unfavourable=T, test.type="MUE.parametric.bootstrap",
-                             M.boot=2000, BB.adj=0.0001))
+                             M.boot=2000, bootCI.type="perc", BB.adj=0.0001))
 correct[[n.t]] <- ifelse((inherits(out5AQ, "list")) && (all.equal(out5AQ$CI[2], -0.08898217, tolerance=10^(-6))), 1, 0) # Checked against BiomDiffCI
 names(correct)[[n.t]] <- "out5AQ"
 n.t <- n.t + 1
+dat4<-data.frame(y=rep(c(1,0,1,0),c(15,85,15,85)), treat=rep(c(1,0), each=100))
+out5AR<-try(test.NI.binary(formula="y~treat(treat)", data=dat4,  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
+                          print.out=TRUE, unfavourable=TRUE, test.type="Wald",
+                          M.boot=2000, BB.adj=0.0001))
+correct[[n.t]]<-ifelse((inherits(out5AR,"list"))&&(all.equal(out5AR$CI[2],0.09897333))&&out5AR$non.inferiority==F,1,0) # Checked against prop.test
+names(correct)[[n.t]]<-"out5AR"
+n.t=n.t+1
+dataf<-data.frame(y<-rep(c(1,0,1,0),c(15,85,15,85)), treat<-rep(c(1,0), each=100))
+colnames(dataf)<-c("y", "treat")
+out5AS<-try(test.NI.binary(data=dataf, formula=as.formula("y~treat(treat)"),  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
+                          print.out=TRUE, unfavourable=TRUE, test.type="Wald",
+                          M.boot=2000, BB.adj=0.0001))
+correct[[n.t]]<-ifelse((inherits(out5AS,"list"))&&(all.equal(out5AS$CI[2],0.09897333))&&out5AS$non.inferiority==F,1,0) # Checked against prop.test
+names(correct)[[n.t]]<-"out5AS"
+n.t=n.t+1
+dataf2<-data.frame(y<-rep(c(1,0,1,0),c(15,85,15,85)), treat<-rep(c(1,0), each=100), age<-rep(c(20,30,40,50), 50))
+colnames(dataf2)<-c("y", "treat", "age")
+out5AT<-try(test.NI.binary(data=dataf2, formula=as.formula("y~treat(treat)+age"),  NI.margin=0.05, sig.level=0.025, summary.measure="RD", 
+                           print.out=TRUE, unfavourable=TRUE, test.type="logistic",
+                           M.boot=2000, BB.adj=0.0001))
+correct[[n.t]]<-ifelse((inherits(out5AT,"list"))&&(all.equal(out5AT$CI[2],0.09890323))&&out5AT$non.inferiority==F,1,0) # Checked against prop.test
+names(correct)[[n.t]]<-"out5AT"
+n.t=n.t+1
 
 #####################################################
 # Sixth set of checks:
@@ -613,17 +656,17 @@ correct[[n.t]] <- ifelse((class(out6W) == "list") && (all.equal(as.numeric(out6W
 names(correct)[[n.t]] <- "out6W"
 n.t <- n.t + 1
 set.seed(1)
-out6X <- try(test.NI.binary(n.control=100, n.experim=101, e.control=12, e.experim=0,  NI.margin=1.5, sig.level=0.025, summary.measure="RR", 
+out6X <- try(test.NI.binary(n.control=100, n.experim=101, e.control=12, e.experim=10,  NI.margin=1.5, sig.level=0.025, summary.measure="RR", 
                             print.out=TRUE, unfavourable=TRUE, test.type="bootstrap",
                             M.boot=2000, BB.adj=0.0001))
-correct[[n.t]] <- ifelse((is.list(out6X)) && (all.equal(out6X$CI[2], 0.6889517, tolerance=10^(-6))), 1, 0) # Checked against desctools
+correct[[n.t]] <- ifelse((is.list(out6X)) && (all.equal(out6X$CI[2], 2.057539, tolerance=10^(-6))), 1, 0) # Checked against desctools
 names(correct)[[n.t]] <- "out6X"
 n.t <- n.t + 1
 set.seed(1)
 out6Y <- try(test.NI.binary(n.control=1000, n.experim=1001, e.control=120, e.experim=10, NI.margin=1.5, sig.level=0.025, summary.measure="RR", 
                             print.out=TRUE, unfavourable=TRUE, test.type="bootstrap",
-                            M.boot=2000, BB.adj=0.0001))
-correct[[n.t]] <- ifelse((is.list(out6Y)) && (all.equal(out6Y$CI[2], 0.1442006, tolerance=10^(-6))), 1, 0) # Checked against desctools
+                            M.boot=2005, BB.adj=0.0001))
+correct[[n.t]] <- ifelse((is.list(out6Y)) && (all.equal(out6Y$CI[2], 0.1492745, tolerance=10^(-6))), 1, 0) # Checked against desctools
 names(correct)[[n.t]] <- "out6Y"
 n.t <- n.t + 1
 out6Z <- try(test.NI.binary(n.control=100, n.experim=101, e.control=12, e.experim=0,  NI.margin=1.5, sig.level=0.025, summary.measure="RR", 
@@ -814,7 +857,7 @@ n.t <- n.t + 1
 out7W <- try(test.NI.binary(n.control=1000, n.experim=1001, e.control=120, e.experim=10, NI.margin=1.5, sig.level=0.025, summary.measure="OR", 
                             print.out=TRUE, unfavourable=TRUE, test.type="logistic",
                             M.boot=2000, BB.adj=0.0001))
-correct[[n.t]] <- ifelse((is.list(out7W)) && (all.equal(out7W$CI[2], 0.1348625, tolerance=10^(-5))), 1, 0) # no comparator
+correct[[n.t]] <- ifelse((is.list(out7W)) && (all.equal(as.numeric(out7W$CI[2]), 0.1348625, tolerance=10^(-5))), 1, 0) # no comparator
 names(correct)[[n.t]] <- "out7W"
 n.t <- n.t + 1
 set.seed(1)
@@ -825,10 +868,10 @@ correct[[n.t]] <- ifelse((class(out7X) == "try-error") && (substr(out7X[1], 81, 
 names(correct)[[n.t]] <- "out7X"
 n.t <- n.t + 1
 set.seed(1)
-out7Y <- try(test.NI.binary(n.control=1000, n.experim=1001, e.control=120, e.experim=10, NI.margin=1.5, sig.level=0.025, summary.measure="OR", 
+out7Y <- try(test.NI.binary(n.control=1000, n.experim=1001, e.control=120, e.experim=20, NI.margin=1.5, sig.level=0.025, summary.measure="OR", 
                             print.out=TRUE, unfavourable=TRUE, test.type="bootstrap",
-                            M.boot=2000, BB.adj=0.0001))
-correct[[n.t]] <- ifelse((is.list(out7Y)) && (all.equal(out7Y$CI[2], 0.1323397, tolerance=10^(-6))), 1, 0) # No comparators
+                            M.boot=2005, BB.adj=0.0001))
+correct[[n.t]] <- ifelse((is.list(out7Y)) && (all.equal(out7Y$CI[2], 0.2364948, tolerance=10^(-6))), 1, 0) # No comparators
 names(correct)[[n.t]] <- "out7Y"
 n.t <- n.t + 1
 out7Z <- try(test.NI.binary(n.control=100, n.experim=101, e.control=12, e.experim=0,  NI.margin=1.5, sig.level=0.025, summary.measure="OR", 

@@ -8,11 +8,10 @@ Function to analyse a MAMS-ROCI (aka DURATIONS) randomised trial.
 A function that can be used to analyse a MAMS-ROCI randomised trial with binary outcome using one of several possible analysis methods to find the minimum/maximum non-inferior arm. 
 }
 \usage{
-test.ROCI.binary(formula=NULL, data=NULL, outcomes=NULL, treatment=NULL, NI.margin,
-                 minimisation=T, se.method="bootstrap", 
-                 treatment.levels=unique(treatment), summary.measure="RD",
-                 tr.model="FP2.fixed", M.boot=NULL, bootCI.type="bca", 
-                 parallel="no", n.cpus=1, sig.level=0.025, unfavourable=TRUE)
+test.ROCI.binary(formula=NULL, data=NULL, NI.margin, reference=max(treatment.levels),
+                               se.method="bootstrap", treatment.levels=unique(treatment), summary.measure="RD", 
+                               tr.model="FP2.fixed", M.boot=NULL, bootCI.type="bca", parallel="no", n.cpus=1, sig.level=0.025,
+                               unfavourable=TRUE)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -22,14 +21,12 @@ test.ROCI.binary(formula=NULL, data=NULL, outcomes=NULL, treatment=NULL, NI.marg
 \item{data}{
 A data.frame with all data.
 }
-  \item{outcomes}{
-  The outcome(s) of the analysis model. This is expected to be a vector. Used only when formula and data are not specified. 
+  \item{NI.margin}{
+ The non-inferiority margin(s). It can be either a scalar, if the margin is the same for all treatment levels, or a vector of length equal to that of treatment.levels minus one. 
+ For summary.measure="target.risk", this represents the target probability that we want to achieve, and if given as a vector it has length equal to that of treatment.levels.
 }
-  \item{treatment}{
-  A vector with the values of the randomised treatment aspect (e.g. durations). Used only when formula and data are not specified. 
-}
-  \item{minimisation}{
-  If TRUE, the standard level of treatment is taken as the largest and the search is for the minimum arm non-inferior to this. If false, the standard level of treatment is taken as the smallest and the search is for the maximum arm non-inferior to this. 
+  \item{reference}{
+  The arm that should act as a reference. It must be one of the arms in treatment levels. Default is the largest value among treatment.levels.  
 }
   \item{se.method}{
   Method for calculating standard errors around the treatment-response curve. Can be either "bootstrap" or "delta". 
@@ -40,9 +37,8 @@ A data.frame with all data.
   \item{summary.measure}{
   The population-level summary measure that defines the estimand. It can be either "RD" (Risk Difference), "RR" (Risk Ratio), "target.risk" (target probability) or "OR" (Odds Ratio).  
 }
-  \item{NI.margin}{
- The non-inferiority margin(s). It can be either a scalar, if the margin is the same for all treatment levels, or a vector of length equal to that of treatment.levels minus one. 
- For summary.measure="target.risk", this represents the target probability that we want to achieve, and if given as a vector it has length equal to that of treatment.levels.
+  \item{tr.model}{
+ Model to use for the treatment-response curve. It can be one of: "FP1.classic" or "FP2.classic" (Multivariable Fractional Polynomials as in package mfp, with a maximum of either 1 or 2 powers), "FP1.fixed" or "FP2.fixed" (Fractional polynomials fixing the number of powers to exactly 1 or 2).  
 }
   \item{M.boot}{
   Number of bootstrap samples if using se.method="bootstrap". 
@@ -59,9 +55,7 @@ A data.frame with all data.
   \item{sig.level}{
  One-sided significance level. 
 }
-  \item{tr.model}{
- Model to use for the treatment-response curve. It can be one of: "FP1.classic" or "FP2.classic" (Multivariable Fractional Polynomials as in package mfp, with a maximum of either 1 or 2 powers), "FP1.fixed" or "FP2.fixed" (Fractional polynomials fixing the number of powers to exactly 1 or 2).  
-}
+
   \item{unfavourable}{
 If TRUE the outcome is taken to be an unfavourable event, e.g. death or relapse. If FALSE, the outcome is considered a positive one, like cure. 
 }

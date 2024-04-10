@@ -11,7 +11,7 @@ samplesize.NI.survival(HR.target=NULL, p.control.expected=NULL,
                        p.experim.target=NULL, NI.margin, sig.level = 0.025, 
                        power = 0.9, r = 1, summary.measure = "HR", 
                        print.out = TRUE, test.type="logrank.Schoenfeld",
-                       unfavourable=Tm round=T, ltfu=0) 
+                       unfavourable=T, round=T, ltfu=0) 
 }
 \arguments{
 \item{HR.target}{The target hazard ratio between experimental and control arm at which to power the trial.}

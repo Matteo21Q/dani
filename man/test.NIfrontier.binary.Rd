@@ -11,7 +11,7 @@
   test.NIfrontier.binary(n.control, n.experim, e.control, e.experim,  
                                     NI.frontier, sig.level, summary.measure="RD", 
                                     print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                                    M.boot=2000, BB.adj=0.0001)  
+                                    M.boot=2000, bootCI.type="bca", BB.adj=0.0001)  
 }
 \arguments{
   \item{e.control}{Number of events in the control arm.}
@@ -30,6 +30,9 @@
     Finally, for arc-sine difference the only available methods are "LRT" and "Wald".
   }
   \item{M.boot}{ Number of bootstrap samples, e.g. for "bootstrap"" and "MUE.parametric.bootstrap" methods.}
+      \item{bootCI.type}{
+  Method for computing the confidence intervals if using a bootstrap method. It can be either "norm", "basic", "perc" or "bca". Default is "bca", which is the recommended option when possible. 
+}
   \item{BB.adj}{Adjustment factor for "Berger.Boos" method.}
 }
 \details{

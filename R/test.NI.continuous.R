@@ -1,6 +1,42 @@
-test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025, summary.measure="mean.difference", 
-                           print.out=TRUE, higher.better=TRUE, test.type=NULL,
-                           M.boot=2000, sd.control=NULL, sd.experim=NULL) {
+test.NI.continuous <- function(y.control=NULL, y.experim=NULL,  NI.margin, sig.level=0.025, 
+                               summary.measure="mean.difference", 
+                               formula=NULL, data=NULL, control.level=0,
+                               print.out=TRUE, higher.better=TRUE, test.type=NULL,
+                               M.boot=2000, bootCI.type="bca", sd.control=NULL, 
+                               sd.experim=NULL) {
+  
+  covariates<-NULL
+  if (any(is.null(y.control), is.null(y.experim))&&any(is.null(data), is.null(formula))) {
+    stop("Either y.control and y.experim or formula+data must be provided.\n")
+  }
+  if (!is.null(formula)) {
+    if (is.character(formula)) formula<-as.formula(formula)
+    stopifnot(is.data.frame(data), inherits(formula,"formula"))
+    if (is_tibble(data)) data<-as.data.frame(data)
+    terms.form <- attr(terms(formula), "term.labels")
+    treat.index <- which(grepl("treat\\(", terms.form))
+    if (length(treat.index)==0) stop("Treatment variable in the formula must be provided within brackets and preceded by treat, e.g. treat(treatment).\n")
+    treatment <- factor(data[,all.vars(formula[[3]])[treat.index]])
+    stopifnot(any(treatment==control.level), nlevels(treatment)==2)
+    treatment<-relevel(treatment, ref=as.character(control.level))
+    covariates <- terms.form[-treat.index]
+    outcomes <- data[,all.vars(formula[[2]])]
+    y.control<-outcomes[treatment==control.level]
+    y.experim<-outcomes[treatment!=control.level]
+    covariate.formula<-NULL
+    if (length(covariates)!=0) {
+      covariate.formula<-"+"
+      for (cc in 1:length(covariates)) {
+        covariate.formula <- paste(covariate.formula, covariates[cc])
+        if (cc!=length(covariates)) covariate.formula<-paste(covariate.formula, "+")
+      }
+    }
+    myformula<-as.formula(paste("outcomes~treatment", covariate.formula))
+    mydata <- data.frame(outcomes, treatment, data[,covariates])
+    if (length(covariates)>0) colnames(mydata)[3:ncol(mydata)]<-covariates
+    assign("mydata", mydata, envir = .GlobalEnv)
+    
+  } 
   
   stopifnot(is.numeric(y.control), is.vector(y.control), length(y.control)>1)
   stopifnot(is.vector(y.experim), is.numeric(y.experim), length(y.experim)>1)
@@ -10,6 +46,8 @@ test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025
   stopifnot(is.logical(print.out), !is.na(print.out))
   stopifnot(is.logical(higher.better), !is.na(higher.better))
   stopifnot(is.numeric(M.boot), M.boot>1)
+  stopifnot(is.character(bootCI.type), bootCI.type%in%c("norm","perc","bca","basic"))
+  
   if (is.null(test.type)) {
     if (summary.measure=="mean.difference") {
       test.type<-"t.test"
@@ -18,18 +56,35 @@ test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025
     } 
   }
   stopifnot(is.character(test.type))
-  if (summary.measure=="mean.difference") {
-    stopifnot(test.type%in%c("Z.test", "t.test", "bootstrap.bca", "bootstrap.basic", "bootstrap.percentile"))
+  adjusted<-(!is.null(covariates)&&any(dim(covariates)>0))
+  if (is.null(formula)) {
+    outcomes<-c(y.experim, y.control)
+    treatment<-factor(c(rep(1,length(y.experim)), rep(0, length(y.control))))
+    mydata<-data.frame(outcomes,treatment)
+    myformula<-as.formula("outcomes~treatment")
+  }
+  
+  if (!adjusted) {
+    if (summary.measure=="mean.difference") {
+      stopifnot(test.type%in%c("Z.test", "t.test", "bootstrap", "lm"))
+    } else {
+      stopifnot(test.type%in%c("Fiellers", "lm", "bootstrap"))
+    } 
   } else {
-    stopifnot(test.type%in%c("Fiellers", "lm", "bootstrap.bca", "bootstrap.basic", "bootstrap.percentile"))
-  } 
+    if (summary.measure=="mean.difference") {
+      stopifnot(test.type%in%c("lm", "bootstrap"))
+    } else {
+      stopifnot(test.type%in%c("lm", "bootstrap"))
+    } 
+  }
+
   if (test.type=="Z.test") {
     stopifnot(is.numeric(sd.control), sd.control>0)
     stopifnot(is.numeric(sd.experim), sd.experim>0)
   }
   
   estimate<-se<-Z<-p<-NULL
-  
+
   if (summary.measure=="mean.difference") {
     if ((higher.better == T)&&(NI.margin>=0)) stop("When higher values of the outcome are better, a mean difference NI margin needs to be negative.\n")
     if ((higher.better == F)&&(NI.margin<=0)) stop("When lower values of the outcome are better, a mean difference NI margin needs to be positive.\n")
@@ -50,18 +105,23 @@ test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025
       direction<-ifelse(higher.better==F, "less", "greater")
       test<-t.test(y.experim, y.control,direction,NI.margin,conf.level=1-sig.level)
       p <- test$p.value
-    } else if (test.type=="bootstrap.bca") {
-      test<-MeanDiffCI(y.experim, y.control, conf.level = (1-sig.level*2), method = "bca", R=M.boot)
-      CI <- as.numeric(test[2:3])
-      estimate<-as.numeric(test[1])
-    } else if (test.type=="bootstrap.basic") {
-      test<-MeanDiffCI(y.experim, y.control, conf.level = (1-sig.level*2), method = "basic", R=M.boot)
-      CI <- as.numeric(test[2:3])
-      estimate<-as.numeric(test[1])
-    } else if (test.type=="bootstrap.percentile") {
-      test<-MeanDiffCI(y.experim, y.control, conf.level = (1-sig.level*2), method = "perc", R=M.boot)
-      CI <- as.numeric(test[2:3])
-      estimate<-as.numeric(test[1])
+    } else if (test.type=="bootstrap") {
+      dif <- function(dat, indices) {
+        d <- dat[indices,] # allows boot to select sample
+        mdif <- mean(d[d$treatment!=control.level,"outcomes"]) - mean(d[d$treatment==control.level,"outcomes"])
+        return(mdif)
+      } 
+      res.b<-boot(mydata, dif, R=M.boot)
+      CI<-boot.ci(res.b, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
+      estimate<-res.b$t0
+    } else if (test.type=="lm") {
+      fit<-lm(myformula, mydata)
+      fit.std<-avg_comparisons(fit, variables="treatment")
+
+      CI <- c(fit.std[fit.std$term=="treatment","conf.low"], fit.std[fit.std$term=="treatment","conf.high"])
+      estimate<-fit.std[fit.std$term=="treatment","estimate"]
+      p<-fit.std[fit.std$term=="treatment","p.value"]
+      
     } 
     estimate.n<-mean(CI)
     if (is.null(se)) {
@@ -77,7 +137,11 @@ test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025
     } else {
       is.p.est<-F
     }
-    
+    if ((higher.better==F&&CI[2]<NI.margin)||(higher.better==T&&CI[1]>NI.margin)) { 
+      non.inferiority<-T
+    } else {
+      non.inferiority<-F
+    }
     if (print.out==T) {
       cat("Testing for non-inferiority.\nSummary measure: Mean difference.\nNon-inferiority margin = ", NI.margin, ".\nMethod: ",test.type,
           ".\nEstimate = ", estimate, 
@@ -85,10 +149,8 @@ test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025
           ")\np-value = ", p, ".\n" , sep="")
       if ((higher.better==F&&CI[2]<NI.margin)||(higher.better==T&&CI[1]>NI.margin)) { 
         cat("The confidence interval does not cross the null ( Mean Difference = ", NI.margin, " ), and hence we have evidence of non-inferiority.\n", sep="")
-        non.inferiority<-T
       } else {
         cat("The confidence interval crosses the null ( Mean DIfference = ", NI.margin, " ), and hence we have NO evidence of non-inferiority.\n", sep="")
-        non.inferiority<-F
       }
       if (is.p.est==T) {
         if (is.se.est==T) {
@@ -101,9 +163,6 @@ test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025
     }
     
   } else if (summary.measure == "mean.ratio") {
-    y.comb<-c(y.control, y.experim)
-    treat<-c(rep(0, length(y.control)),rep(1, length(y.control)))
-    dd<-data.frame(y.comb, treat)
     if ((higher.better == T)&&(NI.margin>=1)) stop("When outcome is such that higher values are better, a NI margin on the mean ratio scale needs to be <1.")
     if ((higher.better == F)&&(NI.margin<=1)) stop("When outcome is such that higher values are worse, a NI margin on the mean ratio scale needs to be >1.")
     if (NI.margin<=0) stop("A mean ratio margin must be >0.\n")
@@ -116,24 +175,21 @@ test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025
       test<-ttestratio(y.experim, y.control,direction,NI.margin,conf.level=1-sig.level)
       p <- test$p.value
     } else if (test.type=="lm") {
-      fit<-lm(y.comb~treat)
-      mf<-avg_comparisons(fit, variables="treat", comparison="lnratioavg", transform = exp)
+      fit<-lm(myformula, mydata)
+      mf<-avg_comparisons(fit, variables="treatment", comparison="lnratioavg", transform = exp)
       estimate<-mf$estimate    
       p <- mf$p.value
       CI <- c(mf$conf.low, mf$conf.high)
-    } else if (test.type=="bootstrap.percentile") {
-      res.b<-boot(dd, ratios, R=M.boot)
-      CI<-boot.ci(res.b, type="perc")$percent[4:5]
-      estimate<-res.b$t0
-    } else if (test.type=="bootstrap.basic") {
-      res.b<-boot(dd, ratios, R=M.boot)
-      CI<-boot.ci(res.b, type="basic")$basic[4:5]
-      estimate<-res.b$t0
-    } else if (test.type=="bootstrap.bca") {
-      res.b<-boot(dd, ratios, R=M.boot)
-      CI<-boot.ci(res.b, type="bca")$bca[4:5]
-      estimate<-res.b$t0
-    }
+    } else if (test.type=="bootstrap") {
+      rat <- function(dat, indices) {
+        d <- dat[indices,] # allows boot to select sample
+        mrat <- log(mean(d[d$treatment!=control.level,"outcomes"])/mean(d[d$treatment==control.level,"outcomes"]))
+        return(mrat)
+      } 
+      res.b<-boot(mydata, rat, R=M.boot)
+      CI<-exp(boot.ci(res.b,  type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")])
+      estimate<-exp(res.b$t0)
+    } 
     if (is.null(se)) {
       se<-(log(CI[2])-log(CI[1]))/(2*qnorm(1-sig.level))
       is.se.est<-T
@@ -147,17 +203,20 @@ test.NI.continuous <- function(y.control, y.experim,  NI.margin, sig.level=0.025
     } else {
       is.p.est<-F
     }
+    if ((higher.better==T&&CI[1]>NI.margin)||(higher.better==F&&CI[2]<NI.margin)) { 
+      non.inferiority<-T
+    } else {
+      non.inferiority<-F
+    }
     if (print.out==T) {
       cat("Testing for non-inferiority.\nSummary measure: Ratio of means.\nNon-inferiority margin = ", NI.margin, ".\nMethod: ",test.type,
           ".\nEstimate = ", estimate, 
           "\nConfidence interval (Two-sided ", (1-sig.level*2)*100,"%): (", CI[1], ",", CI[2], 
           ")\np-value = ", p, ".\n" , sep="")
       if ((higher.better==T&&CI[1]>NI.margin)||(higher.better==F&&CI[2]<NI.margin)) { 
-        non.inferiority<-T
         cat("The confidence interval does not cross the null ( Mean Ratio = ", NI.margin, " ), and hence we have evidence of non-inferiority.\n", sep="")
       } else {
-        non.inferiority<-F
-        cat("The confidence interval crosses the null ( Mean Ratio = ", NI.margin, " ), and hence we have NO evidence of non-inferiority.\n", sep="")
+        cat("The confidence interval crosses the null ( Mean Ratio = ", NI.margin, " ), and hence we have NO clear evidence of non-inferiority.\n", sep="")
       }
       if (is.p.est==T) {
         if (is.se.est==T) {

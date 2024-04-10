@@ -184,79 +184,79 @@ n.t=n.t+1
 out5A<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 1, 
                                  summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                  higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5A,"numeric"))&&(all.equal(out5A[2],171)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5A,"numeric"))&&(all.equal(out5A[2],337)),1,0) 
 names(correct)[[n.t]]<-"out5A"
 n.t=n.t+1
 out5B<-try(samplesize.NI.continuous(0, mean.experim=0, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                      higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5B,"numeric"))&&(all.equal(out5B[2],171)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5B,"numeric"))&&(all.equal(out5B[2],337)),1,0) 
 names(correct)[[n.t]]<-"out5B"
 n.t=n.t+1
 out5C<-try(samplesize.NI.continuous(0, mean.experim=0.25*0.05, sd=1, NI.margin=-0.05, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                      higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5C,"numeric"))&&(all.equal(out5C[2],2692)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5C,"numeric"))&&(all.equal(out5C[2],5380)),1,0) 
 names(correct)[[n.t]]<-"out5C"
 n.t=n.t+1
 out5D<-try(samplesize.NI.continuous(0, mean.experim=-0.25*0.05, sd=1, NI.margin=-0.05, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                      higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5D,"numeric"))&&(all.equal(out5D[2],7474)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5D,"numeric"))&&(all.equal(out5D[2],14944)),1,0) 
 names(correct)[[n.t]]<-"out5D"
 n.t=n.t+1
 out5E<-try(samplesize.NI.continuous(0, mean.experim=0, sd=1, NI.margin=-1.5, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                      higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5E,"numeric"))&&(all.equal(out5E[2],8)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5E,"numeric"))&&(all.equal(out5E[2],10)),1,0) 
 names(correct)[[n.t]]<-"out5E"
 n.t=n.t+1
 out5F<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.difference", print.out = TRUE, test.type="Z.test",
                                      higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5F,"numeric"))&&(all.equal(out5F[2],169)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5F,"numeric"))&&(all.equal(out5F[2],337)),1,0) 
 names(correct)[[n.t]]<-"out5F"
 n.t=n.t+1
 out5G<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=10, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                      higher.better=F))
-correct[[n.t]]<-ifelse((inherits(out5G,"numeric"))&&(all.equal(out5G[2],171)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5G,"numeric"))&&(all.equal(out5G[2],337)),1,0) 
 names(correct)[[n.t]]<-"out5G"
 n.t=n.t+1
 out5H<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.05, power = 0.9, r = 1, 
                                     summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                     higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5H,"numeric"))&&(all.equal(out5H[2],139)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5H,"numeric"))&&(all.equal(out5H[2],275)),1,0) 
 names(correct)[[n.t]]<-"out5H"
 n.t=n.t+1
 out5I<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.5, r = 1, 
                                     summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                     higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5I,"numeric"))&&(all.equal(out5I[2],64)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5I,"numeric"))&&(all.equal(out5I[2],123)),1,0) 
 names(correct)[[n.t]]<-"out5I"
 n.t=n.t+1
 out5J<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 0.5, 
                                     summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                     higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5J,"numeric"))&&(all.equal(out5J[2],171)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5J,"numeric"))&&(all.equal(out5J[2],337)),1,0) 
 names(correct)[[n.t]]<-"out5J"
 n.t=n.t+1
 out5K<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 2, 
                                     summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                     higher.better=T))
-correct[[n.t]]<-ifelse((inherits(out5K,"numeric"))&&(all.equal(out5K[2],171)),1,0) # Checked against prop.test
+correct[[n.t]]<-ifelse((inherits(out5K,"numeric"))&&(all.equal(out5K[2],337)),1,0) # Checked against prop.test
 names(correct)[[n.t]]<-"out5K"
 n.t=n.t+1
 out5L<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 1, 
                                     summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                     higher.better=T, round=F))
-correct[[n.t]]<-ifelse((inherits(out5L,"numeric"))&&(all.equal(out5L[2],170.1188, tolerance=10^(-5))),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5L,"numeric"))&&(all.equal(out5L[2],336.2375, tolerance=10^(-5))),1,0) 
 names(correct)[[n.t]]<-"out5L"
 n.t=n.t+1
 out5M<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, sig.level = 0.025, power = 0.9, r = 1, 
                                     summary.measure = "mean.difference", print.out = TRUE, test.type="t.test",
                                     higher.better=T, ltfu=0.1))
-correct[[n.t]]<-ifelse((inherits(out5M,"numeric"))&&(all.equal(out5M[2],190)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5M,"numeric"))&&(all.equal(out5M[2],375)),1,0) 
 names(correct)[[n.t]]<-"out5M"
 n.t=n.t+1
 
@@ -267,19 +267,19 @@ n.t=n.t+1
 out6A<-try(samplesize.NI.continuous(20, mean.experim=20, sd=1, NI.margin=0.75, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.ratio", print.out = TRUE, test.type="log.t.test",
                                      higher.better=T))
-correct[[n.t]] <- ifelse((is.vector(out6A)) && (all.equal(out6A[2], 129)) , 1, 0) 
+correct[[n.t]] <- ifelse((is.vector(out6A)) && (all.equal(out6A[2], 254)) , 1, 0) 
 names(correct)[[n.t]] <- "out6A"
 n.t <- n.t + 1
 out6B<-try(samplesize.NI.continuous(20, mean.experim=20, sd=1, NI.margin=1.25, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.ratio", print.out = TRUE, test.type="log.t.test",
                                      higher.better=F))
-correct[[n.t]] <- ifelse((is.vector(out6B)) && (all.equal(out6B[2], 213)) , 1, 0) 
+correct[[n.t]] <- ifelse((is.vector(out6B)) && (all.equal(out6B[2], 423)) , 1, 0) 
 names(correct)[[n.t]] <- "out6B"
 n.t <- n.t + 1
 out6C<-try(samplesize.NI.continuous(20, mean.experim=20, sd=1, NI.margin=0.75, sig.level = 0.025, power = 0.9, r = 1, 
                                      summary.measure = "mean.ratio", print.out = TRUE, test.type="log.Z.test",
                                      higher.better=T))
-correct[[n.t]] <- ifelse((is.vector(out6C)) && (all.equal(out6C[2], 127)) , 1, 0) 
+correct[[n.t]] <- ifelse((is.vector(out6C)) && (all.equal(out6C[2], 254)) , 1, 0) 
 names(correct)[[n.t]] <- "out6C"
 n.t <- n.t + 1
 out6D<-try(samplesize.NI.continuous(20, mean.experim=20, sd=10, NI.margin=0.75, sig.level = 0.025, power = 0.9, r = 1, 

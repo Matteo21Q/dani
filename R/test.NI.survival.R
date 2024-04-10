@@ -1,15 +1,37 @@
-test.NI.survival <- function(time, event, treat, NI.margin, sig.level=0.025, summary.measure="HR", 
+test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig.level=0.025, summary.measure="HR", 
                                print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                               M.boot=2000, tau=NULL) {
+                               M.boot=2000, bootCI.type="bca", tau=NULL) {
   
   stopifnot(is.numeric(time), is.vector(time), length(time)>2, all(time>0))
   stopifnot(is.vector(event), nlevels(as.factor(event))==2, length(time)==length(event))
   stopifnot(is.vector(treat), nlevels(as.factor(treat))==2, length(time)==length(treat))
   treat<-as.factor(treat)
+  if (!is.null(covariates)) {
+    stopifnot(is.data.frame(covariates))
+    if (is_tibble(covariates)) covariates<-as.data.frame(covariates)
+  }
+  covariate.formula<-NULL
+  if (length(covariates)!=0) {
+    covariate.formula<-"+"
+    for (cc in 1:length(covariates)) {
+      covariate.formula <- paste(covariate.formula, colnames(covariates)[cc])
+      if (cc!=length(covariates)) covariate.formula<-paste(covariate.formula, "+")
+    }
+  }
+  myformula<-as.formula(paste("Surv(time, event)~treat", covariate.formula))
+  if (!is.null(covariates))  {
+    mydata <- data.frame(time, event, treat, covariates)
+    colnames(mydata)[4:ncol(mydata)]<-colnames(covariates)
+  } else {
+    mydata <- data.frame(time, event, treat)
+  }
+  assign("mydata", mydata, envir = .GlobalEnv)
+  
   stopifnot(is.numeric(NI.margin))
   stopifnot(is.numeric(sig.level), sig.level < 0.5, sig.level > 0)
   stopifnot(is.character(summary.measure), summary.measure %in% c("HR", "DRMST", "DS"))
   stopifnot(is.logical(print.out), !is.na(print.out))
+  stopifnot(is.character(bootCI.type), bootCI.type%in%c("norm","perc","bca","basic"))
   stopifnot(is.logical(unfavourable), !is.na(unfavourable))
   stopifnot(is.numeric(M.boot), M.boot>1)
   if (is.null(test.type)) {
@@ -19,13 +41,22 @@ test.NI.survival <- function(time, event, treat, NI.margin, sig.level=0.025, sum
       test.type<-"flexsurv.PH.delta"
     } 
   }
+  adjusted<-(!is.null(covariates)&&(ncol(covariates)>0))
   stopifnot(is.character(test.type))
   if (summary.measure=="HR") {
     stopifnot(test.type%in%c("Cox.PH", "flexsurv.PH", "Cox.weighted"))
   } else if (summary.measure=="DRMST") {
-    stopifnot(test.type%in%c("KM", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("KM", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap"))
+    } else {
+      stopifnot(test.type%in%c( "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap"))
+    }
   } else {
-    stopifnot(test.type%in%c("Newcombe10", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap", "Cox.weighted"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Newcombe10", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap", "Cox.weighted"))
+    } else {
+      stop("Covariate adjustment not currently supported for summary measures different from HR.\n")
+    }
   }
   
   estimate<-se<-Z<-p<-NULL
@@ -38,15 +69,15 @@ test.NI.survival <- function(time, event, treat, NI.margin, sig.level=0.025, sum
     if ((unfavourable == F)&&(NI.margin>=1)) stop("When events are favourable (e.g. cure), a HR NI margin needs to be <1.\n")
     
     if (test.type=="Cox.PH") {
-      fit<-coxph(Surv(time,event)~treat, dd)
+      fit<-coxph(myformula, mydata)
       estimate<-as.numeric(exp(fit$coefficients["treat1"]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)["treat1",]))
     } else if (test.type=="flexsurv.PH") {
-      fit<-flexsurvspline(Surv(time,event)~treat, k=2, data=dd)
+      fit<-flexsurvspline(myformula, k=2, data=mydata)
       estimate<-as.numeric(exp(fit$coefficients["treat1"]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)["treat1",]))
     } else if (test.type=="Cox.weighted") {
-      fit<-coxphw(Surv(time,event)~treat, data=dd)
+      fit<-coxphw(myformula, data=mydata)
       estimate<-as.numeric(exp(fit$coefficients["treat1"]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)["treat1",]))
     }  
@@ -98,9 +129,8 @@ test.NI.survival <- function(time, event, treat, NI.margin, sig.level=0.025, sum
       estimate<-as.numeric(fit.RMST$unadjusted.result[1,1])
     } else if (test.type=="Cox.PH.bootstrap") {
       res<-boot(dd, RMST.diff, tau=tau, R=M.boot)
-      res.ci<-boot.ci(res, type = "perc", index=1, conf=1-2*sig.level)
+      CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-res$t0     
-      CI <- res.ci$percent[4:5]
     } else if (test.type=="flexsurv.PH.delta") {
       fit.flexsurv<-flexsurvspline(Surv(time,event)~treat, k=2, data=dd)
       varcov<-vcov(fit.flexsurv)
@@ -126,9 +156,8 @@ test.NI.survival <- function(time, event, treat, NI.margin, sig.level=0.025, sum
       CI<-c(low.bndb, up.bndb)
     } else if (test.type=="flexsurv.PH.bootstrap") {
       res<-boot(dd, RMST.diff.flexsurv, tau=tau, R=M.boot)
-      res.ci<-boot.ci(res, type = "perc", index=1, conf=1-2*sig.level)
+      CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-as.numeric(res$t0)    
-      CI <- res.ci$percent[4:5]
     } 
     if (is.null(se)) {
       se<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
@@ -179,9 +208,8 @@ test.NI.survival <- function(time, event, treat, NI.margin, sig.level=0.025, sum
       estimate<-test[1]
     } else if (test.type=="Cox.PH.bootstrap") {
       res<-boot(dd, surv.diff, tau=tau, R=M.boot)
-      res.ci<-boot.ci(res, type = "perc", index=1, conf=1-2*sig.level)
+      CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-res$t0     
-      CI <- res.ci$percent[4:5]
     } else if (test.type=="flexsurv.PH.delta") {
       fit.flexsurv<-flexsurvspline(Surv(time,event)~treat, k=2, data=dd)
       varcov<-vcov(fit.flexsurv)
@@ -206,9 +234,8 @@ test.NI.survival <- function(time, event, treat, NI.margin, sig.level=0.025, sum
       CI<-c(low.bndb, up.bndb)
     } else if (test.type=="flexsurv.PH.bootstrap") {
       res<-boot(dd, Surv.diff.flexsurv, tau=tau, R=M.boot)
-      res.ci<-boot.ci(res, type = "perc", index=1, conf=1-2*sig.level)
+      CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-as.numeric(res$t0)    
-      CI <- res.ci$percent[4:5]
     } 
     if (is.null(se)) {
       se<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
@@ -233,7 +260,7 @@ test.NI.survival <- function(time, event, treat, NI.margin, sig.level=0.025, sum
         cat("The confidence interval does not cross the null ( DS = ", NI.margin, " ), and hence we have evidence of non-inferiority.\n", sep="")
       } else {
         non.inferiority<-F
-        cat("The confidence interval crosses the null ( DS = ", NI.margin, " ), and hence we have NO evidence of non-inferiority.\n", sep="")
+        cat("The confidence interval crosses the null ( DS = ", NI.margin, " ), and hence we have NO clear evidence of non-inferiority.\n", sep="")
       }
       if (is.p.est==T) {
         if (is.se.est==T) {

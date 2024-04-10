@@ -15,25 +15,25 @@ samplesize.NIfrontier.binary <- function(p.control.expected, p.experim.target=NU
   stopifnot(is.numeric(ltfu), ltfu < 1, ltfu >= 0)
   
 
-  ss0<-samplesize.NI.binary(p.control.expected, p.experim.target,  
-                                      NI.margin=NI.frontier(p.control.expected), sig.level, 
-                                      power, r, summary.measure, print.out=FALSE, test.type="score", 
-                                      unfavourable, round=F, ltfu=0) 
+  ss0<-samplesize.NI.binary(p.control.expected=p.control.expected, p.experim.target=p.experim.target,  
+                                      NI.margin=NI.frontier(p.control.expected), sig.level=sig.level, 
+                                      power=power, r=r, summary.measure=summary.measure, print.out=FALSE, test.type="score", 
+                                      unfavourable=unfavourable, round=F, ltfu=0) 
   n.control<-ss0[1]
   n.experim<-ss0[2]
   e.control<-round(n.control*p.control.expected)
   e.experim<-round(n.experim*p.experim.target)
   
-  fit.ed<-test.NIfrontier.binary(n.control, n.experim, e.control, e.experim,  
-                                             NI.frontier, sig.level, summary.measure, 
-                                             print.out=FALSE, unfavourable, test.type="LRT")
+  fit.ed<-test.NIfrontier.binary(n.control=n.control, n.experim=n.experim, e.control=e.control, e.experim=e.experim,  
+                                             NI.frontier=NI.frontier, sig.level=sig.level, summary.measure=summary.measure, 
+                                             print.out=FALSE, unfavourable=unfavourable, test.type="LRT")
   
   p0 <-ifelse(summary.measure%in%c("RD","AS"), p.control.expected, log(p.control.expected))
   p1 <-ifelse(summary.measure%in%c("RD","AS"), p.experim.target, log(p.experim.target))
   NI.m <-ifelse(summary.measure%in%c("RD","AS"), NI.frontier(p.control.expected), log(NI.frontier(p.control.expected)))
-  ss<-samplesize.NI.continuous(p0, p1, sqrt((fit.ed$se)^2*n.experim), 
-                               NI.margin=NI.m, sig.level, 
-                               power, r, summary.measure="mean.difference", print.out, 
+  ss<-samplesize.NI.continuous(mean.control=p0, mean.experim=p1, sd=sqrt((fit.ed$se)^2*n.experim), 
+                               NI.margin=NI.m, sig.level=sig.level, 
+                               power=power, r=r, summary.measure="mean.difference", print.out=print.out, 
                                test.type=NULL, higher.better=!unfavourable, round=round, ltfu=ltfu) 
   return(ss)
 }

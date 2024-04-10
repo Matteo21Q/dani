@@ -5,6 +5,10 @@
 
 # Load dani:
 # library(dani)
+library(tibble)
+library(mfp)
+library(marginaleffects)
+library(boot)
 
 #Initialise vector of outputs 
 correct<-list(NULL)
@@ -129,13 +133,13 @@ correct[[n.t]]<-ifelse((inherits(out4K, "try-error"))&&(grepl("is.logical(unfavo
 names(correct)[[n.t]]<-"out4K"
 n.t=n.t+1
 
-# Check that it works when minimisation incorrectly specified:
-out4L<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", minimisation=NA, treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4L, "try-error"))&&(grepl("!is.na(minimisation) is not TRUE", out4L[1] , fixed=T )),1,0) 
+# Check that it works when reference incorrectly specified:
+out4L<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", reference="r", treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4L, "try-error"))&&(grepl("is.numeric(reference) is not TRUE", out4L[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4L"
 n.t=n.t+1
-out4M<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", minimisation="pippo", treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4M, "try-error"))&&(grepl("is.logical(minimisation) is not TRUE", out4M[1] , fixed=T )),1,0) 
+out4M<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", reference = 0, treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4M, "try-error"))&&(grepl("reference %in% treatment.levels", out4M[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4M"
 n.t=n.t+1
 
@@ -169,23 +173,23 @@ correct[[n.t]]<-ifelse((inherits(out4S, "try-error"))&&(grepl("parallel %in%", o
 names(correct)[[n.t]]<-"out4S"
 n.t=n.t+1
 
-# Check that it works when boot.CI.type incorrectly specified:
-out4T<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", bootCI.type=2, treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4T, "try-error"))&&(grepl("is.character(bootCI.type) is not TRUE", out4T[1] , fixed=T )),1,0) 
+# Check that it works when range incorrectly specified:
+out4T<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", range="pippo", treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4T, "try-error"))&&(grepl("is.numeric(range) is not TRUE", out4T[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4T"
 n.t=n.t+1
-out4U<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", bootCI.type="pippo", treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4U, "try-error"))&&(grepl("bootCI.type %in%", out4U[1] , fixed=T )),1,0) 
+out4U<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", range=c(0,10), treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4U, "try-error"))&&(grepl("all(range %in% treatment.levels)", out4U[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4U"
 n.t=n.t+1
 
-# Check that it works when boot.CI.type incorrectly specified:
-out4V<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", varest.boot = 2, treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4V, "try-error"))&&(grepl("is.character(varest.boot) is not TRUE", out4V[1] , fixed=T )),1,0) 
+# Check that it works when optimal incorrectly specified:
+out4V<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", optimal = 0, treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4V, "try-error"))&&(grepl("optimal %in% treatment.levels", out4V[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4V"
 n.t=n.t+1
-out4W<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", varest.boot = "pippo", treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4W, "try-error"))&&(grepl("varest.boot %in%", out4W[1] , fixed=T )),1,0) 
+out4W<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", optimal = "pippo", treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4W, "try-error"))&&(grepl("is.numeric(optimal) is not TRUE", out4W[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4W"
 n.t=n.t+1
 
@@ -219,24 +223,24 @@ n.t=n.t+1
 # Now check sample size calculations for certain values on RD scale. 
 
 out5A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$ss.total.optimal,537)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$ss.total.optimal,566)),1,0) 
 names(correct)[[n.t]]<-"out5A"
 n.t=n.t+1
-out5B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="delta", treatment.levels = c(6,9,12,15,18), summary.measure="RR", minimisation = F, unfavourable = F))
-correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$ss.total.optimal,1638)),1,0)
+out5B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="delta", treatment.levels = c(6,9,12,15,18), summary.measure="RR", reference=6, optimal=18, unfavourable = F))
+correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$ss.total.optimal,1647)),1,0)
 names(correct)[[n.t]]<-"out5B"
 n.t=n.t+1
 set.seed(1)
-out5C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="bootstrap", treatment.levels = c(6,9,12,15,18), summary.measure="RR", minimisation = F, unfavourable = F))
-correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$ss.total.optimal,1940)),1,0) 
+out5C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="bootstrap", treatment.levels = c(6,9,12,15,18), summary.measure="RR", reference=6, optimal=18, unfavourable = F))
+correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$ss.total.optimal,1823)),1,0) 
 names(correct)[[n.t]]<-"out5C"
 n.t=n.t+1
-out5D<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=c(0.91,0.9,0.89,0.88), se.method="delta", treatment.levels = c(6,9,12,15,18), summary.measure="RR", minimisation = F, unfavourable = F))
-correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$ss.total.optimal,1638)),1,0) 
+out5D<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=c(0.91,0.9,0.89,0.88), se.method="delta", treatment.levels = c(6,9,12,15,18), summary.measure="RR", reference=6, optimal=18, unfavourable = F))
+correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$ss.total.optimal,1647)),1,0) 
 names(correct)[[n.t]]<-"out5D"
 n.t=n.t+1
 out5E<-try(samplesize.ROCI.binary(p.expected.curve=c(0.12,0.12,0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5,6,7)))
-correct[[n.t]]<-ifelse((inherits(out5E,"list"))&&(all.equal(out5E$ss.total.optimal,503)),1,0) 
+correct[[n.t]]<-ifelse((inherits(out5E,"list"))&&(all.equal(out5E$ss.total.optimal,1046)),1,0) 
 names(correct)[[n.t]]<-"out5E"
 n.t=n.t+1
 

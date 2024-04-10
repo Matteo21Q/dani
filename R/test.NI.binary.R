@@ -1,8 +1,43 @@
-test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
+test.NI.binary <- function(n.control=NULL, n.experim=NULL, e.control=NULL, e.experim=NULL,
+                           formula=NULL, data=NULL, control.level=0,
                            NI.margin, sig.level=0.025, summary.measure="RD", 
                            print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                           M.boot=2000, BB.adj=0.0001, recursive.p.estim=FALSE) {
-
+                           M.boot=2000, bootCI.type="bca", BB.adj=0.0001, 
+                           recursive.p.estim=FALSE) {
+  covariates<-NULL
+  if (any(is.null(n.control), is.null(n.experim), is.null(e.control), is.null(e.experim))&&any(is.null(data), is.null(formula))) {
+    stop("Either counts of events and participants or formula+data must be provided.\n")
+  }
+  if (!is.null(formula)) {
+    if (is.character(formula)) formula<-as.formula(formula)
+    stopifnot(is.data.frame(data), inherits(formula,"formula"))
+    if (is_tibble(data)) data<-as.data.frame(data)
+    terms.form <- attr(terms(formula), "term.labels")
+    treat.index <- which(grepl("treat\\(", terms.form))
+    if (length(treat.index)==0) stop("Treatment variable in the formula must be provided within brackets and preceded by treat, e.g. treat(treatment).\n")
+    treatment <- factor(data[,all.vars(formula[[3]])[treat.index]])
+    stopifnot(any(treatment==control.level), nlevels(treatment)==2)
+    treatment<-relevel(treatment, ref=as.character(control.level))
+    covariates <- terms.form[-treat.index]
+    outcomes <- data[,all.vars(formula[[2]])]
+    n.control<-sum(treatment==control.level)
+    n.experim<-length(treatment)-n.control
+    e.control<-sum(outcomes[treatment==control.level]==1)
+    e.experim<-sum(outcomes[treatment!=control.level]==1)
+    covariate.formula<-NULL
+    if (length(covariates)!=0) {
+      covariate.formula<-"+"
+      for (cc in 1:length(covariates)) {
+        covariate.formula <- paste(covariate.formula, covariates[cc])
+        if (cc!=length(covariates)) covariate.formula<-paste(covariate.formula, "+")
+      }
+    }
+    myformula<-as.formula(paste("outcomes~treatment", covariate.formula))
+    mydata <- data.frame(outcomes, treatment, data[,covariates])
+    if (length(covariates)>0) colnames(mydata)[3:ncol(mydata)]<-covariates
+    assign("mydata", mydata, envir = .GlobalEnv)
+    
+  } 
   stopifnot(is.numeric(n.control), n.control>0)
   stopifnot(is.numeric(n.experim), n.experim>0)
   stopifnot(is.numeric(e.control), e.control>=0, n.control>=e.control)
@@ -14,38 +49,71 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
   stopifnot(is.logical(unfavourable), !is.na(unfavourable))
   stopifnot(is.logical(recursive.p.estim), !is.na(recursive.p.estim))
   stopifnot(is.numeric(M.boot), M.boot>1)
+  stopifnot(is.character(bootCI.type), bootCI.type%in%c("norm","perc","bca","basic"))
   stopifnot(is.numeric(BB.adj), BB.adj>0)
+  adjusted<-(!is.null(covariates)&&any(dim(covariates)>0))
+  if (is.null(formula)) {
+    outcomes<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
+    treatment<-factor(c(rep(1,n.experim), rep(0, n.control)))
+    mydata<-data.frame(outcomes,treatment)
+    myformula<-as.formula("outcomes~treatment")
+  }
   if (is.null(test.type)) {
-    if (summary.measure=="RD") {
-      test.type<-"Newcombe10"
-    } else if (summary.measure=="RR") {
-      test.type<-"Koopman"
-    } else if (summary.measure=="OR") {
-      test.type<-"Baptista.Pike.midp"
+    if (!adjusted) {
+      if (summary.measure=="RD") {
+        test.type<-"Newcombe10"
+      } else if (summary.measure=="RR") {
+        test.type<-"Koopman"
+      } else if (summary.measure=="OR") {
+        test.type<-"Baptista.Pike.midp"
+      } else {
+        test.type<-"Wald"
+      } 
     } else {
-      test.type<-"Wald"
-    } 
+        test.type<-"logistic"
+    }
+    
   }
   stopifnot(is.character(test.type))
   if (summary.measure=="RD") {
-    stopifnot(test.type%in%c("Wald", "Wald.cc", "Hauck.Anderson", "Gart.Nam",
-                             "Newcombe10", "Newcombe11", "Haldane", "Jeffreys.Perks",
-                             "Agresti.Caffo", "Miettinen.Nurminen", "Farrington.Manning",
-                             "logistic", "binreg", "bootstrap", "Agresti.Min", "Brown.Li.Jeffreys", 
-                             "Chan.Zhang", "BLNM", "Mee", "uncond.midp", "Berger.Boos",
-                             "MUE.Lin", "MUE.parametric.bootstrap"))
-  } else if (summary.measure=="RR") {
-    stopifnot(test.type%in%c("Wald.Katz", "adjusted.Wald.Katz", "inverse.hyperbolic.sine", "Koopman",
-                             "MOVER.R", "Miettinen.Nurminen", "MOVER", "Gart.Nam", "score.cc",
-                             "logregression", "logistic", "bootstrap", "Bailey", "Noether", 
-                             "Chan.Zhang", "Agresti.Min", "uncond.midp", "Berger.Boos"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Wald", "Wald.cc", "Hauck.Anderson", "Gart.Nam",
+                               "Newcombe10", "Newcombe11", "Haldane", "Jeffreys.Perks",
+                               "Agresti.Caffo", "Miettinen.Nurminen", "Farrington.Manning",
+                               "logistic", "binreg", "bootstrap", "Agresti.Min", "Brown.Li.Jeffreys", 
+                               "Chan.Zhang", "BLNM", "Mee", "uncond.midp", "Berger.Boos",
+                               "MUE.Lin", "MUE.parametric.bootstrap"))
+      
+    } else {
+      stopifnot(test.type%in%c("logistic", "binreg", "bootstrap"))
+      
+    }
+   } else if (summary.measure=="RR") {
+     if (!adjusted) {
+       stopifnot(test.type%in%c("Wald.Katz", "adjusted.Wald.Katz", "inverse.hyperbolic.sine", "Koopman",
+                                "MOVER.R", "Miettinen.Nurminen", "MOVER", "Gart.Nam", "score.cc",
+                                "logregression", "logistic", "bootstrap", "Bailey", "Noether", 
+                                "Chan.Zhang", "Agresti.Min", "uncond.midp", "Berger.Boos"))
+     } else {
+       stopifnot(test.type%in%c("logregression", "logistic", "bootstrap"))
+       
+     }
   } else if (summary.measure=="OR") {
-    stopifnot(test.type%in%c("Wald.Woolf", "adjusted.Wald.Woolf", "inverse.hyperbolic.sine", "Cornfield.exact",
-                             "MOVER.R", "Miettinen.Nurminen", "MOVER", "Gart.Nam", "score.cc",
-                             "logistic", "bootstrap", "Cornfield.midp", "Baptista.Pike.exact", "Baptista.Pike.midp", 
-                             "Chan.Zhang", "Agresti.Min", "uncond.midp", "Berger.Boos"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Wald.Woolf", "adjusted.Wald.Woolf", "inverse.hyperbolic.sine", "Cornfield.exact",
+                               "MOVER.R", "Miettinen.Nurminen", "MOVER", "Gart.Nam", "score.cc",
+                               "logistic", "bootstrap", "Cornfield.midp", "Baptista.Pike.exact", "Baptista.Pike.midp", 
+                               "Chan.Zhang", "Agresti.Min", "uncond.midp", "Berger.Boos"))
+    } else {
+      stopifnot(test.type%in%c("logistic", "bootstrap"))
+      
+    }
   } else {
-    stopifnot(test.type%in%c("Wald","logistic"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Wald","logistic", "bootstrap"))
+    } else {
+      stopifnot(test.type%in%c("logistic", "bootstrap"))
+    }
   }
 
   estimate<-se<-Z<-p<-NULL
@@ -127,34 +195,31 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
         CI <- test1[2:3]/3 + 2 * test2[2:3]/3
         estimate<-test1[1]/3 + 2 * test2[1]/3
       } else if (test.type=="logistic") {
-        y<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
-        treat<-factor(c(rep(1,n.experim), rep(0, n.control)))
-        dd<-data.frame(y,treat)
-        fit<-glm(y~treat, data=dd, family = binomial)
+        
+        fit<-glm(myformula, data=mydata, family = binomial)
         fit.std<-avg_comparisons(fit, conf_level = (1-sig.level*2))
-        CI <- c(fit.std$conf.low, fit.std$conf.high)
-        estimate<-fit.std$estimate
-        se<-fit.std$std.error
+        CI <- c(fit.std[fit.std$term=="treatment","conf.low"], fit.std[fit.std$term=="treatment","conf.high"])
+        estimate<-fit.std[fit.std$term=="treatment","estimate"]
+        se<-fit.std[fit.std$term=="treatment","std.error"]
+        
       } else if (test.type=="binreg") {
-        y<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
-        treat<-factor(c(rep(1,n.experim), rep(0, n.control)))
-        dd<-data.frame(y,treat)
-        fit<-glm(y~treat, data=dd, family = binomial(link = "identity"))
-        estimate<-coef(summary(fit))["treat","Estimate"]
-        se<-coef(summary(fit))["treat","Std. Error"]
+        
+        fit<-glm(myformula, data=mydata, family = binomial(link = "identity"))
+        estimate<-coef(summary(fit))["treatment","Estimate"]
+        se<-coef(summary(fit))["treatment","Std. Error"]
         CI <- c(estimate-qnorm(1-sig.level)*se,estimate+qnorm(1-sig.level)*se)
+        
       } else if ( test.type == "bootstrap") {
-        y<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
-        treat<-factor(c(rep(1,n.experim), rep(0, n.control)))
-        dd<-data.frame(y,treat)
+  
         rdif <- function(dat, indices) {
           d <- dat[indices,] # allows boot to select sample
-          rd <- mean(d[d[,2]==1,1]) - mean(d[d[,2]==0,1])
+          rd <- mean(d[d$treatment!=control.level,"outcomes"]) - mean(d[d$treatment==control.level,"outcomes"])
           return(rd)
         } 
-        res.b<-boot(dd, rdif, R=M.boot)
-        CI<-boot.ci(res.b, type="perc")$percent[4:5]
+        res.b<-boot(mydata, rdif, R=M.boot)
+        CI<-boot.ci(res.b, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
         estimate<-res.b$t0
+        
       } else if (test.type == "Agresti.Min") {
         fit<-uncondExact2x2(e.control,n.control,e.experim,n.experim, method="score", tsmethod = "square", conf.int = T)
         CI <- as.numeric(fit$conf.int)
@@ -231,7 +296,7 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
         }
         res.b<-boot(dd, rdif, R = M.boot, sim = "parametric",
                     ran.gen = rg, mle = c(p0.tilde,n.control,p1.tilde,n.experim))
-        CI<-boot.ci(res.b, type="perc")$percent[4:5]
+        CI<-boot.ci(res.b, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
         estimate<-res.b$t0
     }
     estimate.n<-mean(CI)
@@ -359,9 +424,16 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
       CI<-test[2:3]
       estimate<-test[1]
     } else if (test.type=="bootstrap") {
-      test<-BinomRatioCI(x1 = e.experim, n1 = n.experim, x2 = e.control, n2 = n.control, method = "boot", R=M.boot)
-      CI<-test[2:3]
-      estimate<-test[1]
+      
+      rrat <- function(dat, indices) {
+        d <- dat[indices,] # allows boot to select sample
+        rr <- log(mean(d[d$treatment!=control.level,"outcomes"])) - log(mean(d[d$treatment==control.level,"outcomes"]))
+        return(rr)
+      } 
+      res.b<-boot(mydata, rrat, R=M.boot)
+      CI<-exp(boot.ci(res.b, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")])
+      estimate<-exp(res.b$t0)
+      
     } else if (test.type == "Agresti.Min") {
       fit<-uncondExact2x2(e.control,n.control,e.experim,n.experim, method="score", tsmethod = "square", conf.int = T, parmtype="ratio")
       CI <- as.numeric(fit$conf.int)
@@ -379,21 +451,17 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
       CI <- as.numeric(fit$conf.int)
       estimate<-as.numeric(fit$estimate)
     } else if (test.type=="logistic") {
-      y<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
-      treat<-factor(c(rep(1,n.experim), rep(0, n.control)))
-      dd<-data.frame(y,treat)
-      fit<-glm(y~treat, data=dd, family = binomial)
+      fit<-glm(myformula, data=mydata, family = binomial)
       fit.std<-avg_comparisons(fit, conf_level = (1-sig.level*2), comparison="lnratio", transform = exp)
-      CI <- c(fit.std$conf.low, fit.std$conf.high)
-      estimate<-fit.std$estimate
+      CI <- c(fit.std[fit.std$term=="treatment","conf.low"], fit.std[fit.std$term=="treatment","conf.high"])
+      estimate<-fit.std[fit.std$term=="treatment","estimate"]
+
     } else if (test.type=="logregression") {
       if (e.experim==0||e.control==0) stop("logregression not possible with zero cell counts (e.control=0 or e.experim=0).\n")
-      y<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
-      treat<-c(rep(1,n.experim), rep(0, n.control))
-      dd<-data.frame(y,treat)
-      fit<-glm(y~treat, data=dd, family = binomial(link="log"))
-      estimate<-exp(coef(summary(fit)))["treat","Estimate"]
-      CI <- exp(suppressMessages(confint(fit, level = 1-sig.level*2))["treat",])
+      fit<-glm(myformula, data=mydata, family = binomial(link="log"))
+      row.treat<-which(grepl("treatment", row.names(coef(summary(fit)))))
+      estimate<-exp(coef(summary(fit)))[row.treat,"Estimate"]
+      CI <- exp(suppressMessages(confint(fit, level = 1-sig.level*2))[row.treat,])
     } 
     estimate.n<-mean(log(CI))
     if (is.null(se)) {
@@ -468,16 +536,25 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
       p <- pnorm(Z)
       CI <- c(estimate-qnorm(1-sig.level)*se,estimate+qnorm(1-sig.level)*se)
     } else if (test.type=="logistic") {
-      y<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
-      treat<-factor(c(rep(1,n.experim), rep(0, n.control)))
-      dd<-data.frame(y,treat)
-      fit<-glm(y~treat, data=dd, family = binomial)
+      fit<-glm(myformula, data=mydata, family = binomial)
       fit.std<-avg_comparisons(fit, conf_level = (1-sig.level*2), comparison=function(hi, lo) asin(sqrt(hi))-asin(sqrt(lo)))
-      CI <- c(fit.std$conf.low, fit.std$conf.high)
-      se<-fit.std$std.error
-      estimate<-fit.std$estimate
+      CI <- c(fit.std[fit.std$term=="treatment","conf.low"], fit.std[fit.std$term=="treatment","conf.high"])
+      estimate<-fit.std[fit.std$term=="treatment","estimate"]
+      se<-fit.std[fit.std$term=="treatment","std.error"]
       p<-NULL
+    } else if (test.type=="bootstrap") {
+      
+      asdif <- function(dat, indices) {
+        d <- dat[indices,] # allows boot to select sample
+        as<-asin(sqrt(mean(d[d$treatment!=control.level,"outcomes"])))-asin(sqrt(mean(d[d$treatment==control.level,"outcomes"])))
+        return(as)
+      } 
+      res.b<-boot(mydata, asdif, R=M.boot)
+      CI<-boot.ci(res.b, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
+      estimate<-res.b$t0
+      
     }
+    estimate.n<-mean(CI)
     if (is.null(p)) {
       Z <- ifelse(unfavourable==T,(estimate.n - NIm)/se,(-estimate.n + NIm)/se)
       p <- pnorm(Z)
@@ -596,17 +673,15 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
       estimate<-as.numeric(test[1])
     } else if ( test.type == "bootstrap") {
       if (e.control==0||e.experim==0) stop("bootstrap method not appropriate for zero cell counts (e.control=0 or e.experim=0).\n")
-      y<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
-      treat<-factor(c(rep(1,n.experim), rep(0, n.control)))
-      dd<-data.frame(y,treat)
       oddsr <- function(dat, indices) {
         d <- dat[indices,] # allows boot to select sample
-        or <- ((sum(d[d[,2]==1,1])/(sum(d[,2]==1)-sum(d[d[,2]==1,1])))/((sum(d[d[,2]==0,1])/(sum(d[,2]==0)-sum(d[d[,2]==0,1])))))
+        or <- log((sum(d[d$treatment!=control.level,"outcomes"], na.rm=T)/(sum(d$treatment!=control.level, na.rm=T)-sum(d[d$treatment!=control.level,"outcomes"], na.rm=T)))/(sum(d[d$treatment==control.level,"outcomes"], na.rm=T)/(sum(d$treatment==control.level, na.rm=T)-sum(d[d$treatment==control.level,"outcomes"], na.rm=T))))
         return(or)
       } 
-      res.b<-boot(dd, oddsr, R=M.boot)
-      CI<-boot.ci(res.b, type="perc")$percent[4:5]
-      estimate<-res.b$t0
+      
+      res.b<-boot(mydata, oddsr, R=M.boot)
+      CI<-exp(boot.ci(res.b, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")])
+      estimate<-exp(res.b$t0)
     } else if (test.type == "Agresti.Min") {
       fit<-uncondExact2x2(e.control,n.control,e.experim,n.experim, method="score", tsmethod = "square", conf.int = T, parmtype="oddsratio")
       CI <- as.numeric(fit$conf.int)
@@ -625,12 +700,10 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
       estimate<-as.numeric(fit$estimate)
     } else if (test.type=="logistic") {
       if (e.experim==0||e.control==0) stop("With zero cell counts (e.control=0 or e.experim=0) logistic method not informative.\n")
-      y<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
-      treat<-factor(c(rep(1,n.experim), rep(0, n.control)))
-      dd<-data.frame(y,treat)
-      fit<-glm(y~treat, data=dd, family = binomial)
-      CI <- as.numeric(exp(suppressMessages(confint(fit, level = 1-sig.level*2)))[2,])
-      estimate<-as.numeric(exp(fit$coefficients[2]))
+      fit<-glm(myformula, data=mydata, family = binomial)
+      row.treat<-which(grepl("treatment", row.names(coef(summary(fit)))))
+      estimate<-exp(coef(summary(fit)))[row.treat,"Estimate"]
+      CI <- exp(suppressMessages(confint(fit, level = 1-sig.level*2))[row.treat,])
     }  
     estimate.n<-mean(log(CI))
     if (is.null(se)) {
@@ -685,7 +758,7 @@ test.NI.binary <- function(n.control, n.experim, e.control, e.experim,
       if ((unfavourable==T&&CI[2]<NI.margin)||(unfavourable==F&&CI[1]>NI.margin)) { 
         cat("The confidence interval does not cross the null ( OR = ", NI.margin, " ), and hence we have evidence of non-inferiority.\n", sep="")
       } else {
-        cat("The confidence interval crosses the null ( OR = ", NI.margin, " ), and hence we have NO evidence of non-inferiority.\n", sep="")
+        cat("The confidence interval crosses the null ( OR = ", NI.margin, " ), and hence we have NO clear evidence of non-inferiority.\n", sep="")
       }
       if (is.p.est==T) {
         if (is.se.est==T) {

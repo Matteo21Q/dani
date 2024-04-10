@@ -8,14 +8,15 @@
   Functions for testing non-inferiority when the outcome is survival (time-to-event). It allows for a number of tests on different summary measures: Hazard Ratio, Difference in Restricted Mean Survival Time and Difference in Survival. 
 }
 \usage{
-  test.NI.survival(time, event, treat, NI.margin, sig.level=0.025, summary.measure="HR", 
+  test.NI.survival(time, event, treat, covariates=NULL, NI.margin, sig.level=0.025, summary.measure="HR", 
                    print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                   M.boot=2000, tau=NULL)  
+                   M.boot=2000, bootCI.type="bca", tau=NULL)  
 }
 \arguments{
   \item{time}{A vector with the event (or censoring) times.}
   \item{event}{A vector with the event indicators.}
   \item{treat}{A vector with treatment indicators.}
+  \item{covariates}{Optional: a data.frame including all baseline covariates to be adjusted for.}
   \item{NI.margin}{Non-inferiority margin, expressed as the specified summary measure.}
   \item{sig.level}{One-sided significance level for testing. Default is 0.025, i.e. 2.5\%.}
   \item{summary.measure}{The population-level summary measure to be estimated, i.e. the scale on which we define the non-inferiority margin. Can be one of "HR" (Hazard Ratio), "DRMST" (Difference in Resticted Mean Survival Time by time tau), or "DS" (Difference in Surviving proportion at time tau).}
@@ -27,6 +28,9 @@
  For "DS", methods available include "Newcombe10", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap".
  }
   \item{M.boot}{ Number of bootstrap samples.}
+\item{bootCI.type}{
+  Method for computing the confidence intervals if using a bootstrap method. It can be either "norm", "basic", "perc" or "bca". Default is "bca", which is the recommended option when possible. 
+}
   \item{tau}{The horizon time tau if using either "DRMST" or "DS" as summary measures.}
 }
 \details{

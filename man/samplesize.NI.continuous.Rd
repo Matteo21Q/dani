@@ -43,7 +43,7 @@ The output is a vector ss, containing the sample sizes for the control and activ
 
 \examples{
 
-out5A<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, 
+out<-try(samplesize.NI.continuous(20, mean.experim=20, sd=40, NI.margin=-10, 
                                     sig.level = 0.025, power = 0.9, r = 1, 
                                     summary.measure = "mean.difference", 
                                     print.out = TRUE, test.type="t.test",

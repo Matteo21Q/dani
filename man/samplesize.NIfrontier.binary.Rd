@@ -35,7 +35,7 @@ A data.frame with estimated powers at each control event risk.
 
 \examples{
 NI.frontier.RD<-function(p) return(0.1)
-out5A<-try(samplesize.NIfrontier.binary(p.control.expected=0.1, p.experim.target=0.1, 
+out<-try(samplesize.NIfrontier.binary(p.control.expected=0.1, p.experim.target=0.1, 
                                         NI.frontier=NI.frontier.RD, sig.level = 0.025, 
                                         power = 0.9, r = 1, 
                                         summary.measure = "RD", print.out = TRUE, 

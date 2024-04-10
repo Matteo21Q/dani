@@ -7,25 +7,32 @@ plot.ROCI <- function (x, type="summary.measure", ylim=NULL, pch=15,
   max.treat<-max(x.treat)
   min.treat<-min(x.treat)
   x.treatall<-seq(min.treat,max.treat, length.out=100)
-  y.treat.est<-predict(x$model.fit, 
-                     newdata=data.frame(treatment=x.treat), 
-                                                      type="resp")
+  y.treat.est<-try(predict(x$model.fit, 
+                   newdata=data.frame(treatment=x.treat), 
+                   type="resp"),
+                   silent=T)
+  if (inherits(y.treat.est, "try-error")&&type=="tr.curve") {
+         stop("In presence of covariates, only the summary measure plot is currently available.\n")
+  }
   if (x$family=="binomial") {
     if (x$summary.measure=="RD") {
-      acceptability<-y.treat.est[which(x.treat==x$reference)]+NI.margin
+      acceptability<-try(y.treat.est[which(x.treat==x$reference)]+NI.margin, silent=TRUE)
+      experimental.arms<-x.treat[-which(x.treat==x$reference)]
+    } else if (x$summary.measure=="AS") {
+      acceptability<-try(sin(NI.margin+asin(sqrt(y.treat.est[which(x.treat==x$reference)])))^2, silent=TRUE)
       experimental.arms<-x.treat[-which(x.treat==x$reference)]
     } else if (x$summary.measure=="RR") {
-      acceptability<-y.treat.est[which(x.treat==x$reference)]*NI.margin
+      acceptability<-try(y.treat.est[which(x.treat==x$reference)]*NI.margin, silent=TRUE)
       experimental.arms<-x.treat[-which(x.treat==x$reference)]
     } else if (x$summary.measure=="target.risk") {
       acceptability<-NI.margin
       experimental.arms<-x.treat
     } else if (x$summary.measure=="OR") {
-      odds.treat.est<-exp(predict(x$model.fit, 
+      odds.treat.est<-try(exp(predict(x$model.fit, 
                            newdata=data.frame(treatment=x.treat), 
-                           type="link"))
-      acceptability.odds<-odds.treat.est[which(x.treat==x$reference)]*NI.margin
-      acceptability<-acceptability.odds/(1+acceptability.odds)
+                           type="link")), silent=TRUE)
+      acceptability.odds<-try(odds.treat.est[which(x.treat==x$reference)]*NI.margin, silent=TRUE)
+      acceptability<-try(acceptability.odds/(1+acceptability.odds), silent=TRUE)
       experimental.arms<-x.treat[-which(x.treat==x$reference)]
     }
   } 
@@ -67,7 +74,8 @@ plot.ROCI <- function (x, type="summary.measure", ylim=NULL, pch=15,
     } else {
       if (is.null(ylab)) ylab=ifelse(x$summary.measure=="RD", "Risk Difference vs reference", 
                                      ifelse(x$summary.measure=="RR", "Risk Ratio vs reference",
-                                            "Odds Ratio vs reference")) 
+                                            ifelse(x$summary.measure=="AS", "Arc-sine difference vs reference",
+                                            "Odds Ratio vs reference"))) 
       plot(experimental.arms, x$estimates[-which(x.treat==x$reference)], xlim=c(min(x.treat), max(x.treat)), 
             xaxt="n", yaxt="n", type="p", ylim=ylim, pch=pch, xlab=xlab, ylab=ylab, ...)
     }

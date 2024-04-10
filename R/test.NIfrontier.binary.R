@@ -1,7 +1,7 @@
 test.NIfrontier.binary <- function(n.control, n.experim, e.control, e.experim,  
                                     NI.frontier, sig.level, summary.measure="RD", 
                                     print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                                    M.boot=2000, BB.adj=0.0001) {
+                                    M.boot=2000, bootCI.type="bca", BB.adj=0.0001) {
   
   stopifnot(is.numeric(n.control), n.control>0)
   stopifnot(is.numeric(n.experim), n.experim>0)
@@ -13,6 +13,7 @@ test.NIfrontier.binary <- function(n.control, n.experim, e.control, e.experim,
   stopifnot(is.logical(print.out), !is.na(print.out))
   stopifnot(is.logical(unfavourable), !is.na(unfavourable))
   stopifnot(is.numeric(M.boot), M.boot>1)
+  stopifnot(is.character(bootCI.type), bootCI.type%in%c("norm","perc","bca","basic"))
   stopifnot(is.numeric(BB.adj), BB.adj>0)
   if (is.null(test.type)) {
     if (summary.measure=="RD") {
@@ -76,10 +77,10 @@ test.NIfrontier.binary <- function(n.control, n.experim, e.control, e.experim,
     if ((unfavourable == F)&&(NI.margin>=0)) stop("When outcome is favourable, a NI margin on the arc-sine difference scale needs to be <0.")
   }
   if (test.type!="LRT") {
-    results<-test.NI.binary(n.control, n.experim, e.control, e.experim,  NI.margin, 
-                            sig.level=alpha, summary.measure, 
-                            print.out, unfavourable, test.type,
-                            M.boot, BB.adj)
+    results<-test.NI.binary(n.control=n.control, n.experim=n.experim, e.control=e.control, e.experim=e.experim,  NI.margin=NI.margin, 
+                            sig.level=alpha, summary.measure=summary.measure, 
+                            print.out=print.out, unfavourable=unfavourable, test.type=test.type,
+                            M.boot=M.boot, bootCI.type=bootCI.type, BB.adj=BB.adj)
   } else {
     
     p0.unconstr<-p0.constr<-p0.obs
@@ -312,7 +313,7 @@ test.NIfrontier.binary <- function(n.control, n.experim, e.control, e.experim,
         cat("p<alpha = ", alpha, " ), and hence we have evidence of non-inferiority.\n", sep="")
       } else {
         non.inferiority<-F
-        cat("p>=alpha = ", alpha, ", and hence we have NO evidence of non-inferiority.\n", sep="")
+        cat("p>=alpha = ", alpha, ", and hence we have NO clear evidence of non-inferiority.\n", sep="")
       }
       
       cat("Note: with the test = ",test.type, " the confidence interval is test-based.\n")

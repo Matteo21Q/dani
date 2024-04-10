@@ -8,17 +8,27 @@
   Functions for testing non-inferiority when the outcome is binary. It allows for a number of tests on different summary measures: risk difference, risk ratio, odds ratio or arc-sine difference. 
 }
 \usage{
-  test.NI.binary(n.control, n.experim, e.control, e.experim,  NI.margin, 
-                    sig.level=0.025, summary.measure="RD", 
-                    print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                    M.boot=2000, BB.adj=0.0001, recursive.p.estim=FALSE)  
+  test.NI.binary(n.control=NULL, n.experim=NULL, e.control=NULL, 
+                 e.experim=NULL, formula=NULL, data=NULL, 
+                 control.level=0, NI.margin, sig.level=0.025, 
+                 summary.measure="RD", print.out=TRUE, 
+                 unfavourable=TRUE, test.type=NULL, M.boot=2000,
+                 bootCI.type="bca", BB.adj=0.0001, 
+                 recursive.p.estim=FALSE) 
 }
 \arguments{
   \item{e.control}{Number of events in the control arm.}
   \item{e.experim}{Number of events in the active arm.}
   \item{n.control}{Total sample size of the control arm.}
   \item{n.experim}{Total sample size of the active arm.}
+  \item{formula}{
+  The formula for the outcome model. The variable indicating treatment has to be put within brackets and preceded by treat, e.g. treat(treatment).
+}
+\item{data}{
+A data.frame with all data.
+}
   \item{NI.margin}{Non-inferiority margin, expressed as the specified summary measure.}
+    \item{control.level}{Defines the control level in the treatment variable when using the formula and data interface. Defaults to 0.}
   \item{sig.level}{One-sided significance level for testing. Default is 0.025, i.e. 2.5\%.}
   \item{summary.measure}{The population-level summary measure to be estimated, i.e. the scale on which we define the non-inferiority margin. Can be one of "RD" (Risk Difference), "RR" (Risk Ratio), "OR" (Odds Ratio) or "AS" (Arc-Sine difference).}
   \item{print.out}{Logical. If FALSE, no output is printed.}
@@ -30,6 +40,9 @@
  Finally, for arc-sine difference the only available emthod is "Wald".
  }
   \item{M.boot}{ Number of bootstrap samples, e.g. for "bootstrap"" and "MUE.parametric.bootstrap" methods.}
+    \item{bootCI.type}{
+  Method for computing the confidence intervals if using a bootstrap method. It can be either "norm", "basic", "perc" or "bca". Default is "bca", which is the recommended option when possible. 
+}
   \item{BB.adj}{Adjustment factor for "Berger.Boos" method.}
   \item{recursive.p.estim}{If TRUE, the p value is estimated by recursively running the function with varied significance level until the NI margin is crossed. If FALSE (default), the p-value is either the one calculated with standard methods or an estimate based on normal approximation.}
 }

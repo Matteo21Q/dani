@@ -49,7 +49,7 @@ samplesize.NI.continuous <- function (mean.control, mean.experim, sd, NI.margin,
   } 
   
   if (test.type!="Fiellers") {
-    n = ( qnorm(1 - sig.level) + qnorm(power))^2 * (sd^2/(mean.alt)^2)
+    n = ( qnorm(1 - sig.level) + qnorm(power))^2 *2* (sd^2/(mean.alt)^2)
     
     if (test.type=="log.t.test"||test.type=="t.test") {
       check<-0
@@ -89,7 +89,7 @@ samplesize.NI.continuous <- function (mean.control, mean.experim, sd, NI.margin,
         sig.level * 100, "%.\nMean in control arm =", 
         mean.control, "\nMean in experimental arm =", 
         mean.experim, "\nNon-acceptable mean in experimental arm (null H) =",
-        mean.exp.null,"%\nExpected loss to follow-up: ",
+        mean.exp.null,"\nExpected loss to follow-up: ",
         ltfu*100, "%\n"
     )
     if (summary.measure == "mean.difference") {

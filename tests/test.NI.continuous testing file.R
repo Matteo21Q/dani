@@ -164,21 +164,34 @@ correct[[n.t]] <- ifelse((inherits(out5E, "list")) && (all.equal(out5E$CI[2], 1.
 names(correct)[[n.t]] <- "out5E"
 n.t <- n.t + 1
 set.seed(1)
-out5F<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), -1, test.type="bootstrap.basic"))
-correct[[n.t]] <- ifelse((inherits(out5F, "list")) && (all.equal(out5F$CI[2], 0.9665616, tolerance=10^(-6))), 1, 0) 
+out5F<-try(test.NI.continuous(y.control=rnorm(10,2), y.experim=rnorm(10,2), NI.margin=-1, test.type="bootstrap", bootCI.type = "basic"))
+correct[[n.t]] <- ifelse((inherits(out5F, "list")) && (all.equal(out5F$CI[2], 1.017366, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out5F"
 n.t <- n.t + 1
 set.seed(1)
-out5G<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), -1, test.type="bootstrap.bca"))
-correct[[n.t]] <- ifelse((inherits(out5G, "list")) && (all.equal(out5G$CI[2], 0.7898284, tolerance=10^(-6))), 1, 0) 
+out5G<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), NI.margin=-1, test.type="bootstrap", bootCI.type = "bca"))
+correct[[n.t]] <- ifelse((inherits(out5G, "list")) && (all.equal(out5G$CI[2], 0.7991225, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out5G"
 n.t <- n.t + 1
 set.seed(1)
-out5H<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), -1, test.type="bootstrap.percentile"))
-correct[[n.t]] <- ifelse((inherits(out5H, "list")) && (all.equal(out5H$CI[2], 0.8508199, tolerance=10^(-6))), 1, 0) 
+out5H<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), -1, test.type="bootstrap", bootCI.type = "perc"))
+correct[[n.t]] <- ifelse((inherits(out5H, "list")) && (all.equal(out5H$CI[2], 0.8371394, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out5H"
 n.t <- n.t + 1
-
+set.seed(1)
+dataf<-data.frame(y<-c(rnorm(10,2), rnorm(10,2)), treat<-rep(c(1,0), each=100))
+colnames(dataf)<-c("y", "treat")
+out5I<-try(test.NI.continuous(data=dataf, formula=as.formula("y~treat(treat)"), NI.margin=-0.75, test.type="Z.test", sd.control=1, sd.experim = 1))
+correct[[n.t]]<-ifelse((inherits(out5I,"list"))&&(all.equal(out5I$CI[2],0.2771808, tolerance = 10^(-5)))&&out5I$non.inferiority==T,1,0) 
+names(correct)[[n.t]]<-"out5I"
+n.t=n.t+1
+set.seed(1)
+dataf2<-data.frame(y<-c(rnorm(10,2), rnorm(10,2)), treat<-rep(c(1,0), each=100), age=rep(c(20,30,40,50),50))
+colnames(dataf2)<-c("y", "treat", "age")
+out5J<-try(test.NI.continuous(data=dataf2, formula=as.formula("y~treat(treat)+age"), NI.margin=-0.75, test.type="lm", sd.control=1, sd.experim = 1))
+correct[[n.t]]<-ifelse((inherits(out5J,"list"))&&(all.equal(out5J$CI[2],0.2270376, tolerance = 10^(-5)))&&out5J$non.inferiority==T,1,0) 
+names(correct)[[n.t]]<-"out5J"
+n.t=n.t+1
 #####################################################
 # Sixth set of checks:
 # Now check tests for certain values on ratio scale. 
@@ -208,18 +221,18 @@ correct[[n.t]] <- ifelse((is.list(out6E)) && (all.equal(out6E$CI[2], 1.534643, t
 names(correct)[[n.t]] <- "out6E"
 n.t <- n.t + 1
 set.seed(1)
-out6F<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), 0.75, summary.measure="mean.ratio", test.type="bootstrap.basic"))
-correct[[n.t]] <- ifelse((is.list(out6F)) && (all.equal(out6F$CI[2], 1.432949, tolerance=10^(-6))), 1, 0)
+out6F<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), 0.75, summary.measure="mean.ratio", test.type="bootstrap", bootCI.type = "basic"))
+correct[[n.t]] <- ifelse((is.list(out6F)) && (all.equal(out6F$CI[2], 1.688022, tolerance=10^(-6))), 1, 0)
 names(correct)[[n.t]] <- "out6F"
 n.t <- n.t + 1
 set.seed(1)
-out6G<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), 0.75, summary.measure="mean.ratio", test.type="bootstrap.bca"))
-correct[[n.t]] <- ifelse((is.list(out6G)) && (all.equal(out6G$CI[2], 1.493072, tolerance=10^(-6))), 1, 0) 
+out6G<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), 0.75, summary.measure="mean.ratio", test.type="bootstrap", bootCI.type = "bca"))
+correct[[n.t]] <- ifelse((is.list(out6G)) && (all.equal(out6G$CI[2], 1.41891, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out6G"
 n.t <- n.t + 1
 set.seed(1)
-out6H<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), 0.75, summary.measure="mean.ratio", test.type="bootstrap.percentile"))
-correct[[n.t]] <- ifelse((is.list(out6H)) && (all.equal(out6H$CI[2], 1.496107, tolerance=10^(-6))), 1, 0) 
+out6H<-try(test.NI.continuous(rnorm(10,2), rnorm(10,2), 0.75, summary.measure="mean.ratio", test.type="bootstrap", bootCI.type = "perc"))
+correct[[n.t]] <- ifelse((is.list(out6H)) && (all.equal(out6H$CI[2], 1.462579, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out6H"
 n.t <- n.t + 1
 

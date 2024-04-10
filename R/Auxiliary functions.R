@@ -190,10 +190,10 @@ func.to.opt<-function(x,n.control, n.experim, e.control, e.experim,
                       NI.margin, summary.measure, 
                       unfavourable, test.type,
                       M.boot, BB.adj) {
-  out<-test.NI.binary(n.control, n.experim, e.control, e.experim,
-                      NI.margin, sig.level=x, summary.measure, 
-                      print.out=FALSE, unfavourable, test.type,
-                      M.boot, BB.adj, recursive.p.estim=FALSE)
+  out<-test.NI.binary(n.control=n.control, n.experim=n.experim, e.control=e.control, e.experim=e.experim,
+                      NI.margin=NI.margin, sig.level=x, summary.measure=summary.measure, 
+                      print.out=FALSE, unfavourable=unfavourable, test.type=test.type,
+                      M.boot=M.boot, BB.adj=BB.adj, recursive.p.estim=FALSE)
   if (isTRUE(unfavourable)) {
     extreme<-ifelse(out$estimate>NI.margin,
                     out$CI[1]-NI.margin, out$CI[2]-NI.margin)

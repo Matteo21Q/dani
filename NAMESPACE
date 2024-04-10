@@ -7,13 +7,29 @@ import(ratesci)
 import(exact2x2)
 import(marginaleffects)
 import(mfp)
+import(BSDA)
+import(DescrTab2)
+import(coxphw)
+import(survRM2)
+import(flexsurv)
+import(numDeriv)
+import(mratios)
+import(exact2x2)
+import(contingencytables)
+import(PropCIs)
+import(tibble)
 importFrom("utils","capture.output")
 importFrom("graphics", "abline", "lines", "plot")
 export(samplesize.NI.binary,
        samplesize.NI.survival,
        samplesize.NI.continuous,
        samplesize.NIfrontier.binary,
-       samplesize.ROCI.binary,	   
+       samplesize.ROCI.binary,
+       power.NI.binary,
+       power.NI.continuous,
+       power.NIfrontier.binary,
+	   type1error.NIfrontier.binary,
+       power.ROCI.binary,	   
 	   test.NI.binary,
 	   test.NI.continuous,
        test.NI.survival,
