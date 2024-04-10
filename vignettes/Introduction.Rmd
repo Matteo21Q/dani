@@ -125,7 +125,7 @@ The functions for sample size calculations for NI frontier and ROCI designs are 
 
 a. p.expected.curve: rather than the expectation at a single time point, the user needs to provide expectation at all arms;
 b. treatment.levels: these are the treatment levels that patients may be randomised to;
-c. minimisation: thsi si a logical variable that indicates whether the goal of the trial is to find the minimum effective value of treatment (as it is usually with durations) or the maximum one (as with, eg, frequencies).
+c. reference: this is the treatment level to be considered as reference.
 d. se.method: the method used to estimate standard errors: either "delta" or "bootstrap";
 e. tr.model: the model for the treatment-response curve. Can be a fractional polynomial of either degree 1 or 2, either performed in a classic way (adding one further power only if tehre is evidence it improves fit) or fixing the number fo powers. See help ile for details;
 f. Other: Additional parameters if using the bootstrap method, including type of bootstrap CI calculation method (bootCI.type), number of bootstrap samples (M.boot) and whetehr to use paralell computing (parallel, character). 
@@ -134,7 +134,7 @@ An example code and output is shown below:
 ```{r}
 samplesize.ROCI.binary(p.expected.curve = rep(0.05,7),
                         NI.margin = rep(0.05,6),
-                        minimisation = TRUE,
+                        reference = 20,
                         se.method = "delta",
                         treatment.levels = c(8,10,12,14,16,18,20),
                         summary.measure = "RD",
