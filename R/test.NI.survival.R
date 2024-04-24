@@ -96,7 +96,11 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
     } else {
       is.p.est<-F
     }
-    
+    if ((unfavourable==F&&CI[1]>NI.margin)||(unfavourable==T&&CI[2]<NI.margin)) { 
+      non.inferiority<-T
+    } else {
+      non.inferiority<-F
+    }
     if (print.out==T) {
       cat("Testing for non-inferiority.\nSummary measure: Hazard Ratio.\nNon-inferiority margin = ", NI.margin, ".\nMethod: ",test.type,
           ".\nEstimate = ", estimate, 
@@ -104,10 +108,8 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
           ")\np-value = ", p, ".\n" , sep="")
       if ((unfavourable==F&&CI[1]>NI.margin)||(unfavourable==T&&CI[2]<NI.margin)) { 
         cat("The confidence interval does not cross the null ( Hazard Ratio = ", NI.margin, " ), and hence we have evidence of non-inferiority.\n", sep="")
-        non.inferiority<-T
       } else {
         cat("The confidence interval crosses the null ( Hazard Ratio = ", NI.margin, " ), and hence we have NO evidence of non-inferiority.\n", sep="")
-        non.inferiority<-F
       }
       if (is.p.est==T) {
         if (is.se.est==T) {
@@ -151,8 +153,8 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
                 grad(Deriv5.DRMST,beta1, dat=dd,s0=s0,s1=s1,s3=s3,s2=s2, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau))
       estimate<-DRMST.est(beta1, s0, s1, s2, s3,tau,dd,k1,k2,k3,k4)
       se<-sqrt(t(gradsb)%*%varcov%*%gradsb)
-      low.bndb<-(estimate-qnorm(1-2*sig.level)*se)
-      up.bndb<-(estimate+qnorm(1-2*sig.level)*se)
+      low.bndb<-(estimate-qnorm(1-sig.level)*se)
+      up.bndb<-(estimate+qnorm(1-sig.level)*se)
       CI<-c(low.bndb, up.bndb)
     } else if (test.type=="flexsurv.PH.bootstrap") {
       res<-boot(dd, RMST.diff.flexsurv, tau=tau, R=M.boot)
@@ -166,11 +168,16 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       is.se.est<-F
     }
     if (is.null(p)) {
-      Z <- ifelse( unfavourable==T, (estimate - NI.margin)/se, -(estimate - NI.margin)/se)
+      Z <- ifelse( unfavourable==T, -(estimate - NI.margin)/se, (estimate - NI.margin)/se)
       p <- pnorm(Z)
       is.p.est<-T
     } else {
       is.p.est<-F
+    }
+    if ((unfavourable==T&&CI[1]>NI.margin)||(unfavourable==F&&CI[2]<NI.margin)) { 
+      non.inferiority<-T
+    } else {
+      non.inferiority<-F
     }
     if (print.out==T) {
       cat("Testing for non-inferiority.\nSummary measure: Difference in RMST.\nNon-inferiority margin = ", NI.margin, ".\nMethod: ",test.type,
@@ -178,10 +185,8 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
           "\nConfidence interval (Two-sided ", (1-sig.level*2)*100,"%): (", CI[1], ",", CI[2], 
           ")\np-value = ", p, ".\n" , sep="")
       if ((unfavourable==T&&CI[1]>NI.margin)||(unfavourable==F&&CI[2]<NI.margin)) { 
-        non.inferiority<-T
         cat("The confidence interval does not cross the null ( DRMST = ", NI.margin, " ), and hence we have evidence of non-inferiority.\n", sep="")
       } else {
-        non.inferiority<-F
         cat("The confidence interval crosses the null ( DRMST = ", NI.margin, " ), and hence we have NO evidence of non-inferiority.\n", sep="")
       }
       if (is.p.est==T) {
@@ -229,8 +234,8 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
                 grad(Deriv5.DS,beta1, s0=s0,s1=s1,s3=s3,s2=s2, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau))
       estimate<-DS.est(beta1, s0, s1, s2, s3,k1,k2,k3,k4,tau)
       se<-sqrt(t(grads)%*%varcov%*%grads)
-      low.bndb<-(estimate-qnorm(1-2*sig.level)*se)
-      up.bndb<-(estimate+qnorm(1-2*sig.level)*se)
+      low.bndb<-(estimate-qnorm(1-sig.level)*se)
+      up.bndb<-(estimate+qnorm(1-sig.level)*se)
       CI<-c(low.bndb, up.bndb)
     } else if (test.type=="flexsurv.PH.bootstrap") {
       res<-boot(dd, Surv.diff.flexsurv, tau=tau, R=M.boot)
@@ -244,11 +249,16 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       is.se.est<-F
     }
     if (is.null(p)) {
-      Z <- ifelse( unfavourable==T, (estimate - NI.margin)/se, -(estimate - NI.margin)/se)
+      Z <- ifelse( unfavourable==T, -(estimate - NI.margin)/se, (estimate - NI.margin)/se)
       p <- pnorm(Z)
       is.p.est<-T
     } else {
       is.p.est<-F
+    }
+    if ((unfavourable==T&&CI[1]>NI.margin)||(unfavourable==F&&CI[2]<NI.margin)) { 
+      non.inferiority<-T
+    } else {
+      non.inferiority<-F
     }
     if (print.out==T) {
       cat("Testing for non-inferiority.\nSummary measure: Difference in Survival.\nNon-inferiority margin = ", NI.margin, ".\nMethod: ",test.type,
@@ -256,10 +266,8 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
           "\nConfidence interval (Two-sided ", (1-sig.level*2)*100,"%): (", CI[1], ",", CI[2], 
           ")\np-value = ", p, ".\n" , sep="")
       if ((unfavourable==T&&CI[1]>NI.margin)||(unfavourable==F&&CI[2]<NI.margin)) { 
-        non.inferiority<-T
         cat("The confidence interval does not cross the null ( DS = ", NI.margin, " ), and hence we have evidence of non-inferiority.\n", sep="")
       } else {
-        non.inferiority<-F
         cat("The confidence interval crosses the null ( DS = ", NI.margin, " ), and hence we have NO clear evidence of non-inferiority.\n", sep="")
       }
       if (is.p.est==T) {
