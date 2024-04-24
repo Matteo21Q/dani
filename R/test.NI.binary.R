@@ -55,6 +55,7 @@ test.NI.binary <- function(n.control=NULL, n.experim=NULL, e.control=NULL, e.exp
   if (is.null(formula)) {
     outcomes<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
     treatment<-factor(c(rep(1,n.experim), rep(0, n.control)))
+    treat.index<-1
     mydata<-data.frame(outcomes,treatment)
     myformula<-as.formula("outcomes~treatment")
   }
@@ -205,8 +206,8 @@ test.NI.binary <- function(n.control=NULL, n.experim=NULL, e.control=NULL, e.exp
       } else if (test.type=="binreg") {
         
         fit<-glm(myformula, data=mydata, family = binomial(link = "identity"))
-        estimate<-coef(summary(fit))["treatment","Estimate"]
-        se<-coef(summary(fit))["treatment","Std. Error"]
+        estimate<-coef(summary(fit))[treat.index+1,"Estimate"]
+        se<-coef(summary(fit))[treat.index+1,"Std. Error"]
         CI <- c(estimate-qnorm(1-sig.level)*se,estimate+qnorm(1-sig.level)*se)
         
       } else if ( test.type == "bootstrap") {

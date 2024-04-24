@@ -18,6 +18,7 @@ import(exact2x2)
 import(contingencytables)
 import(PropCIs)
 import(tibble)
+import(pracma)
 importFrom("utils","capture.output")
 importFrom("graphics", "abline", "lines", "plot")
 export(samplesize.NI.binary,

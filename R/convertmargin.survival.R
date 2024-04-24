@@ -1,11 +1,17 @@
-convertmargin.survival <- function( rate.control.expected=NULL, t.expected=NULL, p.control.expected=NULL, NI.margin.original, summary.measure.original, summary.measure.target, tau.RMST=NULL, t.DS=NULL) {
+convertmargin.survival <- function( rate.control.expected=NULL, t.expected=NULL, 
+                                    p.control.expected=NULL, NI.margin.original, 
+                                    summary.measure.original, summary.measure.target, 
+                                    tau.RMST=NULL, t.DS=NULL, BH.est="exponential",
+                                    S.control=NULL) {
   
   stopifnot(is.character(summary.measure.original)&summary.measure.original%in%c("DRMST", "HR", "DS"))
   stopifnot(is.character(summary.measure.target)&summary.measure.target%in%c("DRMST", "HR", "DS"))
   stopifnot(is.numeric(NI.margin.original))
+  stopifnot(BH.est%in%c("exponential", "surv.func"))
+  if (BH.est=="surv.func") stopifnot(is.function(S.control))
   
   if (summary.measure.original=="DRMST"||summary.measure.target=="DRMST") {
-      if (is.null(tau.RMST)||!is.numeric(tau.RMST)||tau.RMST<=0) stop("Please provide tau.RMST as a numeric, positive, horizon time for RMST.")
+    if (is.null(tau.RMST)||!is.numeric(tau.RMST)||tau.RMST<=0) stop("Please provide tau.RMST as a numeric, positive, horizon time for RMST.")
   }
   if (summary.measure.original=="DS"||summary.measure.target=="DS") {
     if (is.null(t.DS)||!is.numeric(t.DS)||t.DS<=0) stop("Please provide t.DS as a numeric, positive, horizon time for DS.")
@@ -57,17 +63,30 @@ convertmargin.survival <- function( rate.control.expected=NULL, t.expected=NULL,
     
   }
   
+  HR.m <- rate.experim.nontolerable / rate.control.expected
+  
   if (summary.measure.target=="HR") {
     
-    NIm <- rate.experim.nontolerable / rate.control.expected
+    NIm <- HR.m
     
   } else if  (summary.measure.target=="DRMST") {
     
-    NIm <- RMST.margin(rate.experim.nontolerable,  rate.control.expected, tau.RMST, 0)
+    if (BH.est=="exponential") {
+      NIm <- RMST.margin(rate.experim.nontolerable,  rate.control.expected, tau.RMST, 0)
+    } else {
+      diff.S<-function(t) {
+        S.control(t)^HR.m-S.control(t)
+      }
+      NIm <- suppressWarnings(quad(diff.S,xa=0, xb=tau.RMST))
+    }
     
   } else if  (summary.measure.target=="DS") {
     
-    NIm <- Diff.margin(rate.experim.nontolerable,  rate.control.expected, t.DS, 0)
+    if (BH.est=="exponential") {
+      NIm <- Diff.margin(rate.experim.nontolerable,  rate.control.expected, t.DS, 0)
+    } else {
+      NIm <- S.control(t.DS)^HR.m-S.control(t.DS)
+    }
     
   } 
   

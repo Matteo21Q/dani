@@ -177,11 +177,11 @@ fun.rate <- function(rate,target.surv, time, dist="exp") {
 }
 
 RMST.margin<-function(lambda2,lambda, tau, target) {
-  return(exp(-lambda2*tau)/lambda2-exp(0)/lambda2-(exp(-lambda*tau)/lambda-exp(0)/lambda)-target)
+  return(-(exp(-lambda2*tau)/lambda2-exp(0)/lambda2-(exp(-lambda*tau)/lambda-exp(0)/lambda)-target))
 }
 
 Diff.margin<-function(lambda2,lambda, t, target) {
-  return(pexp(t,lambda2)-pexp(t,lambda)-target)
+  return(-pexp(t,lambda2)+pexp(t,lambda)-target)
 }
 
 ## Function to recursively estimate p in test.NI.binary

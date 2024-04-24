@@ -11,7 +11,7 @@
   convertmargin.survival(rate.control.expected=NULL, t.expected=NULL,
   p.control.expected=NULL, NI.margin.original, 
   summary.measure.original, summary.measure.target, 
-  tau.RMST=NULL, t.DS=NULL)
+  tau.RMST=NULL, t.DS=NULL, BH.est="exponential", S.control=NULL)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -40,6 +40,12 @@
   }
     \item{t.DS}{
     The horizon time t for difference in surviving proportion. 
+  }
+    \item{BH.est}{
+    How should the baseline hazard be estimated in the conversion of the margin? "exponential" assumes the event distribution si exponential, while "surv.func" uses a survival function fitted on some data (e.g. the control arm data from the trial). 
+  }
+    \item{S.control}{
+    The survival function in the control arm. This is necessary if using BH.est="surv.func". 
   }
 }
 
