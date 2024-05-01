@@ -39,31 +39,54 @@ convertmargin.survival <- function( rate.control.expected=NULL, t.expected=NULL,
   }
   
   
-  
-  if (summary.measure.original=="HR") {
-    if (NI.margin.original<=0) stop("Non-inferiority margin as a hazard ratio should be >0")
-    rate.experim.nontolerable <- rate.control.expected*NI.margin.original
+  if (BH.est=="exponential") {
+    if (summary.measure.original=="HR") {
+      if (NI.margin.original<=0) stop("Non-inferiority margin as a hazard ratio should be >0")
+      rate.experim.nontolerable <- rate.control.expected*NI.margin.original
+      
+    } else if  (summary.measure.original=="DRMST") {
+      
+      rate.experim.nontolerable <- uniroot(RMST.margin, c(1E-6, 1E6), tol = 0.000001, 
+                                           lambda=rate.control.expected, target=NI.margin.original, tau=tau.RMST)$root
+      
+    } else if  (summary.measure.original=="DS") {
+      
+      rate.experim.nontolerable <- uniroot(Diff.margin, c(1E-6, 1E6), tol = 0.000001, 
+                                           lambda=rate.control.expected, target=NI.margin.original, t=t.DS)$root
+      NI.DS<-NI.margin.original
+      
+    } 
+    if (!((is.numeric(rate.experim.nontolerable))&(rate.experim.nontolerable<Inf)&(rate.experim.nontolerable>0))) {
+      
+      stop("The non-inferiority margin on the original scale implies an impossible experimental event risk. Check that this was not mis-specified.")
+      
+    }
     
-  } else if  (summary.measure.original=="DRMST") {
+    HR.m <- rate.experim.nontolerable / rate.control.expected
     
-    rate.experim.nontolerable <- uniroot(RMST.margin, c(1E-6, 1E6), tol = 0.000001, 
-                                         lambda=rate.control.expected, target=NI.margin.original, tau=tau.RMST)$root
+  } else {
     
-  } else if  (summary.measure.original=="DS") {
-    
-    rate.experim.nontolerable <- uniroot(Diff.margin, c(1E-6, 1E6), tol = 0.000001, 
-                                         lambda=rate.control.expected, target=NI.margin.original, t=t.DS)$root
-    
-    
-  } 
-  
-  if (!((is.numeric(rate.experim.nontolerable))&(rate.experim.nontolerable<Inf)&(rate.experim.nontolerable>0))) {
-    
-    stop("The non-inferiority margin on the original scale implies an impossible experimental event risk. Check that this was not mis-specified.")
+    if (summary.measure.original=="HR") {
+      
+      if (NI.margin.original<=0) stop("Non-inferiority margin as a hazard ratio should be >0")
+      HR.m<-NI.margin.original
+      
+    } else if (summary.measure.original=="DRMST") {
+      
+      HR.m <- uniroot(RMST.margin.flex, c(1E-6, 1E6), tol = 0.000001, 
+                      S.control=S.control, target=NI.margin.original, t=tau.RMST)$root
+      
+    } else if (summary.measure.original=="DS") {
+      
+      HR.m <- uniroot(Diff.margin.flex, c(1E-6, 1E6), tol = 0.000001, 
+                                           S.control=S.control, target=NI.margin.original, t=t.DS)$root
+        
+    }
     
   }
+
   
-  HR.m <- rate.experim.nontolerable / rate.control.expected
+
   
   if (summary.measure.target=="HR") {
     

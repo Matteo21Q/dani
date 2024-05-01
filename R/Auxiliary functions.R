@@ -184,6 +184,20 @@ Diff.margin<-function(lambda2,lambda, t, target) {
   return(-pexp(t,lambda2)+pexp(t,lambda)-target)
 }
 
+RMST.margin.flex<-function(S.control, HR, tau, target) {
+  diff.S<-function(t) {
+    S.control(t)^HR-S.control(t)
+  }
+  NIm <- suppressWarnings(quad(diff.S,xa=0, xb=tau))
+  
+  return(NIm-target)
+}
+
+Diff.margin.flex<-function(S.control, HR, t, target) {
+  return(S.control(t)^HR-S.control(t)-target)
+}
+
+
 ## Function to recursively estimate p in test.NI.binary
 
 func.to.opt<-function(x,n.control, n.experim, e.control, e.experim,
