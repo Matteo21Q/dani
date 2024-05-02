@@ -177,7 +177,7 @@ fun.rate <- function(rate,target.surv, time, dist="exp") {
 }
 
 RMST.margin<-function(lambda2,lambda, tau, target) {
-  return(-(exp(-lambda2*tau)/lambda2-exp(0)/lambda2-(exp(-lambda*tau)/lambda-exp(0)/lambda)-target))
+  return(-(exp(-lambda2*tau)/lambda2-exp(0)/lambda2-(exp(-lambda*tau)/lambda-exp(0)/lambda))-target)
 }
 
 Diff.margin<-function(lambda2,lambda, t, target) {

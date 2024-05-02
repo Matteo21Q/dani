@@ -53,8 +53,7 @@ convertmargin.survival <- function( rate.control.expected=NULL, t.expected=NULL,
       
       rate.experim.nontolerable <- uniroot(Diff.margin, c(1E-6, 1E6), tol = 0.000001, 
                                            lambda=rate.control.expected, target=NI.margin.original, t=t.DS)$root
-      NI.DS<-NI.margin.original
-      
+
     } 
     if (!((is.numeric(rate.experim.nontolerable))&(rate.experim.nontolerable<Inf)&(rate.experim.nontolerable>0))) {
       
