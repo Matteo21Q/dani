@@ -1,11 +1,13 @@
 test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig.level=0.025, summary.measure="HR", 
                                print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                               M.boot=2000, bootCI.type="bca", tau=NULL) {
+                               M.boot=2000, bootCI.type="bca", tau=NULL, control.level=NULL) {
   
   stopifnot(is.numeric(time), is.vector(time), length(time)>2, all(time>0))
-  stopifnot(is.vector(event), nlevels(as.factor(event))==2, length(time)==length(event))
+  stopifnot(is.vector(event), nlevels(as.factor(event))%in%c(1,2), length(time)==length(event))
   stopifnot(is.vector(treat), nlevels(as.factor(treat))==2, length(time)==length(treat))
   treat<-as.factor(treat)
+  if (!is.null(control.level)) stopifnot(control.level%in%levels(treat))
+  treat<-relevel(treat, ref = control.level)
   if (!is.null(covariates)) {
     stopifnot(is.data.frame(covariates))
     if (is_tibble(covariates)) covariates<-as.data.frame(covariates)
@@ -126,7 +128,7 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
     if ((unfavourable == T)&&(NI.margin>=0)) stop("When events are unfavourable (e.g. death), a NI margin as a difference in RMST needs to be <0.")
     if ((unfavourable == F)&&(NI.margin<=0)) stop("When events are favourable (e.g. cure), a NI margin as a difference in RMST needs to be >0.")
     if (test.type=="KM") {
-      fit.RMST<-rmst2(time, event, as.numeric(treat)-1, tau=tau, alpha=sig.level*2)
+      fit.RMST<-rmst2(dd$time, dd$event, as.numeric(dd$treat!=control.level), tau=tau, alpha=sig.level*2)
       CI<-as.numeric(fit.RMST$unadjusted.result[1,2:3])
       estimate<-as.numeric(fit.RMST$unadjusted.result[1,1])
     } else if (test.type=="Cox.PH.bootstrap") {
