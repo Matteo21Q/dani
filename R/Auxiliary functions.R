@@ -60,7 +60,7 @@ RMST.diff.flexsurv<- function(data, index, tau) {
   k3boot<-fit.flexsurv.boot$knots[3]
   k4boot<-fit.flexsurv.boot$knots[4]
   
-  DRMST_Est<-DRMST.est(beta1boot, s0boot, s1boot, s2boot, s3boot, tau, datai, k1boot, k2boot, k3boot, k4boot)
+  DRMST_Est<-DRMST.estimator(c(tau, beta1boot, s0boot, s1boot, s2boot, s3boot, k1boot, k2boot, k3boot, k4boot))
   return(c(DRMST_Est))
 }
 
@@ -69,18 +69,18 @@ Surv.diff.flexsurv<- function(data, index, tau) {
   datai<-data[index,]
   datai<-datai[order(datai$time),]
   
-  fit.flexsurv<-flexsurvspline(Surv(time,event)~treat, k=2, data=datai)
-  beta1<-coef(fit.flexsurv)[5]
-  s0<-coef(fit.flexsurv)[1]
-  s1<-coef(fit.flexsurv)[2]
-  s2<-coef(fit.flexsurv)[3]
-  s3<-coef(fit.flexsurv)[4]
-  k1<-fit.flexsurv$knots[1]
-  k2<-fit.flexsurv$knots[2]
-  k3<-fit.flexsurv$knots[3]
-  k4<-fit.flexsurv$knots[4]
+  fit.flexsurv.boot<-flexsurvspline(Surv(time,event)~treat, k=2, data=datai)
+  beta1boot<-coef(fit.flexsurv.boot)[5]
+  s0boot<-coef(fit.flexsurv.boot)[1]
+  s1boot<-coef(fit.flexsurv.boot)[2]
+  s2boot<-coef(fit.flexsurv.boot)[3]
+  s3boot<-coef(fit.flexsurv.boot)[4]
+  k1boot<-fit.flexsurv.boot$knots[1]
+  k2boot<-fit.flexsurv.boot$knots[2]
+  k3boot<-fit.flexsurv.boot$knots[3]
+  k4boot<-fit.flexsurv.boot$knots[4]
   
-  DS_Est<-DS.est(beta1, s0, s1, s2, s3, k1,k2,k3,k4, tau)
+  DS_Est<-DS.estimator(c(tau, beta1boot, s0boot, s1boot, s2boot, s3boot, k1boot, k2boot, k3boot, k4boot))
   return(c(DS_Est))
 }
 
