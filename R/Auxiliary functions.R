@@ -84,51 +84,9 @@ Surv.diff.flexsurv<- function(data, index, tau) {
   return(c(DS_Est))
 }
 
+# Function to estimate survival from flexsurv fit:
 
-# Function to estimate RMST from Royston-Parmar
-
-RMST_RP.Beta <- function(beta, sp0, sp1, sp2, sp3, tau, active, dat, k1, k2, k3, k4){
-  int <- (dat$time[1] - 0)*1 #1 is the initial survival number: 1
-  for(ii in 2:(length(dat$time))){
-    if(dat$time[ii] < tau){
-      int <- int + (dat$time[ii] - dat$time[ii-1])*surv.est(beta, sp0, sp1, sp2, sp3,active,dat$time[ii-1], k1, k2, k3, k4)
-    }
-    else{
-      int <- int + (tau - dat$time[ii-1])*surv.est(beta, sp0, sp1, sp2, sp3,active,dat$time[ii-1], k1, k2, k3, k4)
-      break
-    }
-  }
-  return(int)
-}
-
-
-# Function to estimate difference in RMST:
-
-DRMST.est<-function(beta, sp0, sp1, sp2, sp3, tau, data, k1, k2, k3, k4) {
-  res<-RMST_RP.Beta(beta, sp0, sp1, sp2, sp3,tau,1,data, k1, k2, k3, k4)-RMST_RP.Beta(beta, sp0, sp1, sp2, sp3,tau,0, data, k1, k2, k3, k4)
-  return(res)
-}
-
-# Function to estimate 5 partial derivatives
-Deriv1.DRMST<-function( sp0, dat,beta1, s1, s2, s3, k1, k2, k3, k4, tau ) {
-  return(DRMST.est(beta1, sp0, s1, s2, s3, tau, dat, k1, k2, k3, k4))
-}
-Deriv2.DRMST<-function( sp1,dat,beta1, s0, s2, s3, k1, k2, k3, k4, tau) {
-  return(DRMST.est(beta1, s0, sp1, s2, s3, tau, dat, k1, k2, k3, k4))
-}
-Deriv3.DRMST<-function( sp2,dat,beta1, s1, s0, s3, k1, k2, k3, k4, tau) {
-  return(DRMST.est(beta1, s0, s1, sp2, s3, tau, dat, k1, k2, k3, k4))
-}
-Deriv4.DRMST<-function( sp3,dat,beta1, s1, s2, s0, k1, k2, k3, k4,tau) {
-  return(DRMST.est(beta1, s0, s1, s2, sp3, tau, dat, k1, k2, k3, k4))
-}
-Deriv5.DRMST<-function(beta,dat,s0, s1, s2, s3, k1, k2, k3, k4, tau) {
-  return(DRMST.est(beta, s0, s1, s2, s3, tau, dat, k1, k2, k3, k4))
-}
-
-# Function to estimate survival prob at time tt given Royston-Parmar parameter estimates
-
-surv.est<-function(beta, sp0, sp1, sp2, sp3, active, tt, k1, k2, k3, k4) {
+surv.est<-function(tt, beta, sp0, sp1, sp2, sp3, active, k1, k2, k3, k4) {
   S0<-sp0+sp1*log(tt)+sp2*(max(0,(log(tt)-k2)^3)-(k4-k2)/(k4-k1)*max(0,(log(tt)-k1)^3)-
                              (1-(k4-k2)/(k4-k1))*max(0,(log(tt)-k4)^3))+
     sp3*(max(0,(log(tt)-k3)^3)-(k4-k3)/(k4-k1)*max(0,(log(tt)-k1)^3)-
@@ -138,28 +96,47 @@ surv.est<-function(beta, sp0, sp1, sp2, sp3, active, tt, k1, k2, k3, k4) {
   return(exp(-exp(logres)))
 }
 
-# Function to estimate risk difference at time tau:
+# Function to estimate DS from flexsurv fit:
 
-DS.est<-function(beta, sp0, sp1, sp2, sp3, k1, k2, k3, k4, tau) {
-  surv.est(beta, sp0, sp1, sp2, sp3,1,tau, k1, k2, k3, k4)-surv.est(beta, sp0, sp1, sp2, sp3,0,tau, k1, k2, k3, k4)
+DS.estimator<-function(args) {
+  
+  x=args[1] 
+  beta=args[2] 
+  sp0=args[3] 
+  sp1=args[4] 
+  sp2=args[5] 
+  sp3=args[6] 
+  k1=args[7] 
+  k2=args[8] 
+  k3=args[9] 
+  k4=args[10]
+  
+  surv.est(x,beta, sp0, sp1, sp2, sp3, 1, k1, k2, k3, k4)-surv.est(x,beta, sp0, sp1, sp2, sp3, 0, k1, k2, k3, k4)
 }
 
+# Function to estimate DS from flexsurv fit within adaptive quadrature:
 
-# Function to estimate 5 partial derivatives
-Deriv1.DS<-function( sp0, beta1, s1, s2, s3, k1, k2, k3, k4, tau) {
-  return(DS.est(beta1, sp0, s1, s2, s3, k1, k2, k3, k4, tau))
+DS.integrate<-function(x, beta, sp0, sp1, sp2, sp3, k1, k2, k3, k4) {
+  
+  surv.est(x,beta, sp0, sp1, sp2, sp3, 1, k1, k2, k3, k4)-surv.est(x,beta, sp0, sp1, sp2, sp3, 0, k1, k2, k3, k4)
 }
-Deriv2.DS<-function( sp1, beta1, s0, s2, s3, k1, k2, k3, k4, tau) {
-  return(DS.est(beta1, s0, sp1, s2, s3, k1, k2, k3, k4, tau))
-}
-Deriv3.DS<-function( sp2, beta1, s0, s1, s3, k1, k2, k3, k4, tau) {
-  return(DS.est(beta1, s0, s1, sp2, s3, k1, k2, k3, k4, tau))
-}
-Deriv4.DS<-function( sp3, beta1, s0, s1, s2, k1, k2, k3, k4, tau) {
-  return(DS.est(beta1, s0, s1, s2, sp3, k1, k2, k3, k4, tau))
-}
-Deriv5.DS<-function( beta, s0, s1, s2, s3, k1, k2, k3, k4, tau) {
-  return(DS.est(beta, s0, s1, s2, s3, k1, k2, k3, k4, tau))
+
+# Function to estimate DRMST from flexsurv fit:
+
+DRMST.estimator<-function(args) {
+  tt=args[1] 
+  beta=args[2] 
+  sp0=args[3] 
+  sp1=args[4] 
+  sp2=args[5] 
+  sp3=args[6] 
+  k1=args[7] 
+  k2=args[8] 
+  k3=args[9] 
+  k4=args[10]
+  DS.integrate<-Vectorize(DS.integrate)
+  
+  return(suppressWarnings(quad(DS.integrate,xa=0, xb=tt,beta=beta, sp0=sp0, sp1=sp1, sp2=sp2, sp3=sp3, k1=k1, k2=k2, k3=k3, k4=k4)))
 }
 
 # Functions to convert NI margins on survival outcome:

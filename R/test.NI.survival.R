@@ -6,7 +6,12 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
   stopifnot(is.vector(event), nlevels(as.factor(event))%in%c(1,2), length(time)==length(event))
   stopifnot(is.vector(treat), nlevels(as.factor(treat))==2, length(time)==length(treat))
   treat<-as.factor(treat)
-  if (!is.null(control.level)) stopifnot(control.level%in%levels(treat))
+  if (!is.null(control.level)) {
+    stopifnot(is.character(control.level)&(control.level%in%levels(treat)))
+  } else {
+    control.level<-levels(treat)[1]
+    if (isTRUE(print.out)) cat("NOTE: control level for treatment variable was not specified. It was assumed to be: ", control.level, ".\n")
+  }
   treat<-relevel(treat, ref = control.level)
   if (!is.null(covariates)) {
     stopifnot(is.data.frame(covariates))
@@ -147,13 +152,13 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       k2<-fit.flexsurv$knots[2]
       k3<-fit.flexsurv$knots[3]
       k4<-fit.flexsurv$knots[4]
-
-      gradsb<-c(grad(Deriv1.DRMST,s0, dat=dd,s1=s1,s2=s2,s3=s3,beta1=beta1, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau),
-                grad(Deriv2.DRMST,s1, dat=dd,s0=s0,s2=s2,s3=s3,beta1=beta1, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau),
-                grad(Deriv3.DRMST,s2, dat=dd,s0=s0,s1=s1,s3=s3,beta1=beta1, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau), 
-                grad(Deriv4.DRMST,s3, dat=dd,s0=s0,s1=s1,s2=s2,beta1=beta1, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau),
-                grad(Deriv5.DRMST,beta1, dat=dd,s0=s0,s1=s1,s3=s3,s2=s2, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau))
-      estimate<-DRMST.est(beta1, s0, s1, s2, s3,tau,dd,k1,k2,k3,k4)
+      grads.comp<-numDeriv:::grad(DRMST.estimator, c(tau,beta1,s0,s1,s2,s3,k1,k2,k3,k4))
+      gradsb<-c(grads.comp[3],
+                grads.comp[4],
+                grads.comp[5], 
+                grads.comp[6],
+                grads.comp[2])
+      estimate <- DRMST.estimator(c(tau,beta1,s0,s1,s2,s3,k1,k2,k3,k4))
       se<-sqrt(t(gradsb)%*%varcov%*%gradsb)
       low.bndb<-(estimate-qnorm(1-sig.level)*se)
       up.bndb<-(estimate+qnorm(1-sig.level)*se)
@@ -229,13 +234,14 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       k2<-fit.flexsurv$knots[2]
       k3<-fit.flexsurv$knots[3]
       k4<-fit.flexsurv$knots[4]
-      grads<-c(grad(Deriv1.DS,s0, s1=s1,s2=s2,s3=s3,beta1=beta1, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau),
-                grad(Deriv2.DS,s1, s0=s0,s2=s2,s3=s3,beta1=beta1, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau),
-                grad(Deriv3.DS,s2, s0=s0,s1=s1,s3=s3,beta1=beta1, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau), 
-                grad(Deriv4.DS,s3, s0=s0,s1=s1,s2=s2,beta1=beta1, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau),
-                grad(Deriv5.DS,beta1, s0=s0,s1=s1,s3=s3,s2=s2, k1=k1, k2=k2, k3=k3, k4=k4, tau=tau))
-      estimate<-DS.est(beta1, s0, s1, s2, s3,k1,k2,k3,k4,tau)
-      se<-sqrt(t(grads)%*%varcov%*%grads)
+      grads.comp<-numDeriv:::grad(DS.estimator, c(tau,beta1,s0,s1,s2,s3,k1,k2,k3,k4))
+      gradsb<-c(grads.comp[3],
+                grads.comp[4],
+                grads.comp[5], 
+                grads.comp[6],
+                grads.comp[2])
+      estimate <- DS.estimator(c(tau,beta1,s0,s1,s2,s3,k1,k2,k3,k4))
+      se<-sqrt(t(gradsb)%*%varcov%*%gradsb)
       low.bndb<-(estimate-qnorm(1-sig.level)*se)
       up.bndb<-(estimate+qnorm(1-sig.level)*se)
       CI<-c(low.bndb, up.bndb)
