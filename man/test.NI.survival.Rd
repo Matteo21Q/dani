@@ -10,7 +10,7 @@
 \usage{
   test.NI.survival(time, event, treat, covariates=NULL, NI.margin, sig.level=0.025, summary.measure="HR", 
                    print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                   M.boot=2000, bootCI.type="bca", tau=NULL)  
+                   M.boot=2000, bootCI.type="bca", tau=NULL, control.level=NULL)  
 }
 \arguments{
   \item{time}{A vector with the event (or censoring) times.}
@@ -32,6 +32,8 @@
   Method for computing the confidence intervals if using a bootstrap method. It can be either "norm", "basic", "perc" or "bca". Default is "bca", which is the recommended option when possible. 
 }
   \item{tau}{The horizon time tau if using either "DRMST" or "DS" as summary measures.}
+    \item{control.level}{A character variable specifying the level of the factor variable for treatment that has to be considered as the control one. If missing, the automatic reference will be assumed to be the control and a NOTE is printed on screen specifying which one that is. }
+
 }
 \details{
   This is a function to test non-inferiority of an experimental treatment against the active control within a specific NI margin. The margin can be specified on a number of different summary measures, including HR, DRMST and difference in survival. It is possible to test both with favourable (e.g. cure) or unfavourable (e.g. death) outcomes and using different analysis methods. See the entry on the test.type argument for the specific methods available for each summary measure. 

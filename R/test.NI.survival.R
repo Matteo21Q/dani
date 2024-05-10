@@ -77,16 +77,16 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
     
     if (test.type=="Cox.PH") {
       fit<-coxph(myformula, mydata)
-      estimate<-as.numeric(exp(fit$coefficients["treat1"]))
-      CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)["treat1",]))
+      estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
+      CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     } else if (test.type=="flexsurv.PH") {
       fit<-flexsurvspline(myformula, k=2, data=mydata)
-      estimate<-as.numeric(exp(fit$coefficients["treat1"]))
-      CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)["treat1",]))
+      estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
+      CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     } else if (test.type=="Cox.weighted") {
       fit<-coxphw(myformula, data=mydata)
-      estimate<-as.numeric(exp(fit$coefficients["treat1"]))
-      CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)["treat1",]))
+      estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
+      CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     }  
     
     estimate.n<-mean(CI)
