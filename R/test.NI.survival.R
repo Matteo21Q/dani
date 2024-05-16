@@ -1,6 +1,7 @@
 test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig.level=0.025, summary.measure="HR", 
-                               print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                               M.boot=2000, bootCI.type="bca", tau=NULL, control.level=NULL) {
+                             print.out=TRUE, unfavourable=TRUE, test.type=NULL,
+                             M.boot=2000, bootCI.type="bca", tau=NULL, control.level=NULL,
+                             k=2, knots=NULL, bknots=NULL) {
   
   stopifnot(is.numeric(time), is.vector(time), length(time)>2, all(time>0))
   stopifnot(is.vector(event), nlevels(as.factor(event))%in%c(1,2), length(time)==length(event))
@@ -60,7 +61,7 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
     }
   } else {
     if (!adjusted) {
-      stopifnot(test.type%in%c("Newcombe10", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap", "Cox.weighted"))
+      stopifnot(test.type%in%c("KM", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap", "Cox.weighted"))
     } else {
       stop("Covariate adjustment not currently supported for summary measures different from HR.\n")
     }
@@ -80,7 +81,7 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     } else if (test.type=="flexsurv.PH") {
-      fit<-flexsurvspline(myformula, k=2, data=mydata)
+      fit<-flexsurvspline(myformula, k=k, knots=knots, bknots=bknots, data=mydata)
       estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     } else if (test.type=="Cox.weighted") {
@@ -89,15 +90,14 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     }  
     
-    estimate.n<-mean(CI)
     if (is.null(se)) {
-      se<-(CI[2]-CI[1])/(2*qnorm(1-sig.level))
+      se<-(log(CI[2])-log(CI[1]))/(2*qnorm(1-sig.level))
       is.se.est<-T
     } else {
       is.se.est<-F
     }
     if (is.null(p)) {
-      Z <- ifelse(unfavourable==T,(estimate.n - NI.margin)/se,(-estimate.n + NI.margin)/se)
+      Z <- ifelse(unfavourable==T,(log(estimate) - log(NI.margin))/se,(-log(estimate) + log(NI.margin))/se)
       p <- pnorm(Z)
       is.p.est<-T
     } else {
@@ -141,30 +141,30 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-res$t0     
     } else if (test.type=="flexsurv.PH.delta") {
-      fit.flexsurv<-flexsurvspline(Surv(time,event)~treat, k=2, data=dd)
+      fit.flexsurv<-flexsurvspline(Surv(time,event)~treat, k=k, knots=knots, bknots=bknots, data=dd)
       varcov<-vcov(fit.flexsurv)
-      beta1<-coef(fit.flexsurv)[5]
-      s0<-coef(fit.flexsurv)[1]
-      s1<-coef(fit.flexsurv)[2]
-      s2<-coef(fit.flexsurv)[3]
-      s3<-coef(fit.flexsurv)[4]
-      k1<-fit.flexsurv$knots[1]
-      k2<-fit.flexsurv$knots[2]
-      k3<-fit.flexsurv$knots[3]
-      k4<-fit.flexsurv$knots[4]
-      grads.comp<-numDeriv:::grad(DRMST.estimator, c(tau,beta1,s0,s1,s2,s3,k1,k2,k3,k4))
-      gradsb<-c(grads.comp[3],
-                grads.comp[4],
-                grads.comp[5], 
-                grads.comp[6],
-                grads.comp[2])
-      estimate <- DRMST.estimator(c(tau,beta1,s0,s1,s2,s3,k1,k2,k3,k4))
+      n.par<-length(coef(fit.flexsurv))
+      beta1<-coef(fit.flexsurv)[n.par]
+      parameters<-c(tau,beta1)
+      for (indx in 1:(n.par-1)) {
+        parameters<-c(parameters,coef(fit.flexsurv)[indx])
+      }
+      for (indx in 1:(n.par-1)) {
+        parameters<-c(parameters,fit.flexsurv$knots[indx])
+      }
+      grads.comp<-numDeriv:::grad(DRMST.estimator, parameters)
+      gradsb<-NULL
+      for (indx in 1:(n.par-1)) {
+        gradsb<-c(gradsb, grads.comp[indx+2])
+      }
+      gradsb<-c(gradsb, grads.comp[2])
+      estimate <- DRMST.estimator(parameters)
       se<-sqrt(t(gradsb)%*%varcov%*%gradsb)
       low.bndb<-(estimate-qnorm(1-sig.level)*se)
       up.bndb<-(estimate+qnorm(1-sig.level)*se)
       CI<-c(low.bndb, up.bndb)
     } else if (test.type=="flexsurv.PH.bootstrap") {
-      res<-boot(dd, RMST.diff.flexsurv, tau=tau, R=M.boot)
+      res<-boot(dd, RMST.diff.flexsurv, tau=tau, k=k, knots=knots, bknots=bknots, R=M.boot)
       CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-as.numeric(res$t0)    
     } 
@@ -210,43 +210,45 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
     stopifnot(is.numeric(tau), tau>0)
     if ((unfavourable == T)&&(NI.margin>=0)) stop("When events are unfavourable (e.g. death), a NI margin as a difference in survival needs to be <0.")
     if ((unfavourable == F)&&(NI.margin<=0)) stop("When events are favourable (e.g. cure), a NI margin as a difference in survival needs to be >0.")
-    if (test.type=="Newcombe10") {
-      n0<-sum(treat==levels(factor(treat))[1])
-      n1<-sum(treat==levels(factor(treat))[2])
-      e0<-sum(((dd[dd$treat==levels(factor(dd$treat))[1],"event"]==1)&(dd[dd$treat==levels(factor(dd$treat))[1],"time"]<tau)))
-      e1<-sum(((dd[dd$treat==levels(factor(dd$treat))[2],"event"]==1)&(dd[dd$treat==levels(factor(dd$treat))[2],"time"]<tau)))
-      test<-BinomDiffCI(n1-e1, n1, n0-e0, n0, conf.level = (1-sig.level*2), method = "score")
-      CI <- test[2:3]
-      estimate<-test[1]
-    } else if (test.type=="Cox.PH.bootstrap") {
+    if (test.type=="KM") {
+     
+      fit.KM<-survfit(Surv(time,event)~treat, data=dd)
+      sum.KM<-summary(fit.KM, t=tau)
+      estimate<-sum.KM$surv[2]-sum.KM$surv[1]
+      se<-sqrt(sum.KM$std.err[1]^2+sum.KM$std.err[2]^2)
+      low.bndb<-(estimate-qnorm(1-sig.level)*se)
+      up.bndb<-(estimate+qnorm(1-sig.level)*se)
+      CI<-c(low.bndb, up.bndb)
+      
+      } else if (test.type=="Cox.PH.bootstrap") {
       res<-boot(dd, surv.diff, tau=tau, R=M.boot)
       CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-res$t0     
     } else if (test.type=="flexsurv.PH.delta") {
-      fit.flexsurv<-flexsurvspline(Surv(time,event)~treat, k=2, data=dd)
+      fit.flexsurv<-flexsurvspline(Surv(time,event)~treat, k=k, knots=knots, bknots=bknots, data=dd)
       varcov<-vcov(fit.flexsurv)
-      beta1<-coef(fit.flexsurv)[5]
-      s0<-coef(fit.flexsurv)[1]
-      s1<-coef(fit.flexsurv)[2]
-      s2<-coef(fit.flexsurv)[3]
-      s3<-coef(fit.flexsurv)[4]
-      k1<-fit.flexsurv$knots[1]
-      k2<-fit.flexsurv$knots[2]
-      k3<-fit.flexsurv$knots[3]
-      k4<-fit.flexsurv$knots[4]
-      grads.comp<-numDeriv:::grad(DS.estimator, c(tau,beta1,s0,s1,s2,s3,k1,k2,k3,k4))
-      gradsb<-c(grads.comp[3],
-                grads.comp[4],
-                grads.comp[5], 
-                grads.comp[6],
-                grads.comp[2])
-      estimate <- DS.estimator(c(tau,beta1,s0,s1,s2,s3,k1,k2,k3,k4))
+      n.par<-length(coef(fit.flexsurv))
+      beta1<-coef(fit.flexsurv)[n.par]
+      parameters<-c(tau,beta1)
+      for (indx in 1:(n.par-1)) {
+        parameters<-c(parameters,coef(fit.flexsurv)[indx])
+      }
+      for (indx in 1:(n.par-1)) {
+        parameters<-c(parameters,fit.flexsurv$knots[indx])
+      }
+      grads.comp<-numDeriv:::grad(DS.estimator, parameters)
+      gradsb<-NULL
+      for (indx in 1:(n.par-1)) {
+        gradsb<-c(gradsb, grads.comp[indx+2])
+      }
+      gradsb<-c(gradsb, grads.comp[2])
+      estimate <- DS.estimator(parameters)
       se<-sqrt(t(gradsb)%*%varcov%*%gradsb)
       low.bndb<-(estimate-qnorm(1-sig.level)*se)
       up.bndb<-(estimate+qnorm(1-sig.level)*se)
       CI<-c(low.bndb, up.bndb)
     } else if (test.type=="flexsurv.PH.bootstrap") {
-      res<-boot(dd, Surv.diff.flexsurv, tau=tau, R=M.boot)
+      res<-boot(dd, Surv.diff.flexsurv, tau=tau, k=k, knots=knots, bknots=bknots, R=M.boot)
       CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-as.numeric(res$t0)    
     } 

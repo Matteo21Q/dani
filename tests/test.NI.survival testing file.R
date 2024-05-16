@@ -12,6 +12,8 @@ library(DescTools)
 library(boot)
 library(flexsurv)
 library(numDeriv)
+library(tibble)
+library(pracma)
 
 ###############################################################################################################################################
 ### Here we test the test.NI.survival function
@@ -43,7 +45,7 @@ n.t=n.t+1
 
 # Check that it stops for non acceptable values of event indicator:
 out1E<-try(test.NI.survival(rnorm(100,100,1), "100", rep(0:1,each=50), NI.margin= 1.5))
-correct[[n.t]]<-ifelse((inherits(out1E, "try-error"))&&(grepl("nlevels(as.factor(event)) == 2 is not TRUE", out1E[1], fixed=T  )),1,0) 
+correct[[n.t]]<-ifelse((inherits(out1E, "try-error"))&&(grepl("length(time) == length(event) is not TRUE", out1E[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1E"
 n.t=n.t+1
 out1F<-try(test.NI.survival(rnorm(100,100,1), c(0,1), rep(0:1,each=50), NI.margin= 1.5))
@@ -163,6 +165,29 @@ correct[[n.t]]<-ifelse((inherits(out4H, "try-error"))&&(grepl("tau > 0 is not TR
 names(correct)[[n.t]]<-"out4H"
 n.t=n.t+1
 
+# Check that control.level have acceptable value:
+out4I<-try(test.NI.survival(rnorm(100,100,1), rbinom(100,1,0.5), rep(0:1,each=50), NI.margin= 1.5, summary.measure="DRMST", tau=1, control.level=TRUE))
+correct[[n.t]]<-ifelse((inherits(out4I, "try-error"))&&(grepl("is.character(control.level)", out4I[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4I"
+n.t=n.t+1
+out4J<-try(test.NI.survival(rnorm(100,100,1), rbinom(100,1,0.5), rep(0:1,each=50), NI.margin= 1.5, summary.measure="DRMST", tau=1, control.level="pippo"))
+correct[[n.t]]<-ifelse((inherits(out4J, "try-error"))&&(grepl("is.character(control.level)", out4J[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4J"
+n.t=n.t+1
+
+# Check that flexsurv parameters have acceptable value:
+out4K<-try(test.NI.survival(rnorm(100,100,1), rbinom(100,1,0.5), rep(0:1,each=50), NI.margin= -1.5, summary.measure="DRMST", tau=1, k="pippo"))
+correct[[n.t]]<-ifelse((inherits(out4K, "try-error"))&&(grepl("k must be numeric", out4K[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4K"
+n.t=n.t+1
+out4L<-try(test.NI.survival(rnorm(100,100,1), rbinom(100,1,0.5), rep(0:1,each=50), NI.margin= -1.5, summary.measure="DRMST", tau=1, knots="pippo"))
+correct[[n.t]]<-ifelse((inherits(out4L, "try-error"))&&(grepl("must be a numeric vector", out4L[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4L"
+n.t=n.t+1
+out4M<-try(test.NI.survival(rnorm(100,100,1), rbinom(100,1,0.5), rep(0:1,each=50), NI.margin= -1.5, summary.measure="DRMST", tau=1, bknots="pippo"))
+correct[[n.t]]<-ifelse((inherits(out4M, "try-error"))&&(grepl("boundary knots should be a numeric vector of length 2", out4M[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4M"
+n.t=n.t+1
 #####################################################
 # Fifth set of checks:
 # Now check sample size calculations for certain values on HR scale. There are generally no comparators
@@ -210,19 +235,19 @@ n.t=n.t+1
 # Now check sample size calculations for certain values on DRMST scale.
 
 out6A<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, summary.measure="DRMST", tau=100))
-correct[[n.t]] <- ifelse((is.list(out6A)) && (all.equal(out6A$CI[2], -0.3447635, tolerance=10^(-5))) && out6A$non.inferiority, 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out6A)) && (all.equal(out6A$CI[2], -0.3322545, tolerance=10^(-5))) && out6A$non.inferiority, 1, 0) 
 names(correct)[[n.t]] <- "out6A"
 n.t <- n.t + 1
 out6B<-try(test.NI.survival(time1, event1, treat1, NI.margin=-0.5, summary.measure="DRMST", tau=100))
-correct[[n.t]] <- ifelse((is.list(out6B)) && (all.equal(out6B$CI[2], -0.3447635, tolerance=10^(-5))) && !out6B$non.inferiority, 1, 0)
+correct[[n.t]] <- ifelse((is.list(out6B)) && (all.equal(out6B$CI[2], -0.3322545, tolerance=10^(-5))) && !out6B$non.inferiority, 1, 0)
 names(correct)[[n.t]] <- "out6B"
 n.t <- n.t + 1
 out6C<-try(test.NI.survival(time1, event1, treat1, NI.margin= 1, unfavourable=F, summary.measure="DRMST", tau=100))
-correct[[n.t]] <- ifelse((is.list(out6C)) && (all.equal(out6C$CI[2], -0.3447635, tolerance=10^(-5))) && out6C$non.inferiority, 1, 0)
+correct[[n.t]] <- ifelse((is.list(out6C)) && (all.equal(out6C$CI[2], -0.3322545, tolerance=10^(-5))) && out6C$non.inferiority, 1, 0)
 names(correct)[[n.t]] <- "out6C"
 n.t <- n.t + 1
 out6D<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, sig.level=0.05, summary.measure="DRMST", tau=100))
-correct[[n.t]] <- ifelse((is.list(out6D)) && (all.equal(out6D$CI[2], -0.3695133, tolerance=10^(-6))), 1, 0)
+correct[[n.t]] <- ifelse((is.list(out6D)) && (all.equal(out6D$CI[2], -0.3547087, tolerance=10^(-6))), 1, 0)
 names(correct)[[n.t]] <- "out6D"
 n.t <- n.t + 1
 out6E<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, summary.measure="DRMST", test.type="KM", tau=100))
@@ -236,7 +261,7 @@ names(correct)[[n.t]] <- "out6F"
 n.t <- n.t + 1
 set.seed(1)
 out6G<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, summary.measure="DRMST", test.type="flexsurv.PH.bootstrap", tau=100, M.boot = 20, bootCI.type = "norm"))
-correct[[n.t]] <- ifelse((is.list(out6G)) && (all.equal(out6G$CI[2], 0.3228934, tolerance=10^(-6))), 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out6G)) && (all.equal(out6G$CI[2], 0.3567705, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out6G"
 n.t <- n.t + 1
 
@@ -245,19 +270,19 @@ n.t <- n.t + 1
 # Now check sample size calculations for certain values on DS scale. 
 
 out7A<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, summary.measure="DS", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7A)) && (all.equal(out7A$CI[2], -0.04978398, tolerance=10^(-5))) && out7A$non.inferiority == TRUE, 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out7A)) && (all.equal(out7A$CI[2], -0.04740067, tolerance=10^(-5))) && out7A$non.inferiority == TRUE, 1, 0) 
 names(correct)[[n.t]] <- "out7A"
 n.t <- n.t + 1
 out7B<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.05, summary.measure="DS", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7B)) && (all.equal(out7A$CI[2], -0.04978398, tolerance=10^(-5))) && out7B$non.inferiority == FALSE, 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out7B)) && (all.equal(out7A$CI[2], -0.04740067, tolerance=10^(-5))) && out7B$non.inferiority == FALSE, 1, 0) 
 names(correct)[[n.t]] <- "out7B"
 n.t <- n.t + 1
 out7C<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, sig.level=0.05, summary.measure="DS", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7C)) && (all.equal(out7C$CI[2], -0.05253179, tolerance=10^(-5))) && out7C$non.inferiority == TRUE, 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out7C)) && (all.equal(out7C$CI[2], -0.04978398, tolerance=10^(-5))) && out7C$non.inferiority == TRUE, 1, 0) 
 names(correct)[[n.t]] <- "out7C"
 n.t <- n.t + 1
-out7D<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, summary.measure="DS", test.type="Newcombe10", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7D)) && (all.equal(out7D$CI[2], 0.01249202, tolerance=10^(-6))), 1, 0) 
+out7D<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, summary.measure="DS", test.type="KM", tau=100))
+correct[[n.t]] <- ifelse((is.list(out7D)) && (all.equal(out7D$CI[2], -0.01721723, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out7D"
 n.t <- n.t + 1
 set.seed(1)
@@ -266,7 +291,7 @@ correct[[n.t]] <- ifelse((is.list(out7E)) && (all.equal(out7E$CI[2], 0.04578162,
 names(correct)[[n.t]] <- "out7E"
 n.t <- n.t + 1
 out7F<-try(test.NI.survival(time1, event1, treat1, NI.margin= 0.1, unfavourable=F, summary.measure="DS", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7F)) && (all.equal(out7F$CI[2], -0.04978398, tolerance=10^(-6))), 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out7F)) && (all.equal(out7F$CI[2], -0.04740067, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out7F"
 n.t <- n.t + 1
 set.seed(1)

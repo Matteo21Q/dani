@@ -10,7 +10,8 @@
 \usage{
   test.NI.survival(time, event, treat, covariates=NULL, NI.margin, sig.level=0.025, summary.measure="HR", 
                    print.out=TRUE, unfavourable=TRUE, test.type=NULL,
-                   M.boot=2000, bootCI.type="bca", tau=NULL, control.level=NULL)  
+                   M.boot=2000, bootCI.type="bca", tau=NULL, control.level=NULL,
+                             k=2, knots=NULL, bknots=NULL)  
 }
 \arguments{
   \item{time}{A vector with the event (or censoring) times.}
@@ -25,12 +26,16 @@
                   Default is TRUE, i.e. unfavourable outcome, e.g. death.}
   \item{test.type}{A character string defining the method to be used for calculation of the confidence interval. For the hazard ratio, methods available include "Cox.PH" (simple Cox proportional hazards model), "flexsurv.PH" (flexible parametric regression model) or "Cox.weighted" (Weighted Cox regression model, using Prentice weights).
   For "DRMST", possible methods are "KM" (Kaplan Meier), "Cox.PH.bootstrap" (bootstrap on estimates from Cox), "flexsurv.PH.delta" (delta method on estimates from flexible parametric survival model), "flexsurv.PH.bootstrap" (bootstrap on estimates from flexible parametric survival model).
- For "DS", methods available include "Newcombe10", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap".
+ For "DS", methods available include "KM" (Kaplan Meier), "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap".
  }
   \item{M.boot}{ Number of bootstrap samples.}
 \item{bootCI.type}{
   Method for computing the confidence intervals if using a bootstrap method. It can be either "norm", "basic", "perc" or "bca". Default is "bca", which is the recommended option when possible. 
 }
+  \item{k}{ If using flexsurv methods, this is the number of knots in the spline. The default k=0 gives a Weibull model. k is equivalent to df-1 in the notation of stpm for Stata. The knots are then chosen as equally-spaced quantiles of the log uncensored survival times, for example, at the median with one knot, or at the 33\% and 67\% quantiles of log time (or time, see "timescale") with two knots. To override this default knot placement, specify knots instead.}
+  \item{knots}{ If using flexsurv methods, Locations of knots on the axis of log time. If not specified, knot locations are chosen as described in k above. Either k or knots must be specified. If both are specified, knots overrides k.}
+  \item{bknots}{ If using flexsurv methods, this is the location of boundary knots, on the axis of log time. If not supplied, these are are chosen as the minimum and maximum log event time.}
+
   \item{tau}{The horizon time tau if using either "DRMST" or "DS" as summary measures.}
     \item{control.level}{A character variable specifying the level of the factor variable for treatment that has to be considered as the control one. If missing, the automatic reference will be assumed to be the control and a NOTE is printed on screen specifying which one that is. }
 

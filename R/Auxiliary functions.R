@@ -44,53 +44,68 @@ surv.diff<- function(data, index, tau) {
 }
 
 
-RMST.diff.flexsurv<- function(data, index, tau) {
+RMST.diff.flexsurv<- function(data, index, tau, k, knots, bknots) {
   
   datai<-data[index,]
   datai<-datai[order(datai$time),]
   
-  fit.flexsurv.boot<-flexsurvspline(Surv(time,event)~treat, k=2, data=datai)
-  beta1boot<-coef(fit.flexsurv.boot)[5]
-  s0boot<-coef(fit.flexsurv.boot)[1]
-  s1boot<-coef(fit.flexsurv.boot)[2]
-  s2boot<-coef(fit.flexsurv.boot)[3]
-  s3boot<-coef(fit.flexsurv.boot)[4]
-  k1boot<-fit.flexsurv.boot$knots[1]
-  k2boot<-fit.flexsurv.boot$knots[2]
-  k3boot<-fit.flexsurv.boot$knots[3]
-  k4boot<-fit.flexsurv.boot$knots[4]
+  fit.flexsurv.boot<-flexsurvspline(Surv(time,event)~treat, k=k, knots=knots, bknots=bknots, data=datai)
+  n.parboot<-length(coef(fit.flexsurv.boot))
+  betaboot<-coef(fit.flexsurv.boot)[n.parboot]
+  sboot<-NULL
+  kboot<-NULL
+  for (indx in 1:(n.parboot-1)) {
+    
+    sboot<-c(sboot,coef(fit.flexsurv.boot)[indx])
+    kboot<-c(kboot,fit.flexsurv.boot$knots[indx])
+
+  }
+  parameters<-c(tau, betaboot, sboot, kboot)
   
-  DRMST_Est<-DRMST.estimator(c(tau, beta1boot, s0boot, s1boot, s2boot, s3boot, k1boot, k2boot, k3boot, k4boot))
+  DRMST_Est<-DRMST.estimator(parameters)
   return(c(DRMST_Est))
 }
 
-Surv.diff.flexsurv<- function(data, index, tau) {
+Surv.diff.flexsurv<- function(data, index, tau, k, knots, bknots) {
   
   datai<-data[index,]
   datai<-datai[order(datai$time),]
   
-  fit.flexsurv.boot<-flexsurvspline(Surv(time,event)~treat, k=2, data=datai)
-  beta1boot<-coef(fit.flexsurv.boot)[5]
-  s0boot<-coef(fit.flexsurv.boot)[1]
-  s1boot<-coef(fit.flexsurv.boot)[2]
-  s2boot<-coef(fit.flexsurv.boot)[3]
-  s3boot<-coef(fit.flexsurv.boot)[4]
-  k1boot<-fit.flexsurv.boot$knots[1]
-  k2boot<-fit.flexsurv.boot$knots[2]
-  k3boot<-fit.flexsurv.boot$knots[3]
-  k4boot<-fit.flexsurv.boot$knots[4]
+  fit.flexsurv.boot<-flexsurvspline(Surv(time,event)~treat, k=k, knots=knots, bknots=bknots, data=datai)
+  n.parboot<-length(coef(fit.flexsurv.boot))
+  betaboot<-coef(fit.flexsurv.boot)[n.parboot]
+  sboot<-NULL
+  kboot<-NULL
+  for (indx in 1:(n.parboot-1)) {
+    
+    sboot<-c(sboot,coef(fit.flexsurv.boot)[indx])
+    kboot<-c(kboot,fit.flexsurv.boot$knots[indx])
+    
+  }
+  parameters<-c(tau, betaboot, sboot, kboot)
   
-  DS_Est<-DS.estimator(c(tau, beta1boot, s0boot, s1boot, s2boot, s3boot, k1boot, k2boot, k3boot, k4boot))
+  DS_Est<-DS.estimator(parameters)
   return(c(DS_Est))
 }
 
 # Function to estimate survival from flexsurv fit:
 
-surv.est<-function(tt, beta, sp0, sp1, sp2, sp3, active, k1, k2, k3, k4) {
-  S0<-sp0+sp1*log(tt)+sp2*(max(0,(log(tt)-k2)^3)-(k4-k2)/(k4-k1)*max(0,(log(tt)-k1)^3)-
-                             (1-(k4-k2)/(k4-k1))*max(0,(log(tt)-k4)^3))+
-    sp3*(max(0,(log(tt)-k3)^3)-(k4-k3)/(k4-k1)*max(0,(log(tt)-k1)^3)-
-           (1-(k4-k3)/(k4-k1))*max(0,(log(tt)-k4)^3))
+surv.est<-function(tt, beta, sp, active, kn) {
+  
+  S0<-sp[1]+sp[2]*log(tt)
+  l.k<-length(kn)
+  
+  if (l.k>2) {
+    for (indx in 1:(l.k-2)) {
+      
+      nu.indx<-max(0,(log(tt)-kn[indx+1])^3)-(kn[l.k]-kn[indx+1])/(kn[l.k]-kn[1])*max(0,(log(tt)-kn[1])^3)-
+        (1-(kn[l.k]-kn[indx+1])/(kn[l.k]-kn[1]))*max(0,(log(tt)-kn[l.k])^3)
+      S0<-S0+sp[indx+2]*nu.indx
+      
+    }
+  }
+ 
+
   logres<-as.numeric(S0+active*beta)
   
   return(exp(-exp(logres)))
@@ -100,43 +115,45 @@ surv.est<-function(tt, beta, sp0, sp1, sp2, sp3, active, k1, k2, k3, k4) {
 
 DS.estimator<-function(args) {
   
-  x=args[1] 
-  beta=args[2] 
-  sp0=args[3] 
-  sp1=args[4] 
-  sp2=args[5] 
-  sp3=args[6] 
-  k1=args[7] 
-  k2=args[8] 
-  k3=args[9] 
-  k4=args[10]
+  x=as.numeric(args[1]) 
+  beta=as.numeric(args[2]) 
+  n.par.sp<-length(args)/2-1
+  sp<-NULL
+  for (indx in 1:(n.par.sp)) {
+    sp<-c(sp,as.numeric(args[indx+2]))
+  }
+  kn<-NULL
+  for (indx in 1:(n.par.sp)) {
+    kn<-c(kn,as.numeric(args[indx+2+n.par.sp]))
+  }
   
-  surv.est(x,beta, sp0, sp1, sp2, sp3, 1, k1, k2, k3, k4)-surv.est(x,beta, sp0, sp1, sp2, sp3, 0, k1, k2, k3, k4)
+  surv.est(x,beta, sp, 1, kn)-surv.est(x,beta, sp, 0, kn)
 }
 
 # Function to estimate DS from flexsurv fit within adaptive quadrature:
 
-DS.integrate<-function(x, beta, sp0, sp1, sp2, sp3, k1, k2, k3, k4) {
+DS.integrate<-function(x, beta, sp, kn) {
   
-  surv.est(x,beta, sp0, sp1, sp2, sp3, 1, k1, k2, k3, k4)-surv.est(x,beta, sp0, sp1, sp2, sp3, 0, k1, k2, k3, k4)
+  surv.est(x,beta, sp, 1, kn)-surv.est(x,beta, sp, 0, kn)
+  
 }
 
 # Function to estimate DRMST from flexsurv fit:
 
 DRMST.estimator<-function(args) {
-  tt=args[1] 
-  beta=args[2] 
-  sp0=args[3] 
-  sp1=args[4] 
-  sp2=args[5] 
-  sp3=args[6] 
-  k1=args[7] 
-  k2=args[8] 
-  k3=args[9] 
-  k4=args[10]
-  DS.integrate<-Vectorize(DS.integrate)
+  tt=as.numeric(args[1]) 
+  beta=as.numeric(args[2])
+  n.par.sp<-length(args)/2-1
+  sp<-NULL
+  for (indx in 1:(n.par.sp)) {
+    sp<-c(sp,as.numeric(args[indx+2]))
+  }
+  kn<-NULL
+  for (indx in 1:(n.par.sp)) {
+    kn<-c(kn,as.numeric(args[indx+2+n.par.sp]))
+  }
   
-  return(suppressWarnings(quad(DS.integrate,xa=0, xb=tt,beta=beta, sp0=sp0, sp1=sp1, sp2=sp2, sp3=sp3, k1=k1, k2=k2, k3=k3, k4=k4)))
+  return(suppressWarnings(quad(DS.integrate,xa=0, xb=tt,beta=beta, sp=sp, kn=kn)))
 }
 
 # Functions to convert NI margins on survival outcome:
