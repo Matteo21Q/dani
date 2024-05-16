@@ -88,7 +88,7 @@ n.t=n.t+1
 # Fourth set of checks:
 # Check results for few scenarios. 
 
-out4A<-try(convertmargin.survival(p.control.expected=0.1,t.expected=3, NI.margin.original=0.05,summary.measure.original="DS", summary.measure.target="HR", t.DS=3))
+out4A<-try(convertmargin.survival(p.control.expected=0.1,t.expected=3, NI.margin.original=-0.05,summary.measure.original="DS", summary.measure.target="HR", t.DS=3))
 correct[[n.t]]<-ifelse(((inherits(out4A,"numeric"))&&(isTRUE(all.equal(out4A,1.5, tolerance=10^(-1))))),1,0) 
 names(correct)[[n.t]]<-"out4A"
 n.t=n.t+1

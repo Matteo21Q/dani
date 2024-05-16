@@ -8,7 +8,7 @@
 list.of.packages <- c("mfp", "marginaleffects", "survival", "coxphw",
                       "survRM2", "DescTools", "boot", "flexsurv", "numDeriv",
                       "mratios", "BSDA", "ratesci", "DescrTab2", "exact2x2",
-                      "contingencytables", "PropCIs", "tibble")
+                      "contingencytables", "PropCIs", "tibble", "pracma")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) install.packages(new.packages)
 lapply(list.of.packages, require, character.only = TRUE)

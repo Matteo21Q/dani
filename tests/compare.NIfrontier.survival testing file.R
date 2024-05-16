@@ -203,15 +203,15 @@ out7D<-try(compare.NIfrontier.survival(rate.control.expected = 0.03, rate.experi
 correct[[n.t]]<-ifelse((inherits(out7D,"data.frame"))&&(isTRUE(all.equal(as.numeric(out7D[20,]),c(0.3300000, 0.6600000, 0.4092901, 0.3841800, 0.6977822, 0.4835918, 0.4641589), tolerance=10^(-6)))),1,0)
 names(correct)[[n.t]]<-"out7D"
 n.t=n.t+1
-out7E<-try(compare.NIfrontier.survival(p.control.expected = 0.8, t.expected=3, NI.margin=0.16, summary.measure="DS", t.DS=3, tau.RMST=3))
+out7E<-try(compare.NIfrontier.survival(p.control.expected = 0.8, t.expected=3, NI.margin=-0.16, summary.measure="DS", t.DS=3, tau.RMST=3))
 correct[[n.t]]<-ifelse((inherits(out7E,"data.frame"))&&(isTRUE(all.equal(as.numeric(out7E[20,]),c(0.8364793, 1.6729585 ,       NA, 1.9877181, 1.1754084 ,       NA ,1.4819225), tolerance=10^(-6)))),1,0)
 names(correct)[[n.t]]<-"out7E"
 n.t=n.t+1
-out7F<-try(compare.NIfrontier.survival(p.control.expected = 0.8, t.expected=3, NI.margin=0.16, summary.measure="DS", t.DS=0.3, tau.RMST=0.3))
+out7F<-try(compare.NIfrontier.survival(p.control.expected = 0.8, t.expected=3, NI.margin=-0.16, summary.measure="DS", t.DS=0.3, tau.RMST=0.3))
 correct[[n.t]]<-ifelse((inherits(out7F,"data.frame"))&&(isTRUE(all.equal(as.numeric(out7F[20,]),c( 0.8364793, 1.9184607, 1.6038662, 1.5752901, 1.4141686, 1.1087447, 1.0812622), tolerance=10^(-6)))),1,0)
 names(correct)[[n.t]]<-"out7F"
 n.t=n.t+1
-out7G<-try(compare.NIfrontier.survival(p.control.expected = 0.4, t.expected=3, NI.margin=0.132, summary.measure="DRMST", t.DS=3, tau.RMST=3))
+out7G<-try(compare.NIfrontier.survival(p.control.expected = 0.4, t.expected=3, NI.margin=-0.132, summary.measure="DRMST", t.DS=3, tau.RMST=3))
 correct[[n.t]]<-ifelse((inherits(out7G,"data.frame"))&&(isTRUE(all.equal(as.numeric(out7G[20,]),c( 0.4702752, 0.5879678, 0.5868741, 0.5458915, 0.5142636 ,0.5133757, 0.4807157), tolerance=10^(-6)))),1,0)
 names(correct)[[n.t]]<-"out7G"
 n.t=n.t+1
