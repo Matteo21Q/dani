@@ -26,7 +26,7 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       if (cc!=length(covariates)) covariate.formula<-paste(covariate.formula, "+")
     }
   }
-  myformula<-as.formula(paste("Surv(time, event)~treat", covariate.formula))
+  myformula<-paste("Surv(time, event)~treat", covariate.formula)
   if (!is.null(covariates))  {
     mydata <- data.frame(time, event, treat, covariates)
     colnames(mydata)[4:ncol(mydata)]<-colnames(covariates)
@@ -55,9 +55,9 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
     stopifnot(test.type%in%c("Cox.PH", "flexsurv.PH", "Cox.weighted"))
   } else if (summary.measure=="DRMST") {
     if (!adjusted) {
-      stopifnot(test.type%in%c("KM", "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap"))
+      stopifnot(test.type%in%c("KM", "Cox.PH.bootstrap", "flexsurv.nonPH.delta", "flexsurv.PH.delta", "flexsurv.PH.bootstrap"))
     } else {
-      stopifnot(test.type%in%c( "Cox.PH.bootstrap", "flexsurv.PH.delta", "flexsurv.PH.bootstrap"))
+      stopifnot(test.type%in%c( "Cox.PH.bootstrap", "flexsurv.nonPH.delta", "flexsurv.PH.delta", "flexsurv.PH.bootstrap"))
     }
   } else {
     if (!adjusted) {
@@ -77,15 +77,15 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
     if ((unfavourable == F)&&(NI.margin>=1)) stop("When events are favourable (e.g. cure), a HR NI margin needs to be <1.\n")
     
     if (test.type=="Cox.PH") {
-      fit<-coxph(myformula, mydata)
+      fit<-coxph(as.formula(myformula), mydata)
       estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     } else if (test.type=="flexsurv.PH") {
-      fit<-flexsurvspline(myformula, k=k, knots=knots, bknots=bknots, data=mydata)
+      fit<-flexsurvspline(as.formula(myformula), k=k, knots=knots, bknots=bknots, data=mydata)
       estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     } else if (test.type=="Cox.weighted") {
-      fit<-coxphw(myformula, data=mydata)
+      fit<-coxphw(as.formula(myformula), data=mydata)
       estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))
     }  
@@ -141,23 +141,62 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       CI<-boot.ci(res, index=1, type=bootCI.type, conf=1-sig.level*2)[[4]][4:5-2*(bootCI.type=="norm")]
       estimate<-res$t0     
     } else if (test.type=="flexsurv.PH.delta") {
-      fit.flexsurv<-flexsurvspline(Surv(time,event)~treat, k=k, knots=knots, bknots=bknots, data=dd)
+      fit.flexsurv<-flexsurvspline(as.formula(myformula), k=k, knots=knots, bknots=bknots, data=dd)
       varcov<-vcov(fit.flexsurv)
-      n.par<-length(coef(fit.flexsurv))
-      beta1<-coef(fit.flexsurv)[n.par]
-      parameters<-c(tau,beta1)
-      for (indx in 1:(n.par-1)) {
+      n.par<-k+2
+      betas<-coef(fit.flexsurv)[(n.par+1):length(coef(fit.flexsurv))]
+      n.cov<-1+length(covariates)
+      parameters<-c(tau,betas)
+      for (indx in 1:n.par) {
         parameters<-c(parameters,coef(fit.flexsurv)[indx])
       }
-      for (indx in 1:(n.par-1)) {
+      for (indx in 1:n.par) {
         parameters<-c(parameters,fit.flexsurv$knots[indx])
       }
+      parameters<-c(parameters, rep(0,n.par-1), n.cov, n.par)
       grads.comp<-numDeriv:::grad(DRMST.estimator, parameters)
       gradsb<-NULL
-      for (indx in 1:(n.par-1)) {
-        gradsb<-c(gradsb, grads.comp[indx+2])
+      for (indx in 1:n.par) {
+        gradsb<-c(gradsb, grads.comp[indx+1+n.cov])
       }
-      gradsb<-c(gradsb, grads.comp[2])
+      gradsb<-c(gradsb, grads.comp[2:(n.cov+1)])
+      estimate <- DRMST.estimator(parameters)
+      se<-sqrt(t(gradsb)%*%varcov%*%gradsb)
+      low.bndb<-(estimate-qnorm(1-sig.level)*se)
+      up.bndb<-(estimate+qnorm(1-sig.level)*se)
+      CI<-c(low.bndb, up.bndb)
+    } else if (test.type=="flexsurv.nonPH.delta") {
+      formula.nonPH<-paste(myformula,"+gamma1(treat)", sep="")
+      if (k>0) {
+        for (indx in 1:k) {
+          formula.nonPH<-paste(formula.nonPH, "+gamma", indx+1, "(treat)", sep="")
+        }
+      }
+      fit.flexsurv<-flexsurvspline(as.formula(formula.nonPH), k=k, knots=knots, bknots=bknots, data=dd)
+      varcov<-vcov(fit.flexsurv)
+      n.par<-k+2
+      n.cov<-1+length(covariates)
+      betas<-coef(fit.flexsurv)[(n.par+1):(n.par+n.cov)]
+      parameters<-c(tau,betas)
+      for (indx in 1:(n.par)) {
+        parameters<-c(parameters,coef(fit.flexsurv)[indx])
+      }
+      for (indx in 1:(n.par)) {
+        parameters<-c(parameters,fit.flexsurv$knots[indx])
+      }
+      for (indx in 1:(n.par-1)) {
+        parameters<-c(parameters,coef(fit.flexsurv)[indx+n.par+n.cov])
+      }   
+      parameters<-c(parameters, n.cov, n.par)
+      grads.comp<-numDeriv:::grad(DRMST.estimator, parameters)
+      gradsb<-NULL
+      for (indx in 1:n.par) {
+        gradsb<-c(gradsb, grads.comp[indx+1+n.cov])
+      }
+      gradsb<-c(gradsb, grads.comp[2:(1+n.cov)])
+      for (indx in 1:(n.par-1)) {
+        gradsb<-c(gradsb, grads.comp[indx+n.par*2+1+n.cov])
+      }
       estimate <- DRMST.estimator(parameters)
       se<-sqrt(t(gradsb)%*%varcov%*%gradsb)
       low.bndb<-(estimate-qnorm(1-sig.level)*se)
