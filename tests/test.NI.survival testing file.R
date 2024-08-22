@@ -6,6 +6,7 @@
 # Load dani:
 # library(dani)
 library(survival)
+library(marginaleffects)
 library(coxphw)
 library(survRM2)
 library(DescTools)
@@ -208,7 +209,7 @@ out5C<-try(test.NI.survival(time1, event1, treat1, NI.margin= 1.5, test.type="fl
 correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$CI[2],1.337755, tolerance=10^(-6)))&&out5C$non.inferiority==T,1,0) 
 names(correct)[[n.t]]<-"out5C"
 n.t=n.t+1
-out5D<-try(test.NI.survival(time1, event1, treat1, NI.margin=1.5, test.type="Cox.weighted"))
+out5D<-try(test.NI.survival(time1, event1, treat1, NI.margin=1.5, test.type="Cox.weighted.Conditional"))
 correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$CI[2],1.852567, tolerance=10^(-6))),1,0) 
 names(correct)[[n.t]]<-"out5D"
 n.t=n.t+1
@@ -235,19 +236,19 @@ n.t=n.t+1
 # Now check sample size calculations for certain values on DRMST scale.
 
 out6A<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, summary.measure="DRMST", tau=100))
-correct[[n.t]] <- ifelse((is.list(out6A)) && (all.equal(out6A$CI[2], -0.3322545, tolerance=10^(-5))) && out6A$non.inferiority, 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out6A)) && (all.equal(out6A$CI[2], -0.332696, tolerance=10^(-5))) && out6A$non.inferiority, 1, 0) 
 names(correct)[[n.t]] <- "out6A"
 n.t <- n.t + 1
 out6B<-try(test.NI.survival(time1, event1, treat1, NI.margin=-0.5, summary.measure="DRMST", tau=100))
-correct[[n.t]] <- ifelse((is.list(out6B)) && (all.equal(out6B$CI[2], -0.3322545, tolerance=10^(-5))) && !out6B$non.inferiority, 1, 0)
+correct[[n.t]] <- ifelse((is.list(out6B)) && (all.equal(out6B$CI[2], -0.332696, tolerance=10^(-5))) && !out6B$non.inferiority, 1, 0)
 names(correct)[[n.t]] <- "out6B"
 n.t <- n.t + 1
 out6C<-try(test.NI.survival(time1, event1, treat1, NI.margin= 1, unfavourable=F, summary.measure="DRMST", tau=100))
-correct[[n.t]] <- ifelse((is.list(out6C)) && (all.equal(out6C$CI[2], -0.3322545, tolerance=10^(-5))) && out6C$non.inferiority, 1, 0)
+correct[[n.t]] <- ifelse((is.list(out6C)) && (all.equal(out6C$CI[2], -0.332696, tolerance=10^(-5))) && out6C$non.inferiority, 1, 0)
 names(correct)[[n.t]] <- "out6C"
 n.t <- n.t + 1
 out6D<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, sig.level=0.05, summary.measure="DRMST", tau=100))
-correct[[n.t]] <- ifelse((is.list(out6D)) && (all.equal(out6D$CI[2], -0.3547087, tolerance=10^(-6))), 1, 0)
+correct[[n.t]] <- ifelse((is.list(out6D)) && (all.equal(out6D$CI[2], -0.3550782, tolerance=10^(-6))), 1, 0)
 names(correct)[[n.t]] <- "out6D"
 n.t <- n.t + 1
 out6E<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, summary.measure="DRMST", test.type="KM", tau=100))
@@ -260,8 +261,8 @@ correct[[n.t]] <- ifelse((is.list(out6F)) && (all.equal(out6F$CI[2], 0.3362708, 
 names(correct)[[n.t]] <- "out6F"
 n.t <- n.t + 1
 set.seed(1)
-out6G<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, summary.measure="DRMST", test.type="flexsurv.PH.bootstrap", tau=100, M.boot = 20, bootCI.type = "norm"))
-correct[[n.t]] <- ifelse((is.list(out6G)) && (all.equal(out6G$CI[2], 0.3567705, tolerance=10^(-6))), 1, 0) 
+out6G<-try(test.NI.survival(time1, event1, treat1, NI.margin= -1, summary.measure="DRMST", test.type="flexsurv.PH.bootstrap", tau=100, M.boot = 2000, bootCI.type = "norm"))
+correct[[n.t]] <- ifelse((is.list(out6G)) && (all.equal(out6G$CI[2], 0.3877765, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out6G"
 n.t <- n.t + 1
 
@@ -270,15 +271,15 @@ n.t <- n.t + 1
 # Now check sample size calculations for certain values on DS scale. 
 
 out7A<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, summary.measure="DS", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7A)) && (all.equal(out7A$CI[2], -0.04740067, tolerance=10^(-5))) && out7A$non.inferiority == TRUE, 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out7A)) && (all.equal(out7A$CI[2], -0.04739666, tolerance=10^(-5))) && out7A$non.inferiority == TRUE, 1, 0) 
 names(correct)[[n.t]] <- "out7A"
 n.t <- n.t + 1
 out7B<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.05, summary.measure="DS", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7B)) && (all.equal(out7A$CI[2], -0.04740067, tolerance=10^(-5))) && out7B$non.inferiority == FALSE, 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out7B)) && (all.equal(out7A$CI[2], -0.04739666, tolerance=10^(-5))) && out7B$non.inferiority == FALSE, 1, 0) 
 names(correct)[[n.t]] <- "out7B"
 n.t <- n.t + 1
 out7C<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, sig.level=0.05, summary.measure="DS", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7C)) && (all.equal(out7C$CI[2], -0.04978398, tolerance=10^(-5))) && out7C$non.inferiority == TRUE, 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out7C)) && (all.equal(out7C$CI[2], -0.04978061, tolerance=10^(-5))) && out7C$non.inferiority == TRUE, 1, 0) 
 names(correct)[[n.t]] <- "out7C"
 n.t <- n.t + 1
 out7D<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, summary.measure="DS", test.type="KM", tau=100))
@@ -291,12 +292,12 @@ correct[[n.t]] <- ifelse((is.list(out7E)) && (all.equal(out7E$CI[2], 0.04578162,
 names(correct)[[n.t]] <- "out7E"
 n.t <- n.t + 1
 out7F<-try(test.NI.survival(time1, event1, treat1, NI.margin= 0.1, unfavourable=F, summary.measure="DS", tau=100))
-correct[[n.t]] <- ifelse((is.list(out7F)) && (all.equal(out7F$CI[2], -0.04740067, tolerance=10^(-6))), 1, 0) 
+correct[[n.t]] <- ifelse((is.list(out7F)) && (all.equal(out7F$CI[2], -0.04739666, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out7F"
 n.t <- n.t + 1
 set.seed(1)
-out7G<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, summary.measure="DS", test.type="flexsurv.PH.bootstrap", tau=100, M.boot=20, bootCI.type = "norm"))
-correct[[n.t]] <- ifelse((is.list(out7G)) && (all.equal(out7G$CI[2], 0.04695612, tolerance=10^(-6))), 1, 0) 
+out7G<-try(test.NI.survival(time1, event1, treat1, NI.margin= -0.1, summary.measure="DS", test.type="flexsurv.PH.bootstrap", tau=100, M.boot=2000, bootCI.type = "norm"))
+correct[[n.t]] <- ifelse((is.list(out7G)) && (all.equal(out7G$CI[2], 0.02550793, tolerance=10^(-6))), 1, 0) 
 names(correct)[[n.t]] <- "out7G"
 n.t <- n.t + 1
 

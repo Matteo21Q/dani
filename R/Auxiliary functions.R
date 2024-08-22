@@ -1,3 +1,5 @@
+### Functions to run bootstrap in test.NI.survival
+
 RMST_Cox <- function(survf, tau){
   int <- (survf$time[1] - 0)*1 #1 is the initial survival number: 1
   for(i in 2:(length(survf$time))){
@@ -44,125 +46,8 @@ surv.diff<- function(data, index, tau) {
 }
 
 
-RMST.diff.flexsurv<- function(data, index, tau, k, knots, bknots) {
-  
-  datai<-data[index,]
-  datai<-datai[order(datai$time),]
-  
-  fit.flexsurv.boot<-flexsurvspline(Surv(time,event)~treat, k=k, knots=knots, bknots=bknots, data=datai)
-  n.parboot<-length(coef(fit.flexsurv.boot))
-  betaboot<-coef(fit.flexsurv.boot)[n.parboot]
-  sboot<-NULL
-  kboot<-NULL
-  for (indx in 1:(n.parboot-1)) {
-    
-    sboot<-c(sboot,coef(fit.flexsurv.boot)[indx])
-    kboot<-c(kboot,fit.flexsurv.boot$knots[indx])
 
-  }
-  parameters<-c(tau, betaboot, sboot, kboot)
-  
-  DRMST_Est<-DRMST.estimator(parameters)
-  return(c(DRMST_Est))
-}
-
-Surv.diff.flexsurv<- function(data, index, tau, k, knots, bknots) {
-  
-  datai<-data[index,]
-  datai<-datai[order(datai$time),]
-  
-  fit.flexsurv.boot<-flexsurvspline(Surv(time,event)~treat, k=k, knots=knots, bknots=bknots, data=datai)
-  n.parboot<-length(coef(fit.flexsurv.boot))
-  betaboot<-coef(fit.flexsurv.boot)[n.parboot]
-  sboot<-NULL
-  kboot<-NULL
-  for (indx in 1:(n.parboot-1)) {
-    
-    sboot<-c(sboot,coef(fit.flexsurv.boot)[indx])
-    kboot<-c(kboot,fit.flexsurv.boot$knots[indx])
-    
-  }
-  parameters<-c(tau, betaboot, sboot, kboot)
-  
-  DS_Est<-DS.estimator(parameters)
-  return(c(DS_Est))
-}
-
-# Function to estimate survival from flexsurv fit:
-
-surv.est<-function(tt, betas, sp, gammas, active, kn) {
-  
-  S0<-sp[1]+(sp[2]+gammas[1]*active)*log(tt)
-  l.k<-length(kn)
-  
-  if (l.k>2) {
-    for (indx in 1:(l.k-2)) {
-      
-      nu.indx<-max(0,(log(tt)-kn[indx+1])^3)-(kn[l.k]-kn[indx+1])/(kn[l.k]-kn[1])*max(0,(log(tt)-kn[1])^3)-
-        (1-(kn[l.k]-kn[indx+1])/(kn[l.k]-kn[1]))*max(0,(log(tt)-kn[l.k])^3)
-      S0<-S0+(sp[indx+2]+gammas[indx+1]*active)*nu.indx
-      
-    }
-  }
- 
-
-  logres<-as.numeric(S0+active*betas[1])
-  
-  
-  return(exp(-exp(logres)))
-}
-
-# Function to estimate DS from flexsurv fit:
-
-DS.estimator<-function(args) {
-  
-  x=as.numeric(args[1]) 
-  beta=as.numeric(args[2]) 
-  n.par.sp<-length(args)/2-1
-  sp<-NULL
-  for (indx in 1:(n.par.sp)) {
-    sp<-c(sp,as.numeric(args[indx+2]))
-  }
-  kn<-NULL
-  for (indx in 1:(n.par.sp)) {
-    kn<-c(kn,as.numeric(args[indx+2+n.par.sp]))
-  }
-  
-  surv.est(x,beta, sp, 1, kn)-surv.est(x,beta, sp, 0, kn)
-}
-
-# Function to estimate DS from flexsurv fit within adaptive quadrature:
-
-DS.integrate<-function(x, beta, sp, kn, gammas) {
-  
-  surv.est(x,beta, sp, gammas, 1, kn)-surv.est(x,beta, sp, gammas, 0, kn)
-  
-}
-
-# Function to estimate DRMST from flexsurv fit:
-
-DRMST.estimator<-function(args) {
-  tt=as.numeric(args[1]) 
-  n.par.sp<-as.numeric(args[length(args)])
-  n.cov<-as.numeric(args[length(args)-1])
-  beta=as.numeric(args[2:(n.cov+1)])
-  sp<-NULL
-  for (indx in 1:(n.par.sp)) {
-    sp<-c(sp,as.numeric(args[indx+1+n.cov]))
-  }
-  kn<-NULL
-  for (indx in 1:(n.par.sp)) {
-    kn<-c(kn,as.numeric(args[indx+1+n.cov+n.par.sp]))
-  }
-  gammas<-NULL
-  for (indx in 1:(n.par.sp-1)) {
-    gammas<-c(gammas,as.numeric(args[indx+1+n.cov+2*n.par.sp]))
-  }
-  
-  return(suppressWarnings(quad(DS.integrate,xa=0, xb=tt,beta=beta, sp=sp, kn=kn, gammas=gammas)))
-}
-
-# Functions to convert NI margins on survival outcome:
+### Functions to convert NI margins on survival outcome:
 fun.rate <- function(rate,target.surv, time, dist="exp") {
   if (dist=="exp") {
     test<-qexp(target.surv, rate)
@@ -198,7 +83,7 @@ Diff.margin.flex<-function(S.control, HR, t, target) {
 }
 
 
-## Function to recursively estimate p in test.NI.binary
+### Function to recursively estimate p in test.NI.binary
 
 func.to.opt<-function(x,n.control, n.experim, e.control, e.experim,
                       NI.margin, summary.measure, 
@@ -218,7 +103,7 @@ func.to.opt<-function(x,n.control, n.experim, e.control, e.experim,
   return(extreme)
 }
 
-# function to bootstrap mean ratio:
+### function to bootstrap mean ratio:
 ratios <- function(dat, indices) {
   d <- dat[indices,] # allows boot to select sample
   rat <- mean(d[d$treat==1,"y.comb"])/mean(d[d$treat==0,"y.comb"])

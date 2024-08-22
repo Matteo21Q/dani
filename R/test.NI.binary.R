@@ -702,10 +702,10 @@ test.NI.binary <- function(n.control=NULL, n.experim=NULL, e.control=NULL, e.exp
     } else if (test.type=="logistic") {
       if (e.experim==0||e.control==0) stop("With zero cell counts (e.control=0 or e.experim=0) logistic method not informative.\n")
       fit<-glm(myformula, data=mydata, family = binomial)
-      row.treat<-which(grepl("treatment", row.names(coef(summary(fit)))))
-      estimate<-exp(coef(summary(fit)))[row.treat,"Estimate"]
-      CI <- exp(suppressMessages(confint(fit, level = 1-sig.level*2))[row.treat,])
-    }  
+      fit.std<-avg_comparisons(fit, conf_level = (1-sig.level*2), comparison="lnor", transform = exp)
+      CI <- c(fit.std[fit.std$term=="treatment","conf.low"], fit.std[fit.std$term=="treatment","conf.high"])
+      estimate<-fit.std[fit.std$term=="treatment","estimate"]
+     }  
     estimate.n<-mean(log(CI))
     if (is.null(se)) {
       se<-(log(CI[2])-log(CI[1]))/(2*qnorm(1-sig.level))
