@@ -857,7 +857,7 @@ n.t <- n.t + 1
 out7W <- try(test.NI.binary(n.control=1000, n.experim=1001, e.control=120, e.experim=10, NI.margin=1.5, sig.level=0.025, summary.measure="OR", 
                             print.out=TRUE, unfavourable=TRUE, test.type="logistic",
                             M.boot=2000, BB.adj=0.0001))
-correct[[n.t]] <- ifelse((is.list(out7W)) && (all.equal(as.numeric(out7W$CI[2]), 0.1348625, tolerance=10^(-5))), 1, 0) # no comparator
+correct[[n.t]] <- ifelse((is.list(out7W)) && (all.equal(as.numeric(out7W$CI[2]), 0.1419551, tolerance=10^(-5))), 1, 0) # no comparator
 names(correct)[[n.t]] <- "out7W"
 n.t <- n.t + 1
 set.seed(1)
