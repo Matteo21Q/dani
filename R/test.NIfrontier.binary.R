@@ -1,8 +1,43 @@
-test.NIfrontier.binary <- function(n.control, n.experim, e.control, e.experim,  
+test.NIfrontier.binary <- function(n.control=NULL, n.experim=NULL, e.control=NULL, e.experim=NULL,
+                                   formula=NULL, data=NULL, control.level=0,
                                     NI.frontier, sig.level, summary.measure="RD", 
                                     print.out=TRUE, unfavourable=TRUE, test.type=NULL,
                                     M.boot=2000, bootCI.type="bca", BB.adj=0.0001) {
   
+  covariates<-NULL
+  if (any(is.null(n.control), is.null(n.experim), is.null(e.control), is.null(e.experim))&&any(is.null(data), is.null(formula))) {
+    stop("Either counts of events and participants or formula+data must be provided.\n")
+  }
+  if (!is.null(formula)) {
+    if (is.character(formula)) formula<-as.formula(formula)
+    stopifnot(is.data.frame(data), inherits(formula,"formula"))
+    if (is_tibble(data)) data<-as.data.frame(data)
+    terms.form <- attr(terms(formula), "term.labels")
+    treat.index <- which(grepl("treat\\(", terms.form))
+    if (length(treat.index)==0) stop("Treatment variable in the formula must be provided within brackets and preceded by treat, e.g. treat(treatment).\n")
+    treatment <- factor(data[,all.vars(formula[[3]])[treat.index]])
+    stopifnot(any(treatment==control.level), nlevels(treatment)==2)
+    treatment<-relevel(treatment, ref=as.character(control.level))
+    covariates <- terms.form[-treat.index]
+    outcomes <- data[,all.vars(formula[[2]])]
+    n.control<-sum(treatment==control.level)
+    n.experim<-length(treatment)-n.control
+    e.control<-sum(outcomes[treatment==control.level]==1)
+    e.experim<-sum(outcomes[treatment!=control.level]==1)
+    covariate.formula<-NULL
+    if (length(covariates)!=0) {
+      covariate.formula<-"+"
+      for (cc in 1:length(covariates)) {
+        covariate.formula <- paste(covariate.formula, covariates[cc])
+        if (cc!=length(covariates)) covariate.formula<-paste(covariate.formula, "+")
+      }
+    }
+    myformula<-as.formula(paste("outcomes~treatment", covariate.formula))
+    mydata <- data.frame(outcomes, treatment, data[,covariates])
+    if (length(covariates)>0) colnames(mydata)[3:ncol(mydata)]<-covariates
+    assign("mydata", mydata, envir = .GlobalEnv)
+    
+  } 
   stopifnot(is.numeric(n.control), n.control>0)
   stopifnot(is.numeric(n.experim), n.experim>0)
   stopifnot(is.numeric(e.control), e.control>=0, n.control>=e.control)
@@ -15,37 +50,69 @@ test.NIfrontier.binary <- function(n.control, n.experim, e.control, e.experim,
   stopifnot(is.numeric(M.boot), M.boot>1)
   stopifnot(is.character(bootCI.type), bootCI.type%in%c("norm","perc","bca","basic"))
   stopifnot(is.numeric(BB.adj), BB.adj>0)
+  adjusted<-(!is.null(covariates)&&any(dim(covariates)>0))
+  if (is.null(formula)) {
+    outcomes<-c(rep(1, e.experim),rep(0, n.experim-e.experim),rep(1, e.control), rep(0, n.control-e.control))
+    treatment<-factor(c(rep(1,n.experim), rep(0, n.control)))
+    treat.index<-1
+    mydata<-data.frame(outcomes,treatment)
+    myformula<-as.formula("outcomes~treatment")
+  }
   if (is.null(test.type)) {
-    if (summary.measure=="RD") {
-      test.type<-"Newcombe10"
-    } else if (summary.measure=="RR") {
-      test.type<-"Koopman"
-    } else if (summary.measure=="OR") {
-      test.type<-"Baptista.Pike.midp"
+    if (!adjusted) {
+      if (summary.measure=="RD") {
+        test.type<-"Newcombe10"
+      } else if (summary.measure=="RR") {
+        test.type<-"Koopman"
+      } else if (summary.measure=="OR") {
+        test.type<-"Baptista.Pike.midp"
+      } else {
+        test.type<-"Wald"
+      } 
     } else {
-      test.type<-"Wald"
-    } 
+      test.type<-"logistic"
+    }
   }
   stopifnot(is.character(test.type))
   if (summary.measure=="RD") {
-    stopifnot(test.type%in%c("Wald", "Wald.cc", "Hauck.Anderson", "Gart.Nam",
-                             "Newcombe10", "Newcombe11", "Haldane", "Jeffreys.Perks",
-                             "Agresti.Caffo", "Miettinen.Nurminen", "Farrington.Manning",
-                             "logistic", "binreg", "bootstrap", "Agresti.Min", "Brown.Li.Jeffreys", 
-                             "Chan.Zhang", "BLNM", "Mee", "uncond.midp", "Berger.Boos",
-                             "MUE.Lin", "MUE.parametric.bootstrap", "LRT"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Wald", "Wald.cc", "Hauck.Anderson", "Gart.Nam",
+                               "Newcombe10", "Newcombe11", "Haldane", "Jeffreys.Perks",
+                               "Agresti.Caffo", "Miettinen.Nurminen", "Farrington.Manning",
+                               "logistic", "binreg", "bootstrap", "Agresti.Min", "Brown.Li.Jeffreys", 
+                               "Chan.Zhang", "BLNM", "Mee", "uncond.midp", "Berger.Boos",
+                               "MUE.Lin", "MUE.parametric.bootstrap", "LRT"))
+      
+    } else {
+      stopifnot(test.type%in%c("logistic", "binreg", "bootstrap"))
+      
+    }
   } else if (summary.measure=="RR") {
-    stopifnot(test.type%in%c("Wald.Katz", "adjusted.Wald.Katz", "inverse.hyperbolic.sine", "Koopman",
-                             "MOVER.R", "Miettinen.Nurminen", "MOVER", "Gart.Nam", "score.cc",
-                             "logregression", "logistic", "bootstrap", "Bailey", "Noether", 
-                             "Chan.Zhang", "Agresti.Min", "uncond.midp", "Berger.Boos", "LRT"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Wald.Katz", "adjusted.Wald.Katz", "inverse.hyperbolic.sine", "Koopman",
+                               "MOVER.R", "Miettinen.Nurminen", "MOVER", "Gart.Nam", "score.cc",
+                               "logregression", "logistic", "bootstrap", "Bailey", "Noether", 
+                               "Chan.Zhang", "Agresti.Min", "uncond.midp", "Berger.Boos", "LRT"))
+    } else {
+      stopifnot(test.type%in%c("logregression", "logistic", "bootstrap"))
+      
+    }
   } else if (summary.measure=="OR") {
-    stopifnot(test.type%in%c("Wald.Woolf", "adjusted.Wald.Woolf", "inverse.hyperbolic.sine", "Cornfield.exact",
-                             "MOVER.R", "Miettinen.Nurminen", "MOVER", "Gart.Nam", "score.cc",
-                             "logistic", "bootstrap", "Cornfield.midp", "Baptista.Pike.exact", "Baptista.Pike.midp", 
-                             "Chan.Zhang", "Agresti.Min", "uncond.midp", "Berger.Boos", "LRT"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Wald.Woolf", "adjusted.Wald.Woolf", "inverse.hyperbolic.sine", "Cornfield.exact",
+                               "MOVER.R", "Miettinen.Nurminen", "MOVER", "Gart.Nam", "score.cc",
+                               "logistic", "bootstrap", "Cornfield.midp", "Baptista.Pike.exact", "Baptista.Pike.midp", 
+                               "Chan.Zhang", "Agresti.Min", "uncond.midp", "Berger.Boos", "LRT"))
+    } else {
+      stopifnot(test.type%in%c("logistic", "bootstrap"))
+      
+    }
   } else {
-    stopifnot(test.type%in%c("Wald","logistic", "LRT"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Wald","logistic", "bootstrap", "LRT"))
+    } else {
+      stopifnot(test.type%in%c("logistic", "bootstrap"))
+    }
   }
   
   estimate<-se<-Z<-p<-NULL
@@ -77,10 +144,19 @@ test.NIfrontier.binary <- function(n.control, n.experim, e.control, e.experim,
     if ((unfavourable == F)&&(NI.margin>=0)) stop("When outcome is favourable, a NI margin on the arc-sine difference scale needs to be <0.")
   }
   if (test.type!="LRT") {
-    results<-test.NI.binary(n.control=n.control, n.experim=n.experim, e.control=e.control, e.experim=e.experim,  NI.margin=NI.margin, 
-                            sig.level=alpha, summary.measure=summary.measure, 
-                            print.out=print.out, unfavourable=unfavourable, test.type=test.type,
-                            M.boot=M.boot, bootCI.type=bootCI.type, BB.adj=BB.adj)
+    if (!adjusted) {
+      results<-test.NI.binary(n.control=n.control, n.experim=n.experim, e.control=e.control, e.experim=e.experim,  NI.margin=NI.margin, 
+                              sig.level=alpha, summary.measure=summary.measure, 
+                              print.out=print.out, unfavourable=unfavourable, test.type=test.type,
+                              M.boot=M.boot, bootCI.type=bootCI.type, BB.adj=BB.adj)
+      
+    } else {
+      results<-test.NI.binary(formula=myformula, data=mydata,  NI.margin=NI.margin, 
+                              sig.level=alpha, summary.measure=summary.measure, 
+                              print.out=print.out, unfavourable=unfavourable, test.type=test.type,
+                              M.boot=M.boot, bootCI.type=bootCI.type, BB.adj=BB.adj)
+      
+    }
   } else {
     
     p0.unconstr<-p0.constr<-p0.obs

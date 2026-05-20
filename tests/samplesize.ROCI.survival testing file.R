@@ -1,0 +1,332 @@
+###################################################
+### samplesize.ROCI.survival  testing file    #####
+### 27-02-2025                                #####
+###################################################
+
+# Load dani:
+# library(dani)
+library(tibble)
+library(mfp)
+library(marginaleffects)
+library(boot)
+library(flexsurv)
+
+#Initialise vector of outputs 
+correct<-list(NULL)
+n.t<-1
+
+#####################################################
+# First set of checks:
+# Check that it stops for non acceptable values of expected probabilities:
+
+out1A<-try(samplesize.ROCI.survival(rates=c("0.1",0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out1A, "try-error"))&&(grepl("is.numeric(rates) is not TRUE", out1A[1], fixed=T  )),1,0) 
+names(correct)[[n.t]]<-"out1A"
+n.t=n.t+1
+out1B<-try(samplesize.ROCI.survival(rates=c(-0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out1B, "try-error"))&&(grepl("all(rates > 0) is not TRUE", out1B[1], fixed=T  )),1,0) 
+names(correct)[[n.t]]<-"out1B"
+n.t=n.t+1
+out1C<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep("1",5), NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out1C, "try-error"))&&(grepl("is.numeric(shapes) is not TRUE", out1C[1], fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out1C"
+n.t=n.t+1
+out1D<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(-1,5), NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out1D, "try-error"))&&(grepl("all(shapes > 0) is not TRUE", out1D[1], fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out1D"
+n.t=n.t+1
+
+#####################################################
+# Second set of checks:
+# Check that it stops for non-acceptable margins:
+
+out2A<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin="0.1", se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out2A, "try-error"))&&(grepl("is.numeric(NI.margin) is not TRUE", out2A[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out2A"
+n.t=n.t+1
+out2B<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2))
+correct[[n.t]]<-ifelse((inherits(out2B, "try-error"))&&(grepl("When outcome is unfavourable, NI margins on the hazard ratio scale need to all be >1.", out2B[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out2B"
+n.t=n.t+1
+out2C<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=1.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "RS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out2C, "try-error"))&&(grepl("When outcome is unfavourable, NI margins on the ratio of survival scale need to all be <1.", out2C[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out2C"
+n.t=n.t+1
+out2D<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=1.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, unfavourable = FALSE))
+correct[[n.t]]<-ifelse((inherits(out2D, "try-error"))&&(grepl("NI margins cannot be greater than 1, i.e. 100 percentage points, or otherwise the test is meaningless.", out2D[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out2D"
+n.t=n.t+1
+out2E<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-1.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out2E, "try-error"))&&(grepl("NI margins cannot be lower than -1, i.e. -100 percentage points, or otherwise the test is meaningless.", out2E[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out2E"
+n.t=n.t+1
+
+#####################################################
+# Third set of checks:
+# Check that it stops for unacceptable values of significance level:
+
+out3A<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, sig.level="0.025"))
+correct[[n.t]]<-ifelse((inherits(out3A, "try-error"))&&(grepl("is.numeric(sig.level) is not TRUE", out3A[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out3A"
+n.t=n.t+1
+out3B<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, sig.level=-0.025))
+correct[[n.t]]<-ifelse((inherits(out3B, "try-error"))&&(grepl("sig.level > 0 is not TRUE", out3B[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out3B"
+n.t=n.t+1
+out3C<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, sig.level=1.025))
+correct[[n.t]]<-ifelse((inherits(out3C, "try-error"))&&(grepl("sig.level < 0.5 is not TRUE", out3C[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out3C"
+n.t=n.t+1
+
+#####################################################
+# Fourth set of checks:
+# Check with other wrong arguments:
+
+# Check that it stops for unacceptable values of power:
+out4A<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, power="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4A, "try-error"))&&(grepl("is.numeric(power) is not TRUE", out4A[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4A"
+n.t=n.t+1
+out4B<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, power=0))
+correct[[n.t]]<-ifelse((inherits(out4B, "try-error"))&&(grepl("power > 0 is not TRUE", out4B[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4B"
+n.t=n.t+1
+out4C<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, power=1.9))
+correct[[n.t]]<-ifelse((inherits(out4C, "try-error"))&&(grepl("power < 1 is not TRUE", out4C[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4C"
+n.t=n.t+1
+
+# Check that it works for wrong summary measure value:
+out4D<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "pippo", tau=2, power=0.8))
+correct[[n.t]]<-ifelse((inherits(out4D, "try-error"))&&(grepl("summary.measure ==", out4D[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4D"
+n.t=n.t+1
+
+# Check that it works when print.out incorrectly specified:
+out4E<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, print.out=NA))
+correct[[n.t]]<-ifelse((inherits(out4E, "try-error"))&&(grepl("!is.na(print.out) is not TRUE", out4E[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4E"
+n.t=n.t+1
+
+# Check that it works when se.method incorrectly specified:
+out4F<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, se.method=2))
+correct[[n.t]]<-ifelse((inherits(out4F, "try-error"))&&(grepl("is.character(se.method) is not TRUE", out4F[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4F"
+n.t=n.t+1
+out4G<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="pippo", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, power=0.9))
+correct[[n.t]]<-ifelse((inherits(out4G, "try-error"))&&(grepl("se.method %in%", out4G[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4G"
+n.t=n.t+1
+
+# Check that it works when tr.model incorrectly specified:
+out4H<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, tr.model=2))
+correct[[n.t]]<-ifelse((inherits(out4H, "try-error"))&&(grepl("is.character(tr.model) is not TRUE", out4H[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4H"
+n.t=n.t+1
+out4I<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, tr.model="pippo"))
+correct[[n.t]]<-ifelse((inherits(out4I, "try-error"))&&(grepl("tr.model %in%", out4I[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4I"
+n.t=n.t+1
+
+# Check that it works when unfavourable incorrectly specified:
+out4J<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, unfavourable=NA))
+correct[[n.t]]<-ifelse((inherits(out4J, "try-error"))&&(grepl("!is.na(unfavourable) is not TRUE", out4J[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4J"
+n.t=n.t+1
+out4K<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, unfavourable = 3))
+correct[[n.t]]<-ifelse((inherits(out4K, "try-error"))&&(grepl("is.logical(unfavourable) is not TRUE", out4K[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4K"
+n.t=n.t+1
+
+# Check that it works when reference incorrectly specified:
+out4L<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, reference="3"))
+correct[[n.t]]<-ifelse((inherits(out4L, "try-error"))&&(grepl("is.numeric(reference) is not TRUE", out4L[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4L"
+n.t=n.t+1
+out4M<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, reference=30))
+correct[[n.t]]<-ifelse((inherits(out4M, "try-error"))&&(grepl("reference %in% treatment.levels", out4M[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4M"
+n.t=n.t+1
+
+# Check that it works when treatment levels incorrectly specified:
+out4N<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c("1",2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out4N, "try-error"))&&(grepl("is.numeric(treatment.levels) is not TRUE", out4N[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4N"
+n.t=n.t+1
+out4O<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out4O, "try-error"))&&(grepl("length(treatment.levels) == length(shapes) is not TRUE", out4O[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4O"
+n.t=n.t+1
+
+# Check that it works when M.boot incorrectly specified:
+out4P<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="bootstrap", M.boot="3", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out4P, "try-error"))&&(grepl("is.numeric(M.boot) is not TRUE", out4P[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4P"
+n.t=n.t+1
+out4Q<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="bootstrap", M.boot=0, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out4Q, "try-error"))&&(grepl("M.boot > 1 is not TRUE", out4Q[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4Q"
+n.t=n.t+1
+
+# Check that it works when parallel incorrectly specified:
+out4R<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, parallel=2))
+correct[[n.t]]<-ifelse((inherits(out4R, "try-error"))&&(grepl("is.character(parallel) is not TRUE", out4R[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4R"
+n.t=n.t+1
+out4S<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, parallel="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4S, "try-error"))&&(grepl("parallel %in%", out4S[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4S"
+n.t=n.t+1
+
+# Check that it works when power.type incorrectly specified:
+out4T<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5),  power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, power.type=1))
+correct[[n.t]]<-ifelse((inherits(out4T, "try-error"))&&(grepl("is.character(power.type) is not TRUE", out4T[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4T"
+n.t=n.t+1
+out4U<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5),  power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, power.type="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4U, "try-error"))&&(grepl("power.type %in% ", out4U[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4U"
+n.t=n.t+1
+
+# Check that it works when power.arms incorrectly specified:
+out4V<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=10, follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out4V, "try-error"))&&(grepl("all(power.arms %in% treatment.levels)", out4V[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4V"
+n.t=n.t+1
+out4W<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms="1", follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out4W, "try-error"))&&(grepl("is.numeric(power.arms) is not TRUE", out4W[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4W"
+n.t=n.t+1
+
+# Check that it works when round incorrectly specified:
+out4X<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, round=NA))
+correct[[n.t]]<-ifelse((inherits(out4X, "try-error"))&&(grepl("!is.na(round) is not TRUE", out4X[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4X"
+n.t=n.t+1
+out4Y<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, round="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4Y, "try-error"))&&(grepl("is.logical(round) is not TRUE", out4Y[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4Y"
+n.t=n.t+1
+
+# Check that it stops for unacceptable values of loss to follow up:
+out4Z<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, summary.measure = "DS", tau=2, follow.up="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4Z, "try-error"))&&(grepl("is.numeric(follow.up) is not TRUE", out4Z[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4Z"
+n.t=n.t+1
+out4AA<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 0, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out4AA, "try-error"))&&(grepl("follow.up > 0 is not TRUE", out4AA[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AA"
+n.t=n.t+1
+
+# Checkthat it stops for unacceptable values of recruitment
+out4AB<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, recruitment="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4AB, "try-error"))&&(grepl("is.function(recruitment) is not TRUE", out4AB[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AB"
+n.t=n.t+1
+
+# Check that it works when iterative incorrectly specified:
+out4AC<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, iterative=NA))
+correct[[n.t]]<-ifelse((inherits(out4AC, "try-error"))&&(grepl("!is.na(iterative) is not TRUE", out4AC[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AC"
+n.t=n.t+1
+out4AD<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, iterative="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4AD, "try-error"))&&(grepl("is.logical(iterative) is not TRUE", out4AD[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AD"
+n.t=n.t+1
+
+# Check that it works when r incorrectly specified:
+out4AE<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, r=0.9))
+correct[[n.t]]<-ifelse((inherits(out4AE, "try-error"))&&(grepl("length(r) == length(treatment.arms) is not TRUE", out4AE[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AE"
+n.t=n.t+1
+out4AF<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, r="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4AF, "try-error"))&&(grepl("is.numeric(r) is not TRUE", out4AF[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AF"
+n.t=n.t+1
+out4AG<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, r=c(0.9,0.9,0.8,1,-2)))
+correct[[n.t]]<-ifelse((inherits(out4AG, "try-error"))&&(grepl("all(r > 0) is not TRUE", out4AG[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AG"
+n.t=n.t+1
+
+# Check that it works when n.tot.start incorrectly specified:
+out4AH<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, n.tot.start ="0.9"))
+correct[[n.t]]<-ifelse((inherits(out4AH, "try-error"))&&(grepl("is.numeric(n.tot.start) is not TRUE", out4AH[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AH"
+n.t=n.t+1
+out4AI<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, n.tot.start = 1))
+correct[[n.t]]<-ifelse((inherits(out4AI, "try-error"))&&(grepl("n.tot.start > sum(r * 2) is not TRUE", out4AI[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AI"
+n.t=n.t+1
+
+# Check that it works when treatment arms incorrectly specified:
+out4AJ<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, treatment.arms = "0.9"))
+correct[[n.t]]<-ifelse((inherits(out4AJ, "try-error"))&&(grepl("is.numeric(treatment.arms) is not TRUE", out4AJ[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AJ"
+n.t=n.t+1
+out4AK<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, treatment.arms = 1:7))
+correct[[n.t]]<-ifelse((inherits(out4AK, "try-error"))&&(grepl("length(treatment.levels) >= length(treatment.arms) is not TRUE", out4AK[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AK"
+n.t=n.t+1
+out4AL<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2, treatment.arms = 2:6))
+correct[[n.t]]<-ifelse((inherits(out4AL, "try-error"))&&(grepl("all(treatment.arms %in% treatment.levels) is not TRUE", out4AL[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AL"
+n.t=n.t+1
+
+#####################################################
+# Fifth set of checks:
+# Now check sample size calculations for certain values on RD scale. 
+
+out5A<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$ss.total,939)),1,0) 
+names(correct)[[n.t]]<-"out5A"
+n.t=n.t+1
+out5B<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=0.9, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "RS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$ss.total,1251)),1,0)
+names(correct)[[n.t]]<-"out5B"
+n.t=n.t+1
+set.seed(1)
+out5C<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DRMST", tau=2))
+correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$ss.total,1075)),1,0) 
+names(correct)[[n.t]]<-"out5C"
+n.t=n.t+1
+out5D<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=1.5, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "HR", tau=2))
+correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$ss.total,2109)),1,0) 
+names(correct)[[n.t]]<-"out5D"
+n.t=n.t+1
+out5E<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="acceptable", power.arms=c(1,2), follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out5E,"list"))&&(all.equal(out5E$ss.total,523)),1,0) 
+names(correct)[[n.t]]<-"out5E"
+n.t=n.t+1
+set.seed(1)
+out5F<-try(samplesize.ROCI.survival(rates=c(0.1,0.1,0.1,0.1,0.1), shapes=rep(1,5), NI.margin=-0.2, se.method="bootstrap", M.boot=10, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, follow.up = 2, summary.measure = "DS", tau=2))
+correct[[n.t]]<-ifelse((inherits(out5F,"list"))&&(all.equal(out5F$ss.total,294)),1,0) 
+names(correct)[[n.t]]<-"out5F"
+n.t=n.t+1
+
+##################################################
+#### Now summarise results
+
+vec.correct<-unlist(correct)  # Create vector from list
+number.of.tests<-n.t-1   # How many tests did we do?
+tot.correct<-sum(vec.correct==1, na.rm = T) # How many tests gave correct result?
+tot.incorrect<-sum(vec.correct==0, na.rm = T) # How many test gave wrong result?
+tot.NA<-sum(is.na(vec.correct))              # How many test generated an NA?
+
+cat("Testing completed. ", tot.correct, " tests out of ", number.of.tests, " behaved correctly.\n",
+    tot.incorrect, " tests out of ", number.of.tests, " behaved incorrectly.\n",
+    "An NA was produced for ", tot.NA, " tests out of ", number.of.tests, ".\n")
+
+# Now list incorrect tests
+if(tot.incorrect>0) {
+  cat("Incorrect tests:\n")
+  names(correct)[which(vec.correct==0)]
+}
+# Now list NA tests
+if (tot.NA>0) {
+  cat("Tests returning NAs:\n")
+  names(correct)[which(is.na(vec.correct))]
+}
+
+ss.ROCI.s<-(tot.correct==number.of.tests) 
+
+

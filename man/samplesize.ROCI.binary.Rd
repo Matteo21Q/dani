@@ -9,10 +9,11 @@ A function that can be used to do sample size calculations for a MAMS-ROCI rando
 }
 \usage{
 samplesize.ROCI.binary(p.expected.curve, NI.margin, reference=max(treatment.levels), 
-                                    optimal=min(treatment.levels), range=optimal, unfavourable=T,
-                                    se.method="bootstrap", treatment.levels, summary.measure="RD", 
-                                    tr.model="FP2.classic", M.boot=NULL, parallel="no", n.cpus=1, sig.level=0.025,
-                                    n.per.arm=100, power=0.8, print.out=T, round=T, ltfu=0)
+                                    power.type, power.arms, unfavourable=T, r=NULL,
+                                    se.method=NULL, treatment.levels, treatment.arms=treatment.levels, 
+                                    summary.measure="RD", tr.model="FP2.classic", M.boot=NULL, parallel="no", 
+                                    n.cpus=1, sig.level=0.025, n.tot.start=NULL, power=0.8, print.out=T, round=T, 
+                                    ltfu=0, iterative=T)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -26,27 +27,33 @@ samplesize.ROCI.binary(p.expected.curve, NI.margin, reference=max(treatment.leve
 }
 
   \item{reference}{
-  The arm that should act as a reference. It must be one of the arms in treatment levels. Default is the largest value among treatment.levels.  
+  The arm that should act as a reference. It must be one of the arms in treatment.levels. Default is the largest value among treatment.levels.  
 }
 
-  \item{optimal}{
-  The arm that should be considered as the optimal under the given data generating mechanism. It must be one of the arms in treatment levels. Default is the smallest value among treatment.levels.  
+  \item{power.type}{
+  The type of power to target. It can be one of "optimal" (power to identify exactly THE optimal arm), "acceptable" (power to find any arm to be NI to reference), "range" (power to find at least one NI level within a range) and "individual" (power for a specific arm).  
 }
 
-  \item{range}{
-  The arm(s) that should be considered in the acceptable range for the range power method under the given data generating mechanism. It must be one or more of the arms in treatment levels. Default is the smallest value among treatment.levels (same as optimal).  
+  \item{power.arms}{
+  The arm(s) that should be targeted in the power calculation. It must be one (for "optimal" and "individual") or more (for "range" or "acceptable") of the arms in treatment levels. 
 }
 
   \item{unfavourable}{
 If TRUE the outcome is taken to be an unfavourable event, e.g. death or relapse. If FALSE, the outcome is considered a positive one, like cure. 
 }
+  \item{r}{
+The allocation ratio. It must be a vector of same length as treatment.arms. Default is 1:1:...:1, i.e. equal allocation ratio fo r all arms.  
+}
 
   \item{se.method}{
-  Method for calculating standard errors around the treatment-response curve. Can be either "bootstrap" or "delta". 
+  Method for calculating standard errors around the treatment-response curve. Can be either "bootstrap" (default for "optimal" and "individual" power.type), "empirical.bootstrap" (default for "range" and "acceptable" power.type) or "delta" (recommended only for initial ballpark estimates). 
 }
 
   \item{treatment.levels}{
-  A vector with all the treatment levels to be investigated. These will generally correspond to the treatment arms.  
+  A vector with all the treatment levels to be investigated. These often, but not necessarily, correspond to the treatment arms.  
+}
+  \item{treatment.levels}{
+  A vector with all the treatment arms to which we plan to randomise patients. Deafult is the same as treatment.levels.  
 }
 
   \item{summary.measure}{
@@ -72,14 +79,14 @@ If TRUE the outcome is taken to be an unfavourable event, e.g. death or relapse.
  One-sided significance level. 
 }
 
-  \item{n.per.arm}{
-The number of patients per arm used in the estimation of variance on a data set of expected outcomes. Default is 100.}
+  \item{n.tot.start}{
+The starting value for total sample size for which the variance of the effect measure(s) are initially calculated. Default is the equivalent of 100 patient per arm for all arms with allocation ratio 1. If using the iterative=T option (recommended) this does not have a strong impact on the results. }
 
   \item{power}{
 The targeted power level.
 }
 
-  \item{print,out}{
+  \item{print.out}{
 If TRUE the estimated sample sizes are printed on screen. 
 }
 
@@ -87,10 +94,14 @@ If TRUE the estimated sample sizes are printed on screen.
 
 
 \item{ltfu}{A numeric variable with the expected proportion of patients lost to follow-up. Default is 0.}
+
+\item{iterative}{A logical variable. If TRUE, an initial estimate of sample size is obtained by estimating variance(s) on an expected outcome dataset with n.tot.start individuals, and then iteratively re-estimated using the previously found sample size. If set to FALSE, only n.tot.start is used. It is recommended to leave this as TRUE, the default. }
+
+
 }
 
 \details{
-This function estimates the sample size to target both optimal and acceptable power for a ROCI trial. It requires as input the expected treatment response curve under which to power the trial, the NI margins and a specification of all the methods. The function creates a data set of expected outcomes (e.g. if risk in one arm is 0.7, it creates 70 records with event=1 and 30 with event=0) and fits the model for the treatment-response curve on this data set. It then estimates the variance of the summary measure of interest and uses this to do a sample size calculation based on simple formula from normal theory for non-inferiority with a continuous outcome. 
+This function estimates the sample size to target either optimal, range, individual or acceptable power for a ROCI trial. It requires as input the expected treatment response curve under which to power the trial, the NI margins and a specification of all the methods. The function creates a data set of expected outcomes (e.g. if risk in one arm is 0.7 and n.tot.start is the default, it creates 70 records with event=1 and 30 with event=0) and fits the model for the treatment-response curve on this data set. It then estimates the variance of the summary measure of interest and uses this to do a sample size calculation based on simple formula from normal theory for non-inferiority with a continuous outcome. 
 The function allows for the margin to be expressed as either a risk difference, risk ratio, odds ratio or a target probability. 
 }
 \value{
@@ -101,8 +112,8 @@ The function also returns sample size to achieve same power level for all specif
 p.expected.curve=rep(0.05,7)
 NI.margin=rep(0.05,6)
 reference=20
-optimal=8
-range=c(8,10,12)
+power.type="range"
+power.arms=c(8,10,12)
 se.method="delta"
 treatment.levels<-c(8,10,12,14,16,18,20)
 summary.measure<-"RD"
@@ -111,7 +122,7 @@ sig.level=0.05
 power=0.8
 unfavourable=T
 
-\donttest{ss<-samplesize.ROCI.binary(p.expected.curve, NI.margin, reference=reference, optimal=optimal, range=range, unfavourable=unfavourable, 
+\donttest{ss<-samplesize.ROCI.binary(p.expected.curve, NI.margin, reference=reference, power.type=power.type, power.arms=power.arms, unfavourable=unfavourable, 
                                      se.method=se.method,treatment.levels=treatment.levels,summary.measure=summary.measure,
                                      tr.model=tr.model, sig.level = sig.level, power=power)}
 

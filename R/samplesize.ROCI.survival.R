@@ -1,12 +1,15 @@
-samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(treatment.levels), 
+samplesize.ROCI.survival <- function (rates, shapes, NI.margin, reference=max(treatment.levels), 
                                     power.type, power.arms, unfavourable=T, r=NULL,
                                     se.method=NULL, treatment.levels, treatment.arms=treatment.levels, 
-                                    summary.measure="RD", tr.model="FP2.select", M.boot=NULL, parallel="no", 
-                                    n.cpus=1, sig.level=0.025, n.tot.start=NULL, power=0.8, print.out=T, round=T, 
-                                    ltfu=0, iterative=T) {
+                                    summary.measure="HR", tr.model="FP2.select", M.boot=NULL, parallel="no", cl=NULL,
+                                    n.cpus=1, sig.level=0.025, n.tot.start=NULL, power=0.8, print.out=T, round=T,
+                                    k=2, knots=NULL, bknots=NULL, tau=NULL, 
+                                    rate.censor=0, follow.up=NULL, iterative=T, recruitment=NULL) {
   
-  stopifnot(is.numeric(p.expected.curve), all(p.expected.curve < 1), all(p.expected.curve > 0))
-  stopifnot(is.numeric(treatment.levels), length(treatment.levels)==length(p.expected.curve))
+  stopifnot(is.numeric(rates), all(rates > 0))
+  stopifnot(is.numeric(shapes), all(shapes > 0))
+  
+  stopifnot(is.numeric(treatment.levels), length(treatment.levels)==length(shapes), length(treatment.levels)==length(rates))
   stopifnot(is.numeric(treatment.arms), length(treatment.levels)>=length(treatment.arms), all(treatment.arms%in%treatment.levels))
   n.arms<-length(treatment.arms)
   if (is.null(r)) {
@@ -16,21 +19,9 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(t
     
   }
   stopifnot(is.logical(unfavourable), !is.na(unfavourable))
-  stopifnot(is.character(summary.measure),(( summary.measure == "RD" ) || ( summary.measure == "AS" ) || ( summary.measure == "RR" ) || ( summary.measure == "OR" ) || ( summary.measure == "target.risk" )))
-  stopifnot(is.numeric(NI.margin), (length(NI.margin)==1)||(length(NI.margin)==(length(treatment.levels)-(summary.measure!="target.risk"))))
-  if (length(NI.margin)==1) NI.margin<-rep(NI.margin, length(treatment.levels)-(summary.measure!="target.risk"))
-  if (summary.measure%in%c("RD","AS")) {
-    if ((unfavourable == T)&&any(NI.margin<=0)) stop("When outcome is unfavourable, risk difference or arc-sine difference NI margins need to all be positive.\n")
-    if ((unfavourable == F)&&any(NI.margin>=0)) stop("When outcome is favourable, risk difference or arc-sine difference NI margins needs to all be negative.\n")
-    if (any(NI.margin>=1)) stop("NI margins cannot be greater than 1, i.e. 100 percentage points, or otherwise the test is meaningless.\n ")
-    if (any(NI.margin<=-1)) stop("NI margins cannot be lower than -1, i.e. -100 percentage points, or otherwise the test is meaningless.\n ")
-  } else if (summary.measure%in%c("OR","RR")) {
-    if ((unfavourable == T)&&any(NI.margin<=1)) stop("When outcome is unfavourable, NI margins on the risk ratio or odds ratio scale need to all be >1.")
-    if ((unfavourable == F)&&any(NI.margin>=1)) stop("When outcome is favourable, NI margins on the risk ratio or odds ratio scale need to all be <1.")
-    if (any(NI.margin<=0)) stop("A risk/odds ratio margin must be >0.\n")
-  } else if (summary.measure=="target.risk") {
-    if (any(NI.margin>=1)||any(NI.margin<=0)) stop("Target risks as defined in NI.margin should be numbers in the interval (0,1)")
-  } 
+  stopifnot(is.character(summary.measure),(( summary.measure == "HR" ) || ( summary.measure == "DS" ) || ( summary.measure == "DRMST" ) || ( summary.measure == "RS" )))
+  stopifnot(is.numeric(NI.margin), (length(NI.margin)==1)||(length(NI.margin)==(length(treatment.levels)-1)))
+  if (length(NI.margin)==1) NI.margin<-rep(NI.margin, length(treatment.levels)-1)
   stopifnot(is.numeric(sig.level), sig.level < 0.5, sig.level > 0)
   stopifnot(is.numeric(power), power < 1, power > 0)
   if (is.null(n.tot.start)) {
@@ -40,7 +31,7 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(t
   }
   stopifnot(is.logical(print.out), !is.na(print.out))
   stopifnot(is.logical(round), !is.na(round))
-  stopifnot(is.numeric(ltfu), ltfu < 1, ltfu >= 0)
+  stopifnot(is.numeric(rate.censor), rate.censor >= 0)
   stopifnot(is.numeric(reference), length(reference)==1, reference%in%treatment.levels)
   stopifnot(is.character(power.type), power.type%in%c("optimal", "acceptable"))
   stopifnot(is.numeric(power.arms), all(power.arms%in%treatment.levels), all(power.arms!=reference))
@@ -64,6 +55,17 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(t
   stopifnot(is.character(parallel), parallel%in%c("no", "multicore", "snow"))
   stopifnot(is.logical(iterative), !is.na(iterative))
   
+  if (is.null(recruitment)) {
+    recruitment<-function(x) return(0)
+  } else {
+    stopifnot(is.function(recruitment))
+  }
+  
+  stopifnot(is.numeric(follow.up), follow.up>0)
+  
+  if (is.null(tau)&summary.measure=="HR") tau<-1
+  stopifnot(is.numeric(tau), tau>0)
+  
   if (tr.model%in%c("FP1.fixed","FP1.select")) {
     if (length(treatment.arms)<3) stop ("With Fractional Polynomials with 1 power, at least 3 arms are needed.\n")
   } else {
@@ -72,59 +74,65 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(t
   unit.per.arm<-ceiling(n.tot.start/sum(r))
   n.per.arm<-r*unit.per.arm
   n.tot.start<-sum(n.per.arm)
-  n.comparisons<-ifelse(summary.measure=="target.risk", length(treatment.levels), length(treatment.levels)-1)
+  n.comparisons<- length(treatment.levels)-1
   if (length(NI.margin)==1) NI.margin<-rep(NI.margin, n.comparisons)
-  if (summary.measure=="target.risk") experimental.levels<-treatment.levels
-  
+
   if (isTRUE(iterative)) {
     
     # Get first estimate of sample size:
     
-    n.tot<-samplesize.ROCI.binary(p.expected.curve, NI.margin, reference, 
-                                            power.type, power.arms, unfavourable, r,
-                                            se.method, treatment.levels, treatment.arms, 
-                                            summary.measure, tr.model, max(1000,n.tot.start), parallel, 
-                                            n.cpus, sig.level, n.tot.start, power, print.out=FALSE, round=F, 
-                                            ltfu=0, iterative=FALSE)$ss.total
+    n.tot<-samplesize.ROCI.survival(rates=rates, shapes=shapes, NI.margin=NI.margin, reference=reference, 
+                                    power.type=power.type, power.arms=power.arms, unfavourable=unfavourable, r=r,
+                                    se.method="delta", treatment.levels=treatment.levels, treatment.arms=treatment.arms, 
+                                    summary.measure=summary.measure, tr.model=tr.model, M.boot=M.boot, parallel=parallel, 
+                                    cl=cl, n.cpus=n.cpus, sig.level=sig.level, n.tot.start=n.tot.start, power=power, 
+                                    print.out=FALSE, round=FALSE,
+                                    k=k, knots=knots, bknots=bknots, tau=tau, 
+                                    rate.censor=rate.censor, follow.up=follow.up, iterative=F, recruitment=recruitment)$ss.total
     
   } else {
     n.tot<-n.tot.start
   }
-
-     # Generate data set with exactly expected outcomes:
+  
+  # Generate data set with exactly expected outcomes:
   unit.per.arm<-ceiling(n.tot/sum(r))
   n.per.arm<-r*unit.per.arm
   n.tot<-sum(n.per.arm)
   treatment<-rep(treatment.arms, n.per.arm)
-  outcomes<-rep(0,n.tot)
+  event.time<-rep(NA,n.tot)
   curr.k<-1
   for (nar in 1:n.arms) {
     n.per.arm.i<-ifelse(length(n.per.arm)==1,n.per.arm, n.per.arm[nar])
-    outcomes[curr.k:(p.expected.curve[nar]*n.per.arm.i+curr.k-1)]<-1
+    event.time[curr.k:(n.per.arm.i+curr.k-1)]<-qweibull(seq(0.001,0.999,length.out=n.per.arm.i), shapes[nar],1/rates[nar])
     curr.k<-curr.k+n.per.arm.i
   }
-  dat<-data.frame(outcomes,treatment)
+  event.status<-event.time<follow.up
+  dat<-data.frame(event.time, event.status,treatment)
+  
+  list.ss<-list(recruitment, follow.up, rate.censor)
   
   # Fit fractional polynomials on expected outcomes data set:
-  myformula<-as.formula("outcomes~treat(treatment)")
+  myformula<-as.formula("Surv(event.time, event.status)~treat(treatment)")
   se.method.analysis<-ifelse(se.method=="empirical.bootstrap", "bootstrap", se.method)
-  res<-test.ROCI.binary(formula=myformula, data=dat,  reference = reference, unfavourable=unfavourable,
+  res<-test.ROCI.survival(formula=myformula, data=dat,  reference = reference, unfavourable=unfavourable,
                         se.method=se.method.analysis, treatment.levels=treatment.levels, summary.measure=summary.measure, 
-                        NI.margin=NI.margin, sig.level=sig.level, parallel=parallel, n.cpus=n.cpus,
-                        tr.model=tr.model, M.boot=M.boot, bootCI.type = "basic")
+                        NI.margin=NI.margin, sig.level=sig.level, parallel=parallel, n.cpus=n.cpus, cl=cl,
+                        tr.model=tr.model, M.boot=M.boot, bootCI.type = "basic",
+                        k=2, knots=NULL, bknots=NULL, tau=tau, list.ss=list.ss)
   
-  if (summary.measure=="RD") {
-    expected.sm<-p.expected.curve[-which(treatment.levels==reference)]-p.expected.curve[which(treatment.levels==reference)]
-  } else if (summary.measure=="AS") {
-    expected.sm<-asin(sqrt(p.expected.curve[-which(treatment.levels==reference)]))-asin(sqrt(p.expected.curve[which(treatment.levels==reference)]))
-  } else if (summary.measure=="RR") {
-    expected.sm<-log(p.expected.curve[-which(treatment.levels==reference)])-log(p.expected.curve[which(treatment.levels==reference)])
-  } else if (summary.measure=="OR") {
-    expected.sm<-log(p.expected.curve[-which(treatment.levels==reference)]/(1-p.expected.curve[-which(treatment.levels==reference)]))-log(p.expected.curve[which(treatment.levels==reference)]/(1-p.expected.curve[which(treatment.levels==reference)]))
+  survs<-1-pweibull(tau,shapes,1/rates)
+  if (summary.measure=="HR") {
+    expected.sm<-log(rates[-which(treatment.levels==reference)]/rates[which(treatment.levels==reference)])
+  } else if (summary.measure=="DS") {
+    expected.sm<-survs[-which(treatment.levels==reference)]-survs[which(treatment.levels==reference)]
+  } else if (summary.measure=="RS") {
+    expected.sm<-log(survs[-which(treatment.levels==reference)]/survs[which(treatment.levels==reference)])
+  } else if (summary.measure=="DRMST") {
+    expected.sm<-res$estimates
   }
   
   
-  if (summary.measure%in%c("RR","OR")) {
+  if (summary.measure%in%c("HR","RS")) {
     NI.marg<-log(NI.margin)
     upper<- log(res$up.bounds.CI)
     lower<- log(res$low.bounds.CI)
@@ -139,7 +147,7 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(t
   if (se.method=="delta") {
     var.n.fp<-((upper-lower)/(2*qnorm(1-sig.level)))^2
   } else {
-    var.n.fp<-apply(ests,2,var)
+    var.n.fp<-apply(ests,2,var, na.rm=T)
   }
   
   var.1<-var.n.fp*n.tot       # Estimate of variance
@@ -148,18 +156,18 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(t
     var.1.low<-(sqrt(var.1)-qnorm(0.975)*sqrt(var.1)/sqrt(2*(M.boot-1)))^2
   }
   if (se.method!="empirical.bootstrap") {
-    ss <- ((qnorm(sig.level)+qnorm(1-power))^2*var.1/(expected.sm-NI.marg)^2)/(1-ltfu)
+    ss <- ((qnorm(sig.level)+qnorm(1-power))^2*var.1/(expected.sm-NI.marg)^2)
     if (se.method=="bootstrap") {
-      ss.up <- ((qnorm(sig.level)+qnorm(1-power))^2*var.1.up/(expected.sm-NI.marg)^2)/(1-ltfu)
-      ss.low <- ((qnorm(sig.level)+qnorm(1-power))^2*var.1.low/(expected.sm-NI.marg)^2)/(1-ltfu)
+      ss.up <- ((qnorm(sig.level)+qnorm(1-power))^2*var.1.up/(expected.sm-NI.marg)^2)
+      ss.low <- ((qnorm(sig.level)+qnorm(1-power))^2*var.1.low/(expected.sm-NI.marg)^2)
     } 
   }
-
+  
   if (se.method=="empirical.bootstrap") {
-
+    
     v<-which(experimental.levels%in%power.arms)
     
-      if (power.type=="optimal") {
+    if (power.type=="optimal") {
       
       if (isTRUE(unfavourable)) {
         sol.finder<-function(x, which.bound, var.curr) {
@@ -172,26 +180,26 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(t
           pow.est<-mean((ests[,v]/(sqrt(x/n.tot))-qnorm(1-sig.level)*sqrt(var.curr[v]/x))>NI.marg)
           pow.est<-pow.est+which.bound*qnorm(0.975)*sqrt(pow.est*(1-pow.est)/M.boot)
           pow.est-power
-          }
+        }
       }
-      } else if (power.type=="acceptable") {
+    } else if (power.type=="acceptable") {
       
-        if (isTRUE(unfavourable)) {
-          sol.finder<-function(x, which.bound, var.curr) {
-            pow.est<-mean(apply(t(t(ests[,v]/(sqrt(x/n.tot)))+qnorm(1-sig.level)*sqrt(var.curr[v]/x))<NI.marg[v],1,any))
-            pow.est<-pow.est+which.bound*qnorm(0.975)*sqrt(pow.est*(1-pow.est)/M.boot)
-            pow.est-power
-          }
-        } else {
-          sol.finder<-function(x, which.bound, var.curr) {
-            pow.est<-mean(apply(t(t(ests[,v]/(sqrt(x/n.tot)))-qnorm(1-sig.level)*sqrt(var.curr[v]/x))>NI.marg[v],1,any))
-            pow.est<-pow.est+which.bound*qnorm(0.975)*sqrt(pow.est*(1-pow.est)/M.boot)
-            pow.est-power
-          }
-        } 
-        
+      if (isTRUE(unfavourable)) {
+        sol.finder<-function(x, which.bound, var.curr) {
+          pow.est<-mean(apply(t(t(ests[,v]/(sqrt(x/n.tot)))+qnorm(1-sig.level)*sqrt(var.curr[v]/x))<NI.marg[v],1,any))
+          pow.est<-pow.est+which.bound*qnorm(0.975)*sqrt(pow.est*(1-pow.est)/M.boot)
+          pow.est-power
+        }
+      } else {
+        sol.finder<-function(x, which.bound, var.curr) {
+          pow.est<-mean(apply(t(t(ests[,v]/(sqrt(x/n.tot)))-qnorm(1-sig.level)*sqrt(var.curr[v]/x))>NI.marg[v],1,any))
+          pow.est<-pow.est+which.bound*qnorm(0.975)*sqrt(pow.est*(1-pow.est)/M.boot)
+          pow.est-power
+        }
+      } 
+      
     }
-
+    
     ss<-uniroot(sol.finder, c(1, 10^8), tol = 0.0001, which.bound=0, var.curr=var.1)$root
     ss.up<-uniroot(sol.finder, c(1, 10^8), tol = 0.0001, which.bound=-1, var.curr=var.1.up)$root
     ss.low<-uniroot(sol.finder, c(1, 10^8), tol = 0.0001, which.bound=1, var.curr=var.1.low)$root
@@ -224,21 +232,19 @@ samplesize.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(t
   } else {
     ss.total.CI<-NULL
   }
-
+  
   
   if (print.out==T) {
     
     if (se.method=="delta") {
       cat("Reference arm: ", reference, "\nPower type: ", power.type, 
-          " power for the following arm(s): ", power.arms, "\nExpected loss to follow-up: ",
-          ltfu*100, "%.\nTotal sample size needed (across all arms): ", ss.total, ".\n")
+          " power for the following arm(s): ", power.arms, "\nTotal sample size needed (across all arms): ", ss.total, ".\n")
     } else {
       
- 
+      
       
       cat("Reference arm: ", reference, "\nPower type: ", power.type, 
-          " power for the following arm(s): ", power.arms, "\nExpected loss to follow-up: ",
-          ltfu*100, "%.\nTotal sample size (across all arms): ", ss.total,
+          " power for the following arm(s): ", power.arms, "\nTotal sample size (across all arms): ", ss.total,
           " (95% Monte-Carlo CI: [", ss.total.low, ", ", ss.total.up,
           "]).\n")
       

@@ -18,15 +18,15 @@ n.t<-1
 # First set of checks:
 # Check that it stops for non acceptable values of expected probabilities:
 
-out1A<-try(samplesize.ROCI.binary(p.expected.curve=c("0.1",0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5)))
+out1A<-try(samplesize.ROCI.binary(p.expected.curve=c("0.1",0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out1A, "try-error"))&&(grepl("is.numeric(p.expected.curve) is not TRUE", out1A[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1A"
 n.t=n.t+1
-out1B<-try(samplesize.ROCI.binary(p.expected.curve=c(-0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5)))
+out1B<-try(samplesize.ROCI.binary(p.expected.curve=c(-0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out1B, "try-error"))&&(grepl("all(p.expected.curve > 0) is not TRUE", out1B[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1B"
 n.t=n.t+1
-out1C<-try(samplesize.ROCI.binary(p.expected.curve=c(1.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5)))
+out1C<-try(samplesize.ROCI.binary(p.expected.curve=c(1.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out1C, "try-error"))&&(grepl("all(p.expected.curve < 1) is not TRUE", out1C[1], fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1C"
 n.t=n.t+1
@@ -35,23 +35,23 @@ n.t=n.t+1
 # Second set of checks:
 # Check that it stops for non-acceptable margins:
 
-out2A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin="0.1", se.method="delta", treatment.levels = c(1,2,3,4,5)))
+out2A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin="0.1", se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out2A, "try-error"))&&(grepl("is.numeric(NI.margin) is not TRUE", out2A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2A"
 n.t=n.t+1
-out2B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=-0.1, summary.measure="RR", se.method="delta", treatment.levels = c(1,2,3,4,5)))
+out2B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=-0.1, summary.measure="RR", se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out2B, "try-error"))&&(grepl("When outcome is unfavourable, NI margins on the risk ratio or odds ratio scale need to all be >1.", out2B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2B"
 n.t=n.t+1
-out2C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=-0.1, summary.measure="OR", se.method="delta", treatment.levels = c(1,2,3,4,5)))
+out2C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=-0.1, summary.measure="OR", se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out2C, "try-error"))&&(grepl("When outcome is unfavourable, NI margins on the risk ratio or odds ratio scale need to all be >1.", out2C[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2C"
 n.t=n.t+1
-out2D<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=1.2, se.method="delta", treatment.levels = c(1,2,3,4,5)))
+out2D<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=1.2, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out2D, "try-error"))&&(grepl("NI margins cannot be greater than 1, i.e. 100 percentage points, or otherwise the test is meaningless.", out2D[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2D"
 n.t=n.t+1
-out2E<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=-1.2, se.method="delta", unfavourable=F, treatment.levels = c(1,2,3,4,5)))
+out2E<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=-1.2, se.method="delta", unfavourable=F, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out2E, "try-error"))&&(grepl("NI margins cannot be lower than -1, i.e. -100 percentage points, or otherwise the test is meaningless.", out2E[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2E"
 n.t=n.t+1
@@ -60,15 +60,15 @@ n.t=n.t+1
 # Third set of checks:
 # Check that it stops for unacceptable values of significance level:
 
-out3A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", sig.level="0.025", treatment.levels = c(1,2,3,4,5)))
+out3A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", sig.level="0.025", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out3A, "try-error"))&&(grepl("is.numeric(sig.level) is not TRUE", out3A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3A"
 n.t=n.t+1
-out3B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", sig.level=0, treatment.levels = c(1,2,3,4,5)))
+out3B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", sig.level=0, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out3B, "try-error"))&&(grepl("sig.level > 0 is not TRUE", out3B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3B"
 n.t=n.t+1
-out3C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", sig.level=1, treatment.levels = c(1,2,3,4,5)))
+out3C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", sig.level=1, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out3C, "try-error"))&&(grepl("sig.level < 0.5 is not TRUE", out3C[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3C"
 n.t=n.t+1
@@ -78,118 +78,118 @@ n.t=n.t+1
 # Check with other wrong arguments:
 
 # Check that it stops for unacceptable values of power:
-out4A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power="0.9", treatment.levels = c(1,2,3,4,5)))
+out4A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power="0.9", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4A, "try-error"))&&(grepl("is.numeric(power) is not TRUE", out4A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4A"
 n.t=n.t+1
-out4B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0, treatment.levels = c(1,2,3,4,5)))
+out4B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4B, "try-error"))&&(grepl("power > 0 is not TRUE", out4B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4B"
 n.t=n.t+1
-out4C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=1, treatment.levels = c(1,2,3,4,5)))
+out4C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=1, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4C, "try-error"))&&(grepl("power < 1 is not TRUE", out4C[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4C"
 n.t=n.t+1
 
 # Check that it works for wrong summary measure value:
-out4D<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", summary.measure="pippo", treatment.levels = c(1,2,3,4,5)))
+out4D<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", summary.measure="pippo", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4D, "try-error"))&&(grepl("summary.measure ==", out4D[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4D"
 n.t=n.t+1
 
 # Check that it works when print.out incorrectly specified:
-out4E<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", print.out=NA, treatment.levels = c(1,2,3,4,5)))
+out4E<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", print.out=NA, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4E, "try-error"))&&(grepl("!is.na(print.out) is not TRUE", out4E[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4E"
 n.t=n.t+1
 
 # Check that it works when se.method incorrectly specified:
-out4F<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method=1, treatment.levels = c(1,2,3,4,5)))
+out4F<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method=1, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4F, "try-error"))&&(grepl("is.character(se.method) is not TRUE", out4F[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4F"
 n.t=n.t+1
-out4G<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="pippo", treatment.levels = c(1,2,3,4,5)))
+out4G<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="pippo", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4G, "try-error"))&&(grepl("se.method %in%", out4G[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4G"
 n.t=n.t+1
 
 # Check that it works when tr.model incorrectly specified:
-out4H<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", tr.model=1, treatment.levels = c(1,2,3,4,5)))
+out4H<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", tr.model=1, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4H, "try-error"))&&(grepl("is.character(tr.model) is not TRUE", out4H[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4H"
 n.t=n.t+1
-out4I<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", tr.model="pippo", treatment.levels = c(1,2,3,4,5)))
+out4I<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", tr.model="pippo", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4I, "try-error"))&&(grepl("tr.model %in%", out4I[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4I"
 n.t=n.t+1
 
 # Check that it works when unfavourable incorrectly specified:
-out4J<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", unfavourable=NA, treatment.levels = c(1,2,3,4,5)))
+out4J<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", unfavourable=NA, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4J, "try-error"))&&(grepl("!is.na(unfavourable) is not TRUE", out4J[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4J"
 n.t=n.t+1
-out4K<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", unfavourable="pippo", treatment.levels = c(1,2,3,4,5)))
+out4K<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", unfavourable="pippo", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4K, "try-error"))&&(grepl("is.logical(unfavourable) is not TRUE", out4K[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4K"
 n.t=n.t+1
 
 # Check that it works when reference incorrectly specified:
-out4L<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", reference="r", treatment.levels = c(1,2,3,4,5)))
+out4L<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", reference="r", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4L, "try-error"))&&(grepl("is.numeric(reference) is not TRUE", out4L[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4L"
 n.t=n.t+1
-out4M<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", reference = 0, treatment.levels = c(1,2,3,4,5)))
+out4M<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", reference = 0, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4M, "try-error"))&&(grepl("reference %in% treatment.levels", out4M[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4M"
 n.t=n.t+1
 
 # Check that it works when treatment levels incorrectly specified:
-out4N<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c("1",2,3,4,5)))
+out4N<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c("1",2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4N, "try-error"))&&(grepl("is.numeric(treatment.levels) is not TRUE", out4N[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4N"
 n.t=n.t+1
-out4O<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(2,3,4,5)))
+out4O<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4O, "try-error"))&&(grepl("length(treatment.levels) == length(p.expected.curve) is not TRUE", out4O[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4O"
 n.t=n.t+1
 
 # Check that it works when M.boot incorrectly specified:
-out4P<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", M.boot=NA, treatment.levels = c(1,2,3,4,5)))
+out4P<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", M.boot=NA, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4P, "try-error"))&&(grepl("is.numeric(M.boot) is not TRUE", out4P[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4P"
 n.t=n.t+1
-out4Q<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", M.boot=0, treatment.levels = c(1,2,3,4,5)))
+out4Q<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", M.boot=0, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4Q, "try-error"))&&(grepl("M.boot > 1 is not TRUE", out4Q[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4Q"
 n.t=n.t+1
 
 # Check that it works when parallel incorrectly specified:
-out4R<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", parallel=NA, treatment.levels = c(1,2,3,4,5)))
+out4R<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", parallel=NA, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4R, "try-error"))&&(grepl("is.character(parallel) is not TRUE", out4R[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4R"
 n.t=n.t+1
-out4S<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", parallel="pippo", treatment.levels = c(1,2,3,4,5)))
+out4S<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", parallel="pippo", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
 correct[[n.t]]<-ifelse((inherits(out4S, "try-error"))&&(grepl("parallel %in%", out4S[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4S"
 n.t=n.t+1
 
-# Check that it works when range incorrectly specified:
-out4T<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", range="pippo", treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4T, "try-error"))&&(grepl("is.numeric(range) is not TRUE", out4T[1] , fixed=T )),1,0) 
+# Check that it works when power.type incorrectly specified:
+out4T<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", power.type=T, treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4T, "try-error"))&&(grepl("is.character(power.type) is not TRUE", out4T[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4T"
 n.t=n.t+1
-out4U<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", range=c(0,10), treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4U, "try-error"))&&(grepl("all(range %in% treatment.levels)", out4U[1] , fixed=T )),1,0) 
+out4U<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", power.type="pippo", treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4U, "try-error"))&&(grepl("power.type %in% ", out4U[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4U"
 n.t=n.t+1
 
-# Check that it works when optimal incorrectly specified:
-out4V<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", optimal = 0, treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4V, "try-error"))&&(grepl("optimal %in% treatment.levels", out4V[1] , fixed=T )),1,0) 
+# Check that it works when power.arms incorrectly specified:
+out4V<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", power.arms = 0, treatment.levels = c(1,2,3,4,5), power.type="optimal"))
+correct[[n.t]]<-ifelse((inherits(out4V, "try-error"))&&(grepl("all(power.arms %in% treatment.levels)", out4V[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4V"
 n.t=n.t+1
-out4W<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", optimal = "pippo", treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4W, "try-error"))&&(grepl("is.numeric(optimal) is not TRUE", out4W[1] , fixed=T )),1,0) 
+out4W<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", power.arms = "pippo", treatment.levels = c(1,2,3,4,5), power.type="optimal"))
+correct[[n.t]]<-ifelse((inherits(out4W, "try-error"))&&(grepl("is.numeric(power.arms) is not TRUE", out4W[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4W"
 n.t=n.t+1
 
@@ -198,50 +198,102 @@ out4X<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.mar
 correct[[n.t]]<-ifelse((inherits(out4X, "try-error"))&&(grepl("!is.na(round) is not TRUE", out4X[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4X"
 n.t=n.t+1
-out4O<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), round = "pippo"))
-correct[[n.t]]<-ifelse((inherits(out4O, "try-error"))&&(grepl("is.logical(round) is not TRUE", out4O[1] , fixed=T )),1,0) 
-names(correct)[[n.t]]<-"out4O"
+out4Y<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), round = "pippo"))
+correct[[n.t]]<-ifelse((inherits(out4Y, "try-error"))&&(grepl("is.logical(round) is not TRUE", out4Y[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4Y"
 n.t=n.t+1
 
 # Check that it stops for unacceptable values of loss to follow up:
-out4P<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = "0.9"))
-correct[[n.t]]<-ifelse((inherits(out4P, "try-error"))&&(grepl("is.numeric(ltfu) is not TRUE", out4P[1] , fixed=T )),1,0) 
-names(correct)[[n.t]]<-"out4P"
+out4Z<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = "0.9"))
+correct[[n.t]]<-ifelse((inherits(out4Z, "try-error"))&&(grepl("is.numeric(ltfu) is not TRUE", out4Z[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4Z"
 n.t=n.t+1
-out4Q<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = -0.9))
-correct[[n.t]]<-ifelse((inherits(out4Q, "try-error"))&&(grepl("ltfu >= 0 is not TRUE", out4Q[1] , fixed=T )),1,0) 
-names(correct)[[n.t]]<-"out4Q"
+out4AA<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = -0.9))
+correct[[n.t]]<-ifelse((inherits(out4AA, "try-error"))&&(grepl("ltfu >= 0 is not TRUE", out4AA[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AA"
 n.t=n.t+1
-out4R<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = 1))
-correct[[n.t]]<-ifelse((inherits(out4R, "try-error"))&&(grepl("ltfu < 1 is not TRUE", out4R[1] , fixed=T )),1,0) 
-names(correct)[[n.t]]<-"out4R"
+out4AB<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), ltfu = 1))
+correct[[n.t]]<-ifelse((inherits(out4AB, "try-error"))&&(grepl("ltfu < 1 is not TRUE", out4AB[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AB"
 n.t=n.t+1
 
+# Check that it works when iterative incorrectly specified:
+out4AC<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, iterative = NA))
+correct[[n.t]]<-ifelse((inherits(out4AC, "try-error"))&&(grepl("!is.na(iterative) is not TRUE", out4AC[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AC"
+n.t=n.t+1
+out4AD<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, iterative = "pippo"))
+correct[[n.t]]<-ifelse((inherits(out4AD, "try-error"))&&(grepl("is.logical(iterative) is not TRUE", out4AD[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AD"
+n.t=n.t+1
+
+# Check that it works when r incorrectly specified:
+out4AE<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, r = 1))
+correct[[n.t]]<-ifelse((inherits(out4AE, "try-error"))&&(grepl("length(r) == length(treatment.arms) is not TRUE", out4AE[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AE"
+n.t=n.t+1
+out4AF<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, r = "pippo"))
+correct[[n.t]]<-ifelse((inherits(out4AF, "try-error"))&&(grepl("is.numeric(r) is not TRUE", out4AF[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AF"
+n.t=n.t+1
+out4AG<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, r = c(1,1,1,2,-1)))
+correct[[n.t]]<-ifelse((inherits(out4AG, "try-error"))&&(grepl("all(r > 0) is not TRUE", out4AG[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AG"
+n.t=n.t+1
+
+# Check that it works when n.tot.start incorrectly specified:
+out4AH<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, n.tot.start = "pippo"))
+correct[[n.t]]<-ifelse((inherits(out4AH, "try-error"))&&(grepl("is.numeric(n.tot.start) is not TRUE", out4AH[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AH"
+n.t=n.t+1
+out4AI<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", power=0.9, treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1, n.tot.start = 0))
+correct[[n.t]]<-ifelse((inherits(out4AI, "try-error"))&&(grepl("n.tot.start > sum(r * 2) is not TRUE", out4AI[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AI"
+n.t=n.t+1
+
+# Check that it works when treatment arms incorrectly specified:
+out4AJ<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.arms = c("1",2,3,4,5), treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out4AJ, "try-error"))&&(grepl("is.numeric(treatment.arms) is not TRUE", out4AJ[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AJ"
+n.t=n.t+1
+out4AK<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), treatment.arms = c(1,2,3,4,5,6), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out4AK, "try-error"))&&(grepl("length(treatment.levels) >= length(treatment.arms) is not TRUE", out4AK[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AK"
+n.t=n.t+1
+out4AL<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,6), treatment.arms = c(1,2,3,4,5), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out4AL, "try-error"))&&(grepl("all(treatment.arms %in% treatment.levels) is not TRUE", out4AL[1] , fixed=T )),1,0) 
+names(correct)[[n.t]]<-"out4AL"
+n.t=n.t+1
 
 #####################################################
 # Fifth set of checks:
 # Now check sample size calculations for certain values on RD scale. 
 
-out5A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$ss.total.optimal,566)),1,0) 
+out5A<-try(samplesize.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5), power.type="optimal", power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$ss.total,548)),1,0) 
 names(correct)[[n.t]]<-"out5A"
 n.t=n.t+1
-out5B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="delta", treatment.levels = c(6,9,12,15,18), summary.measure="RR", reference=6, optimal=18, unfavourable = F))
-correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$ss.total.optimal,1647)),1,0)
+out5B<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="delta", treatment.levels = c(6,9,12,15,18), summary.measure="RR", power.type="optimal", reference=6, power.arms=18, unfavourable = F))
+correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$ss.total,1647)),1,0)
 names(correct)[[n.t]]<-"out5B"
 n.t=n.t+1
 set.seed(1)
-out5C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="bootstrap", treatment.levels = c(6,9,12,15,18), summary.measure="RR", reference=6, optimal=18, unfavourable = F))
-correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$ss.total.optimal,1823)),1,0) 
+out5C<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="bootstrap", treatment.levels = c(6,9,12,15,18), summary.measure="RR", power.type="optimal", reference=6, power.arms=18, unfavourable = F, iterative=F, M.boot=100))
+correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$ss.total,1561)),1,0) 
 names(correct)[[n.t]]<-"out5C"
 n.t=n.t+1
-out5D<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=c(0.91,0.9,0.89,0.88), se.method="delta", treatment.levels = c(6,9,12,15,18), summary.measure="RR", reference=6, optimal=18, unfavourable = F))
-correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$ss.total.optimal,1647)),1,0) 
+out5D<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=c(0.91,0.9,0.89,0.88), se.method="delta", treatment.levels = c(6,9,12,15,18), summary.measure="RR", power.type="optimal", reference=6, power.arms=18, unfavourable = F))
+correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$ss.total,1647)),1,0) 
 names(correct)[[n.t]]<-"out5D"
 n.t=n.t+1
-out5E<-try(samplesize.ROCI.binary(p.expected.curve=c(0.12,0.12,0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5,6,7)))
-correct[[n.t]]<-ifelse((inherits(out5E,"list"))&&(all.equal(out5E$ss.total.optimal,1046)),1,0) 
+out5E<-try(samplesize.ROCI.binary(p.expected.curve=c(0.12,0.12,0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="delta", treatment.levels = c(1,2,3,4,5,6,7), power.type="optimal", reference=7, power.arms=1))
+correct[[n.t]]<-ifelse((inherits(out5E,"list"))&&(all.equal(out5E$ss.total,1046)),1,0) 
 names(correct)[[n.t]]<-"out5E"
+n.t=n.t+1
+set.seed(1)
+out5F<-try(samplesize.ROCI.binary(p.expected.curve=c(0.7,0.7,0.7,0.7,0.7),NI.margin=0.88, se.method="empirical.bootstrap", treatment.levels = c(6,9,12,15,18), summary.measure="RR", power.type="optimal", reference=6, power.arms=18, unfavourable = F, iterative=F, M.boot=100))
+correct[[n.t]]<-ifelse((inherits(out5F,"list"))&&(all.equal(out5F$ss.total,1759)),1,0) 
+names(correct)[[n.t]]<-"out5F"
 n.t=n.t+1
 
 ##################################################

@@ -31,7 +31,7 @@ samplesize.NIfrontier.binary <- function(p.control.expected, p.experim.target=NU
   p0 <-ifelse(summary.measure%in%c("RD","AS"), p.control.expected, log(p.control.expected))
   p1 <-ifelse(summary.measure%in%c("RD","AS"), p.experim.target, log(p.experim.target))
   NI.m <-ifelse(summary.measure%in%c("RD","AS"), NI.frontier(p.control.expected), log(NI.frontier(p.control.expected)))
-  ss<-samplesize.NI.continuous(mean.control=p0, mean.experim=p1, sd=sqrt((fit.ed$se)^2*n.experim), 
+  ss<-samplesize.NI.continuous(mean.control=p0, mean.experim=p1, sd=sqrt((fit.ed$se)^2*(n.experim+n.control)/2)/sqrt(2), 
                                NI.margin=NI.m, sig.level=sig.level, 
                                power=power, r=r, summary.measure="mean.difference", print.out=print.out, 
                                test.type=NULL, higher.better=!unfavourable, round=round, ltfu=ltfu) 

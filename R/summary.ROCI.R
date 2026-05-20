@@ -4,7 +4,11 @@ summary.ROCI <- function (object, ...) {
   experimental.arms<-object$treatment.levels[-ref.index]
   
   cat("Family = ", object$family, "\n Model fit: \n")
-  print(summary(object$model.fit))
+  if (object$family=="binomial") {
+    print(summary(object$model.fit))
+  } else {
+    print(object$model.fit)
+  }
   if (object$summary.measure=="RD") {
     cat("Difference from control treatment level (", object$reference, "):\n")
     arms<-paste(experimental.arms, " - ", object$reference)
@@ -25,7 +29,23 @@ summary.ROCI <- function (object, ...) {
     cat("Estimated outcome probabilities:\n")
     arms<-paste( object$treatment.levels )
     best.est<-object$estimates
-  } 
+  } else if (object$summary.measure=="DS") {
+    cat("Difference in survival from control treatment level (", object$reference, "):\n")
+    arms<-paste(experimental.arms, " - ", object$reference)
+    best.est<-object$estimates
+  } else if (object$summary.measure=="RS") {
+    cat("Ratio of survival against control treatment level (", object$reference, "):\n")
+    arms<-paste(experimental.arms, " - ", object$reference)
+    best.est<-object$estimates
+  } else if (object$summary.measure=="HR") {
+    cat("Hazard Ratio against control duration (", object$reference, "):\n")
+    arms<-paste( experimental.arms, " / ", object$reference)
+    best.est<-object$estimates
+  } else if (object$summary.measure=="DRMST") {
+    cat("Difference in RMST against control duration (", object$reference, "):\n")
+    arms<-paste( experimental.arms, " / ", object$reference )
+    best.est<-object$estimates
+  }
 
   for (i in (length(experimental.arms)+as.numeric(object$summary.measure=="target.risk")):1) {
     cat(arms[i], ": ", round(best.est[i],3)  ,"(",

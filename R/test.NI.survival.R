@@ -54,7 +54,11 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
   adjusted<-(!is.null(covariates)&&(ncol(covariates)>0))
   stopifnot(is.character(test.type))
   if (summary.measure=="HR") {
-    stopifnot(test.type%in%c("Cox.PH", "flexsurv.PH", "Cox.weighted.Conditional"))
+    if (!adjusted) {
+      stopifnot(test.type%in%c("Cox.PH", "flexsurv.PH", "Cox.weighted"))
+    } else {
+      stopifnot(test.type%in%c("Cox.PH", "flexsurv.PH"))
+    }
   } else if (summary.measure=="DRMST"||summary.measure=="DS") {
     if (!adjusted) {
       stopifnot(test.type%in%c("KM", "Cox.PH.bootstrap", "flexsurv.nonPH", "flexsurv.PH", "flexsurv.PH.bootstrap"))
@@ -84,7 +88,7 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
       se<-as.numeric(standsurv_fit$contrast2_1_se)
       CI<-as.numeric(c(standsurv_fit$contrast2_1_lci, standsurv_fit$contrast2_1_uci))
 
-    } else if (test.type=="Cox.weighted.Conditional") {
+    } else if (test.type=="Cox.weighted") {
       fit<-coxphw(as.formula(myformula), data=mydata)
       estimate<-as.numeric(exp(fit$coefficients[paste("treat",levels(treat)[levels(treat)!=control.level], sep="")]))
       CI<-as.numeric(exp(confint(fit, level=1-2*sig.level)[paste("treat",levels(treat)[levels(treat)!=control.level], sep=""),]))

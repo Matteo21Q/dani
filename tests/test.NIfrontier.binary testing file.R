@@ -30,43 +30,43 @@ sig.l<-function(p0) {
   sl<-ifelse((p0<0.05||p0>0.15),0.005,0.025)
   return(sl)
 }
-out1A<-try(test.NIfrontier.binary("100", 100, 15, 15,  NI.m, sig.l))
+out1A<-try(test.NIfrontier.binary(n.control="100", 100, 15, 15,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1A, "try-error"))&&(grepl("is.numeric(n.control) is not TRUE", out1A[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1A"
 n.t=n.t+1
-out1B<-try(test.NIfrontier.binary(100, "100", 15, 15,  NI.m, sig.l))
+out1B<-try(test.NIfrontier.binary(n.control=100, "100", 15, 15,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1B, "try-error"))&&(grepl("is.numeric(n.experim) is not TRUE", out1B[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1B"
 n.t=n.t+1
-out1C<-try(test.NIfrontier.binary(100, 100, "15", 15,  NI.m, sig.l))
+out1C<-try(test.NIfrontier.binary(n.control=100, 100, "15", 15,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1C, "try-error"))&&(grepl("is.numeric(e.control) is not TRUE", out1C[1], fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1C"
 n.t=n.t+1
-out1D<-try(test.NIfrontier.binary(100, 100, 15, "15",  NI.m, sig.l))
+out1D<-try(test.NIfrontier.binary(n.control=100, 100, 15, "15",  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1D, "try-error"))&&(grepl("is.numeric(e.experim) is not TRUE", out1D[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1D"
 n.t=n.t+1
-out1E<-try(test.NIfrontier.binary(0, 100, 15, 15,  NI.m, sig.l))
+out1E<-try(test.NIfrontier.binary(n.control=0, 100, 15, 15,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1E, "try-error"))&&(grepl("n.control > 0 is not TRUE", out1E[1], fixed=T  )),1,0) 
 names(correct)[[n.t]]<-"out1E"
 n.t=n.t+1
-out1F<-try(test.NIfrontier.binary(100, 0, 15, 15,  NI.m, sig.l))
+out1F<-try(test.NIfrontier.binary(n.control=100, 0, 15, 15,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1F, "try-error"))&&(grepl("n.experim > 0 is not TRUE", out1F[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1F"
 n.t=n.t+1
-out1G<-try(test.NIfrontier.binary(100, 100, -1, 15,  NI.m, sig.l))
+out1G<-try(test.NIfrontier.binary(n.control=100, 100, -1, 15,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1G, "try-error"))&&(grepl("e.control >= 0 is not TRUE", out1G[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1G"
 n.t=n.t+1
-out1H<-try(test.NIfrontier.binary(100, 100, 15, -1,  NI.m, sig.l))
+out1H<-try(test.NIfrontier.binary(n.control=100, 100, 15, -1,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1H, "try-error"))&&(grepl("e.experim >= 0 is not TRUE", out1H[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1H"
 n.t=n.t+1
-out1I<-try(test.NIfrontier.binary(10, 100, 15, 15,  NI.m, sig.l))
+out1I<-try(test.NIfrontier.binary(10, 100, 15, 15,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1I, "try-error"))&&(grepl("n.control >= e.control is not TRUE", out1I[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1I"
 n.t=n.t+1
-out1J<-try(test.NIfrontier.binary(100, 10, 15, 15,  NI.m, sig.l))
+out1J<-try(test.NIfrontier.binary(100, 10, 15, 15,  NI.frontier=NI.m, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out1J, "try-error"))&&(grepl("n.experim >= e.experim is not TRUE", out1J[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out1J"
 n.t=n.t+1
@@ -74,7 +74,7 @@ n.t=n.t+1
 #####################################################
 # Second set of checks:
 # Check that it stops for non acceptable values of NI frontier:
-out2A<-try(test.NIfrontier.binary(100, 100, 15, 15,  0.05, sig.l))
+out2A<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=0.05, sig.level=sig.l))
 correct[[n.t]]<-ifelse((inherits(out2A, "try-error"))&&(grepl("is.function(NI.frontier) is not TRUE", out2A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2A"
 n.t=n.t+1
@@ -82,7 +82,7 @@ NI.f2<-function(p0,gigi) {
   NI.m<-0.1+0.01*(p0-0.1)+gigi
   return(NI.m)
 }
-out2B<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f2, sig.l ))
+out2B<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f2, sig.level=sig.l ))
 correct[[n.t]]<-ifelse((inherits(out2B, "try-error"))&&(grepl("length(formals(NI.frontier)) == 1 is not TRUE", out2B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out2B"
 n.t=n.t+1
@@ -90,7 +90,7 @@ n.t=n.t+1
 #####################################################
 # Third set of checks:
 # Check that it stops for unacceptable values of significance level:
-out3A<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, "sig.l"))
+out3A<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level="sig.l"))
 correct[[n.t]]<-ifelse((inherits(out3A, "try-error"))&&(grepl("is.function(sig.level)", out3A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3A"
 n.t=n.t+1
@@ -98,7 +98,7 @@ sig.l2<-function(p0,gigi) {
   sl<-0.025+0.01(p0-0.1)+gigi
   return(sl)
 }
-out3B<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l2))
+out3B<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l2))
 correct[[n.t]]<-ifelse((inherits(out3B, "try-error"))&&(grepl("is.function(sig.level)", out3B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3B"
 n.t=n.t+1
@@ -106,7 +106,7 @@ sig.l3<-function(p0) {
   sl<-0.025+(p0>0.1)
   return(sl)
 }
-out3C<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l3))
+out3C<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l3))
 correct[[n.t]]<-ifelse((inherits(out3C, "try-error"))&&(grepl("alpha < 0.5 is not TRUE", out3C[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out3C"
 n.t=n.t+1
@@ -115,53 +115,53 @@ n.t=n.t+1
 # Fourth set of checks:
 # Check with other wrong arguments:
 
-out4A<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l, summary.measure="pippo"))
+out4A<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l, summary.measure="pippo"))
 correct[[n.t]]<-ifelse((inherits(out4A, "try-error"))&&(grepl("summary.measure ==", out4A[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4A"
 n.t=n.t+1
 
 # Check that it works when print.out incorrectly specified:
-out4B<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l, print.out = NA))
+out4B<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l, print.out = NA))
 correct[[n.t]]<-ifelse((inherits(out4B, "try-error"))&&(grepl("!is.na(print.out) is not TRUE", out4B[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4B"
 n.t=n.t+1
 
 # Check that it works when test.type incorrectly specified:
-out4C<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l, test.type = NA))
+out4C<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l, test.type = NA))
 correct[[n.t]]<-ifelse((inherits(out4C, "try-error"))&&(grepl("is.character(test.type) is not TRUE", out4C[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4C"
 n.t=n.t+1
-out4D<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l,  test.type = "pippo"))
+out4D<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l,  test.type = "pippo"))
 correct[[n.t]]<-ifelse((inherits(out4D, "try-error"))&&(grepl("test.type %in% c", out4D[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4D"
 n.t=n.t+1
 
 # Check that it works when unfavourable incorrectly specified:
-out4E<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l,  unfavourable = "pippo"))
+out4E<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l,  unfavourable = "pippo"))
 correct[[n.t]]<-ifelse((inherits(out4E, "try-error"))&&(grepl("is.logical(unfavourable) is not TRUE", out4E[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4E"
 n.t=n.t+1
-out4F<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l, unfavourable = NA))
+out4F<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l, unfavourable = NA))
 correct[[n.t]]<-ifelse((inherits(out4F, "try-error"))&&(grepl("!is.na(unfavourable) is not TRUE", out4F[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4F"
 n.t=n.t+1
 
 # Check that M.boot has acceptable value:
-out4G<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l, test.type="bootstrap", M.boot="2000"))
+out4G<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l, test.type="bootstrap", M.boot="2000"))
 correct[[n.t]]<-ifelse((inherits(out4G, "try-error"))&&(grepl("is.numeric(M.boot) is not TRUE", out4G[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4G"
 n.t=n.t+1
-out4H<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l, test.type="bootstrap", M.boot=1))
+out4H<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l, test.type="bootstrap", M.boot=1))
 correct[[n.t]]<-ifelse((inherits(out4H, "try-error"))&&(grepl("M.boot > 1 is not TRUE", out4H[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4H"
 n.t=n.t+1
 
 # Check that BB.adj has acceptable value:
-out4I<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l, test.type="Berger.Boos", BB.adj="0.00001"))
+out4I<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l, test.type="Berger.Boos", BB.adj="0.00001"))
 correct[[n.t]]<-ifelse((inherits(out4I, "try-error"))&&(grepl("is.numeric(BB.adj) is not TRUE", out4I[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4I"
 n.t=n.t+1
-out4J<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.f, sig.l,  test.type="Berger.Boos", BB.adj=-0.00001))
+out4J<-try(test.NIfrontier.binary(100, 100, 15, 15,  NI.frontier=NI.f, sig.level=sig.l,  test.type="Berger.Boos", BB.adj=-0.00001))
 correct[[n.t]]<-ifelse((inherits(out4J, "try-error"))&&(grepl("BB.adj > 0 is not TRUE", out4J[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4J"
 n.t=n.t+1

@@ -1,7 +1,7 @@
 power.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(treatment.levels),
-                               optimal=min(treatment.levels), range=optimal, unfavourable=T,
+                               optimal=min(treatment.levels), acceptable=optimal, unfavourable=T,
                                se.method="bootstrap", treatment.levels, summary.measure="RD",
-                               tr.model="FP2.classic", M.boot=NULL, parallel="no", n.cpus=1, sig.level=0.025,
+                               tr.model="FP2.select", M.boot=NULL, parallel="no", n.cpus=1, sig.level=0.025,
                                n.per.arm, print.out=T, simulations=FALSE, n.rep=1000, bootCI.type="bca") {
   stopifnot(is.numeric(p.expected.curve), all(p.expected.curve < 1), all(p.expected.curve > 0))
   stopifnot(is.numeric(treatment.levels), length(treatment.levels)==length(p.expected.curve))
@@ -28,15 +28,15 @@ power.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(treatm
   stopifnot(is.logical(print.out), !is.na(print.out))
   stopifnot(is.numeric(reference), length(reference)==1, reference%in%treatment.levels)
   stopifnot(is.numeric(optimal), length(optimal)==1, optimal%in%treatment.levels)
-  stopifnot(is.numeric(range), all(range%in%treatment.levels))
+  stopifnot(is.numeric(acceptable), all(acceptable%in%treatment.levels))
   ref.index<-which(treatment.levels==reference)
   experimental.arms<-treatment.levels[-ref.index]
   if (!is.null(M.boot)) stopifnot(is.numeric(M.boot), M.boot>1)
   stopifnot(is.character(se.method), se.method%in%c("bootstrap", "delta"))
   stopifnot(is.character(bootCI.type), bootCI.type%in%c("norm","perc","bca","basic"))
-  stopifnot(is.character(tr.model), tr.model%in%c("FP1.fixed","FP2.fixed", "FP1.classic", "FP2.classic", "FP01", "FP02"))
+  stopifnot(is.character(tr.model), tr.model%in%c("FP1.fixed","FP2.fixed", "FP1.select", "FP2.select", "FP01", "FP02"))
   stopifnot(is.character(parallel), parallel%in%c("no", "multicore", "snow"))
-  if (tr.model%in%c("FP1.fixed","FP1.classic")) {
+  if (tr.model%in%c("FP1.fixed","FP1.select")) {
     if (length(treatment.levels)<3) stop ("With Fractional Polynomials with 1 power, at least 3 arms are needed.\n")
   } else {
     if (length(treatment.levels)<5) stop ("With Fractional Polynomials with 2 powers, at least 5 arms are needed.\n")
@@ -94,7 +94,7 @@ power.ROCI.binary <- function (p.expected.curve, NI.margin, reference=max(treatm
     power <- pnorm(sqrt(n.tot*(expected.sm-NI.marg)^2/var.1)-qnorm(1-sig.level))*100
     if (summary.measure=="target.risk") experimental.arms<-treatment.levels
     power.optimal<-power[which(experimental.arms==optimal)]
-    power.range<-max(power[which(experimental.arms%in%range)])
+    power.range<-max(power[which(experimental.arms%in%acceptable)])
     power.acceptable<-max(power)
     
     if (print.out==T) {
@@ -110,8 +110,8 @@ expected curves and NI margins is: \nOptimal power: ", power.optimal,
         power.low <- 100*pnorm(sqrt(n.tot*(expected.sm-NI.marg)^2/var.1.up)-qnorm(1-sig.level))
         power.up.optimal<-power.up[which(experimental.arms==optimal)]
         power.low.optimal<-power.low[which(experimental.arms==optimal)]
-        power.up.range<-max(power.up[which(experimental.arms%in%range)])
-        power.low.range<-max(power.low[which(experimental.arms%in%range)])
+        power.up.range<-max(power.up[which(experimental.arms%in%acceptable)])
+        power.low.range<-max(power.low[which(experimental.arms%in%acceptable)])
         power.up.acceptable<-max(power.up)
         power.low.acceptable<-max(power.low)
         cat("The power with a total sample size of ", n.tot, " and  for the specified
@@ -168,7 +168,7 @@ expected curves and NI margins is: \nOptimal power: ", power.optimal,
     power<-apply(ni.indicator,2,mean)*100
     if (summary.measure=="target.risk") experimental.arms<-treatment.levels
     power.optimal<-power[which(experimental.arms==optimal)]
-    power.range<-max(power[which(experimental.arms%in%range)])
+    power.range<-max(power[which(experimental.arms%in%acceptable)])
     power.acceptable<-max(power)
     
     if (print.out==T) {
@@ -178,8 +178,8 @@ expected curves and NI margins is: \nOptimal power: ", power.optimal,
         power.low <- power-MC.SE*qnorm(0.975)
         power.up.optimal<-power.up[which(experimental.arms==optimal)]
         power.low.optimal<-power.low[which(experimental.arms==optimal)]
-        power.up.range<-max(power.up[which(experimental.arms%in%range)])
-        power.low.range<-max(power.low[which(experimental.arms%in%range)])
+        power.up.range<-max(power.up[which(experimental.arms%in%acceptable)])
+        power.low.range<-max(power.low[which(experimental.arms%in%acceptable)])
         power.up.acceptable<-max(power.up)
         power.low.acceptable<-max(power.low)
         cat("The power with a total sample size of ", n.tot, " and  for the specified

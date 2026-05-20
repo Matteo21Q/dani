@@ -1,6 +1,6 @@
 test.ROCI.binary <- function (formula=NULL, data=NULL, NI.margin, reference=max(treatment.levels),
                                se.method="bootstrap", treatment.levels=unique(treatment), summary.measure="RD", 
-                               tr.model="FP2.fixed", M.boot=NULL, bootCI.type="bca", parallel="no", n.cpus=1, sig.level=0.025,
+                               tr.model="FP2.select", M.boot=NULL, bootCI.type="bca", parallel="no", n.cpus=1, sig.level=0.025,
                                unfavourable=TRUE) {
 
   stopifnot(!is.null(formula), !is.null(data))
@@ -39,7 +39,7 @@ test.ROCI.binary <- function (formula=NULL, data=NULL, NI.margin, reference=max(
   if (!is.null(M.boot)) stopifnot(is.numeric(M.boot), M.boot>1)
   stopifnot(is.character(se.method), se.method%in%c("bootstrap", "delta"))
   stopifnot(is.character(bootCI.type), bootCI.type%in%c("norm","perc","bca","basic"))
-  stopifnot(is.character(tr.model), tr.model%in%c("FP1.fixed","FP2.fixed", "FP1.classic", "FP2.classic"))
+  stopifnot(is.character(tr.model), tr.model%in%c("FP1.fixed","FP2.fixed", "FP1.select", "FP2.select"))
   min.treat<-min(treatment)
   n.treat<-length(treatment.levels)
   max.treat<-max(treatment)
@@ -72,10 +72,10 @@ test.ROCI.binary <- function (formula=NULL, data=NULL, NI.margin, reference=max(
   } else if (tr.model=="FP1.fixed") {
     myformula<-as.formula(paste("outcomes~fp(treatment,df=2, select=1, alpha=1)", covariate.formula))
     fit<-mfp(myformula, data.mfp, family="binomial")
-  } else if (tr.model=="FP2.classic") {
+  } else if (tr.model=="FP2.select") {
     myformula<-as.formula(paste("outcomes~fp(treatment,df=4)", covariate.formula))
     fit<-mfp(myformula, data.mfp, family="binomial")
-  } else if (tr.model=="FP1.classic") {
+  } else if (tr.model=="FP1.select") {
     myformula<-as.formula(paste("outcomes~fp(treatment,df=2)", covariate.formula))
     fit<-mfp(myformula, data.mfp, family="binomial")
   } 
@@ -151,10 +151,10 @@ test.ROCI.binary <- function (formula=NULL, data=NULL, NI.margin, reference=max(
       } else if (da$tr.model[1]=="FP1.fixed") {
         myformula<-as.formula(paste("outcomes~fp(treatment,df=2, select=1, alpha=1)", covariate.formula))
         fit.i<-mfp(myformula, da, family="binomial")
-      } else if (da$tr.model[1]=="FP2.classic") {
+      } else if (da$tr.model[1]=="FP2.select") {
         myformula<-as.formula(paste("outcomes~fp(treatment,df=4)", covariate.formula))
         fit.i<-mfp(myformula, da, family="binomial")
-      } else if (da$tr.model[1]=="FP1.classic") {
+      } else if (da$tr.model[1]=="FP1.select") {
         myformula<-as.formula(paste("outcomes~fp(treatment,df=2)", covariate.formula))
         fit.i<-mfp(myformula, da, family="binomial")
       }  
