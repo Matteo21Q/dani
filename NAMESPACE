@@ -8,13 +8,11 @@ import(exact2x2)
 import(marginaleffects)
 import(mfp)
 import(BSDA)
-import(DescrTab2)
 import(coxphw)
 import(survRM2)
 import(flexsurv)
 import(numDeriv)
 import(mratios)
-import(exact2x2)
 import(contingencytables)
 import(PropCIs)
 import(tibble)
@@ -26,23 +24,25 @@ export(samplesize.NI.binary,
        samplesize.NI.continuous,
        samplesize.NIfrontier.binary,
        samplesize.ROCI.binary,
+       samplesize.ROCI.survival,
        power.NI.binary,
        power.NI.continuous,
        power.NIfrontier.binary,
 	   type1error.NIfrontier.binary,
-       power.ROCI.binary,	   
+       power.ROCI.binary,
 	   test.NI.binary,
 	   test.NI.continuous,
        test.NI.survival,
        test.NIfrontier.binary,
-       test.ROCI.binary,	   
+       test.ROCI.binary,
+       test.ROCI.survival,
 	   convertmargin.binary,
 	   convertmargin.continuous,
 	   convertmargin.survival,
        compare.NIfrontier.binary,
        compare.NIfrontier.survival,
-       compare.NIfrontier.continuous,	   
-	   plot.ROCI, 
+       compare.NIfrontier.continuous,
+	   plot.ROCI,
 	   summary.ROCI)
 S3method(plot,ROCI)
 S3method(summary,ROCI)

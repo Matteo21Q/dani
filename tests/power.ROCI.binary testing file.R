@@ -174,12 +174,12 @@ names(correct)[[n.t]]<-"out4S"
 n.t=n.t+1
 
 # Check that it works when range incorrectly specified:
-out4T<-try(power.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", range="pippo", n.per.arm=rep(100,5), treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4T, "try-error"))&&(grepl("is.numeric(range) is not TRUE", out4T[1] , fixed=T )),1,0) 
+out4T<-try(power.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", acceptable="pippo", n.per.arm=rep(100,5), treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4T, "try-error"))&&(grepl("is.numeric(acceptable) is not TRUE", out4T[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4T"
 n.t=n.t+1
-out4U<-try(power.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", n.per.arm=rep(100,5), range=c(0,10), treatment.levels = c(1,2,3,4,5)))
-correct[[n.t]]<-ifelse((inherits(out4U, "try-error"))&&(grepl("all(range %in% treatment.levels)", out4U[1] , fixed=T )),1,0) 
+out4U<-try(power.ROCI.binary(p.expected.curve=c(0.1,0.1,0.1,0.1,0.1),NI.margin=0.1, se.method="bootstrap", n.per.arm=rep(100,5), acceptable=c(0,10), treatment.levels = c(1,2,3,4,5)))
+correct[[n.t]]<-ifelse((inherits(out4U, "try-error"))&&(grepl("all(acceptable %in% treatment.levels)", out4U[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4U"
 n.t=n.t+1
 

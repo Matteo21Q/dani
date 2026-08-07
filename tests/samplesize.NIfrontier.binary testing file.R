@@ -186,7 +186,7 @@ n.t=n.t+1
 out5A<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.RD, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5A,"numeric"))&&(all.equal(out5A[2],385)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5A,"numeric"))&&(all.equal(out5A[2],193)),1,0)  
 names(correct)[[n.t]]<-"out5A"
 n.t=n.t+1
 NI.frontier.RR<-function(p) {
@@ -199,7 +199,7 @@ NI.frontier.RR<-function(p) {
 out5B<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.RR, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5B,"numeric"))&&(all.equal(out5B[2],866)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5B,"numeric"))&&(all.equal(out5B[2],433)),1,0)  
 names(correct)[[n.t]]<-"out5B"
 n.t=n.t+1
 NI.frontier.AS<-function(x) {
@@ -213,61 +213,61 @@ NI.frontier.AS<-function(x) {
 out5C<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.AS, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5C,"numeric"))&&(all.equal(out5C[2],564)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5C,"numeric"))&&(all.equal(out5C[2],282)),1,0)  
 names(correct)[[n.t]]<-"out5C"
 n.t=n.t+1
 out5D<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.12, NI.frontier.RD, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5D,"numeric"))&&(all.equal(out5D[2],654)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5D,"numeric"))&&(all.equal(out5D[2],327)),1,0)  
 names(correct)[[n.t]]<-"out5D"
 n.t=n.t+1
 out5E<-try(samplesize.NIfrontier.binary(0.5, p.experim.target=0.45, NI.frontier.RD, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "RD", print.out = TRUE,
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5E,"numeric"))&&(all.equal(out5E[2],448)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5E,"numeric"))&&(all.equal(out5E[2],224)),1,0)  
 names(correct)[[n.t]]<-"out5E"
 n.t=n.t+1
 out5F<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.RD, sig.level = 0.05, power = 0.9, r = 1, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5F,"numeric"))&&(all.equal(out5F[2],325)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5F,"numeric"))&&(all.equal(out5F[2],163)),1,0)  
 names(correct)[[n.t]]<-"out5F"
 n.t=n.t+1
 out5G<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.RD, sig.level = 0.025, power = 0.54, r = 1, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5G,"numeric"))&&(all.equal(out5G[2],166)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5G,"numeric"))&&(all.equal(out5G[2],83)),1,0)  
 names(correct)[[n.t]]<-"out5G"
 n.t=n.t+1
 out5H<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.RD, sig.level = 0.025, power = 0.9, r = 0.5, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5H,"numeric"))&&(all.equal(out5H[2],335)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5H,"numeric"))&&(all.equal(out5H[2],251)),1,0)  
 names(correct)[[n.t]]<-"out5H"
 n.t=n.t+1
 out5I<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.RD, sig.level = 0.025, power = 0.9, r = 2, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]]<-ifelse((inherits(out5I,"numeric"))&&(all.equal(out5I[2],483)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5I,"numeric"))&&(all.equal(out5I[2],182)),1,0)  
 names(correct)[[n.t]]<-"out5I"
 n.t=n.t+1
 out5J<-try(samplesize.NIfrontier.binary(0.2, p.experim.target=0.2, NI.frontier.RDf, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "RD", print.out = TRUE, 
                                 unfavourable=F))
-correct[[n.t]]<-ifelse((inherits(out5J,"numeric"))&&(all.equal(out5J[2],656)),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5J,"numeric"))&&(all.equal(out5J[2],328)),1,0)  
 names(correct)[[n.t]]<-"out5J"
 n.t=n.t+1
 out5K<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.RD, sig.level = 0.025, power = 0.9, r = 1, 
                                         summary.measure = "RD", print.out = TRUE, 
                                         unfavourable=T, round=F))
-correct[[n.t]]<-ifelse((inherits(out5K,"numeric"))&&(all.equal(out5K[2],384.7856, tolerance=10^(-5))),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5K,"numeric"))&&(all.equal(out5K[2],192.3928, tolerance=10^(-5))),1,0)  
 names(correct)[[n.t]]<-"out5K"
 n.t=n.t+1
 out5L<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.RD, sig.level = 0.025, power = 0.9, r = 1, 
                                         summary.measure = "RD", print.out = TRUE, 
                                         unfavourable=T, ltfu=0.1))
-correct[[n.t]]<-ifelse((inherits(out5L,"numeric"))&&(all.equal(out5L[2],428, tolerance=10^(-5))),1,0)  
+correct[[n.t]]<-ifelse((inherits(out5L,"numeric"))&&(all.equal(out5L[2],215, tolerance=10^(-5))),1,0)  
 names(correct)[[n.t]]<-"out5L"
 n.t=n.t+1
 #####################################################
@@ -278,50 +278,50 @@ NI.frontier.ratio<-function(p) return(1.5)
 out6A<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.ratio, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "OR", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out6A)) && (all.equal(out6A[2], 2715)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out6A)) && (all.equal(out6A[2], 1358)) , 1, 0)  
 names(correct)[[n.t]] <- "out6A"
 n.t <- n.t + 1
 out6B<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.12, NI.frontier.ratio, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "OR", print.out = TRUE,
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out6B)) && (all.equal(out6B[2], 8327)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out6B)) && (all.equal(out6B[2], 4164)) , 1, 0)  
 names(correct)[[n.t]] <- "out6B"
 n.t <- n.t + 1
 out6C<-try(samplesize.NIfrontier.binary(0.5, p.experim.target=0.45, NI.frontier.ratio, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "OR", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out6C)) && (all.equal(out6C[2], 617)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out6C)) && (all.equal(out6C[2], 309)) , 1, 0)  
 names(correct)[[n.t]] <- "out6C"
 n.t <- n.t + 1
 out6D<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.ratio, sig.level = 0.05, power = 0.9, r = 1, 
                                 summary.measure = "OR", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out6D)) && (all.equal(out6D[2], 2209)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out6D)) && (all.equal(out6D[2], 1105)) , 1, 0)  
 names(correct)[[n.t]] <- "out6D"
 n.t <- n.t + 1
 out6E<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.ratio, sig.level = 0.025, power = 0.54, r = 1, 
                                 summary.measure = "OR", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out6E)) && (all.equal(out6E[2], 1102)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out6E)) && (all.equal(out6E[2], 551)) , 1, 0)  
 names(correct)[[n.t]] <- "out6E"
 n.t <- n.t + 1
 out6F<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.ratio, sig.level = 0.025, power = 0.9, r = 0.5, 
                                 summary.measure = "OR", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out6F)) && (all.equal(out6F[2], 1967)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out6F)) && (all.equal(out6F[2], 1476)) , 1, 0)  
 names(correct)[[n.t]] <- "out6F"
 n.t <- n.t + 1
 out6G<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.ratio, sig.level = 0.025, power = 0.9, r = 2, 
                                 summary.measure = "OR", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out6G)) && (all.equal(out6G[2], 4215)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out6G)) && (all.equal(out6G[2], 1581)) , 1, 0)  
 names(correct)[[n.t]] <- "out6G"
 n.t <- n.t + 1
 NI.frontier.ratiof<-function(p) return(0.5)
 out6H<-try(samplesize.NIfrontier.binary(0.1, p.experim.target=0.1, NI.frontier.ratiof, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "OR", print.out = TRUE, 
                                 unfavourable=F))
-correct[[n.t]] <- ifelse((is.vector(out6H)) && (all.equal(out6H[2], 964)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out6H)) && (all.equal(out6H[2], 482)) , 1, 0)  
 names(correct)[[n.t]] <- "out6H"
 n.t <- n.t + 1
 
@@ -332,13 +332,13 @@ n.t <- n.t + 1
 out7A<-try(samplesize.NIfrontier.binary(0.05, p.experim.target=0.05, NI.frontier.ratio, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "RR", print.out = TRUE,
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out7A)) && (all.equal(out7A[2], 4868)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out7A)) && (all.equal(out7A[2], 2434)) , 1, 0)  
 names(correct)[[n.t]] <- "out7A"
 n.t <- n.t + 1
 out7B<-try(samplesize.NIfrontier.binary(0.05, p.experim.target=0.05, NI.frontier.RD, sig.level = 0.025, power = 0.9, r = 1, 
                                 summary.measure = "AS", print.out = TRUE, 
                                 unfavourable=T))
-correct[[n.t]] <- ifelse((is.vector(out7B)) && (all.equal(out7B[2], 1005)) , 1, 0)  
+correct[[n.t]] <- ifelse((is.vector(out7B)) && (all.equal(out7B[2], 503)) , 1, 0)  
 names(correct)[[n.t]] <- "out7B"
 n.t <- n.t + 1
 
