@@ -135,6 +135,8 @@ An example code and output is shown below:
 samplesize.ROCI.binary(p.expected.curve = rep(0.05,7),
                         NI.margin = rep(0.05,6),
                         reference = 20,
+                        power.type="acceptable",
+                        power.arms = c(8, 10, 12),
                         se.method = "delta",
                         treatment.levels = c(8,10,12,14,16,18,20),
                         summary.measure = "RD",
