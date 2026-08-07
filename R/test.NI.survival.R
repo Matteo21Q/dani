@@ -77,7 +77,7 @@ test.NI.survival <- function(time, event, treat, covariates=NULL, NI.margin, sig
     if ((unfavourable == F)&&(NI.margin>=1)) stop("When events are favourable (e.g. cure), a HR NI margin needs to be <1.\n")
     if (test.type=="Cox.PH") {
       fit<-coxph(as.formula(myformula), mydata)
-      fit.std<-avg_comparisons(fit, conf_level = (1-sig.level*2), comparison="lnratio", transform = exp)
+      fit.std<-avg_comparisons(fit, conf_level = (1-sig.level*2), comparison="lnratio", transform = exp, type="risk")
       CI <- c(fit.std[fit.std$term=="treat","conf.low"], fit.std[fit.std$term=="treat","conf.high"])
       estimate<-fit.std[fit.std$term=="treat","estimate"]
     } else if (test.type=="flexsurv.PH") {
