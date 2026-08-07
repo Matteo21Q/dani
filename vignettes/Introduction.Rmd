@@ -140,7 +140,7 @@ samplesize.ROCI.binary(p.expected.curve = rep(0.05,7),
                         se.method = "delta",
                         treatment.levels = c(8,10,12,14,16,18,20),
                         summary.measure = "RD",
-                        tr.model = "FP2.classic")
+                        tr.model = "FP2.select")
 ```
  
 ## Analysis / testing for non-inferiority
