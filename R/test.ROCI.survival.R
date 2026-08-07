@@ -1,5 +1,5 @@
 test.ROCI.survival <- function (formula=NULL, data=NULL, NI.margin, reference=max(treatment.levels),
-                              se.method="bootstrap", treatment.levels=unique(treatment), summary.measure="HR", 
+                              se.method="bootstrap", treatment.levels=NULL, summary.measure="HR", 
                               tr.model="FP2.fixed", M.boot=NULL, bootCI.type="bca", parallel="no", n.cpus=1, cl=NULL, sig.level=0.025,
                               unfavourable=TRUE, k=2, knots=NULL, bknots=NULL, tau=NULL, list.ss=NULL) {
   
@@ -17,6 +17,7 @@ test.ROCI.survival <- function (formula=NULL, data=NULL, NI.margin, reference=ma
   
   stopifnot(is.numeric(treatment))
   stopifnot(is.numeric(outcomes[,1]), nrow(outcomes)==length(treatment), nlevels(factor(outcomes[,2]))==2)
+  if (is.null(treatment.levels))  treatment.levels=unique(treatment)
   stopifnot(is.numeric(treatment.levels), length(treatment.levels)>2)
   stopifnot(is.numeric(reference), length(reference)==1, reference%in%treatment.levels)
   stopifnot(is.logical(unfavourable), !is.na(unfavourable))

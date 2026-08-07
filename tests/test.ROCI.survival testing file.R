@@ -178,17 +178,17 @@ names(correct)[[n.t]]<-"out4N"
 n.t=n.t+1
 
 # Check that it works when parallel incorrectly specified:
-out4O<-try(test.ROCI.survival(formula=as.formula(Surv(time, status)~treat(treatment)), data=data.frame(status = rep(c(1,0),50), time = rnorm(100,100,1), treatment = sample(7,100,rep=TRUE)), NI.margin=1.1, se.method="bootstrap", parallel=NA))
+out4O<-try(test.ROCI.survival(formula=as.formula(Surv(time, status)~treat(treatment)), data=data.frame(status = rep(c(1,0),50), time = rnorm(100,100,10), treatment = sample(7,100,rep=TRUE)), NI.margin=1.1, se.method="bootstrap", parallel=NA))
 correct[[n.t]]<-ifelse((inherits(out4O, "try-error"))&&(grepl("'arg' must be NULL or a character vector", out4O[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4O"
 n.t=n.t+1
-out4P<-try(test.ROCI.survival(formula=as.formula(Surv(time, status)~treat(treatment)), data=data.frame(status = rep(c(1,0),50), time = rnorm(100,100,1), treatment = sample(7,100,rep=TRUE)), NI.margin=1.1, se.method="bootstrap", parallel="pippo"))
+out4P<-try(test.ROCI.survival(formula=as.formula(Surv(time, status)~treat(treatment)), data=data.frame(status = rep(c(1,0),50), time = rnorm(100,100,10), treatment = sample(7,100,rep=TRUE)), NI.margin=1.1, se.method="bootstrap", parallel="pippo"))
 correct[[n.t]]<-ifelse((inherits(out4P, "try-error"))&&(grepl("should be one of", out4P[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4P"
 n.t=n.t+1
 
 # Check behavior with wrong n.cpus
-out4Q<-try(test.ROCI.survival(formula=as.formula(Surv(time, status)~treat(treatment)), data=data.frame(status = rep(c(1,0),50), time = rnorm(100,100,1), treatment = sample(7,100,rep=TRUE)), NI.margin=1.1, se.method="bootstrap", parallel="snow", n.cpus="pippo"))
+out4Q<-try(test.ROCI.survival(formula=as.formula(Surv(time, status)~treat(treatment)), data=data.frame(status = rep(c(1,0),50), time = rnorm(100,100,10), treatment = sample(7,100,rep=TRUE)), NI.margin=1.1, se.method="bootstrap", parallel="snow", n.cpus="pippo"))
 correct[[n.t]]<-ifelse((inherits(out4Q, "try-error"))&&(grepl("invalid 'times' argument", out4Q[1] , fixed=T )),1,0) 
 names(correct)[[n.t]]<-"out4Q"
 n.t=n.t+1
@@ -205,7 +205,7 @@ data1<-data.frame(status1, time1, treatment1)
 out5A<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                             NI.margin=-0.1, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="DS", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$up.bounds.CI[2],0.2416069, tolerance=10^(-4)))&&out5A$optimal.treat==3,1,0)  
 names(correct)[[n.t]]<-"out5A"
@@ -213,7 +213,7 @@ n.t=n.t+1
 out5B<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=-0.1, reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.05,
+                              tr.model="FP2.select",sig.level=0.05,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$up.bounds.CI[2],0.2140328, tolerance=10^(-4)))&&out5B$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out5B"
@@ -221,7 +221,7 @@ n.t=n.t+1
 out5C<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=c(-0.1, -0.095,-0.09,-0.085,-0.08,-0.075), reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$up.bounds.CI[2],0.2416069, tolerance=10^(-4)))&&out5C$optimal.treat==3,1,0)  
 names(correct)[[n.t]]<-"out5C"
@@ -239,7 +239,7 @@ out5E<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(trea
                               NI.margin=-0.1, reference=7, se.method="bootstrap", 
                               M.boot=10, bootCI.type = "basic",
                               treatment.levels=1:7, summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5E,"list"))&&(all.equal(out5E$up.bounds.CI[2],0.2599099, tolerance=10^(-6)))&&out5E$optimal.treat==2,1,0)  
 names(correct)[[n.t]]<-"out5E"
@@ -249,7 +249,7 @@ out5F<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(trea
                               NI.margin=-0.1, reference=7, se.method="bootstrap", 
                               M.boot=10, bootCI.type = "perc",
                               treatment.levels=1:7, summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5F,"list"))&&(all.equal(out5F$up.bounds.CI[2],0.1051021, tolerance=10^(-6)))&&out5F$optimal.treat==3,1,0)  
 names(correct)[[n.t]]<-"out5F"
@@ -257,7 +257,7 @@ n.t=n.t+1
 out5G<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=-0.1, reference=7, se.method="delta", 
                               treatment.levels=c(1.5,5.5,7), summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5G,"list"))&&(all.equal(out5G$up.bounds.CI[2], 0.08078335, tolerance=10^(-4)))&&out5G$optimal.treat==5.5,1,0)  
 names(correct)[[n.t]]<-"out5G"
@@ -265,7 +265,7 @@ n.t=n.t+1
 out5H<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=-0.5, reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5H,"list"))&&(all.equal(out5H$up.bounds.CI[2],0.2416069, tolerance=10^(-4)))&&out5H$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out5H"
@@ -281,7 +281,7 @@ n.t=n.t+1
 out5J<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                                                  NI.margin=-0.1, reference=7, se.method="delta", 
                                                  treatment.levels=1:7, summary.measure="DS", 
-                                                 tr.model="FP1.classic",sig.level=0.025,
+                                                 tr.model="FP1.select",sig.level=0.025,
                                                  unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5J,"list"))&&(all.equal(out5J$up.bounds.CI[2],0.2416069, tolerance=10^(-4)))&&out5J$optimal.treat==3,1,0)  
 names(correct)[[n.t]]<-"out5J"
@@ -289,7 +289,7 @@ n.t=n.t+1
 out5K<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=-0.1, reference=6, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5K,"list"))&&(all.equal(out5K$up.bounds.CI[2],0.1869576, tolerance=10^(-4)))&&out5K$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out5K"
@@ -297,7 +297,7 @@ n.t=n.t+1
 out5L<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=0.1, reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=FALSE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5L,"list"))&&(all.equal(out5L$low.bounds.CI[2],-0.1014109, tolerance=10^(-3)))&&out5L$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out5L"
@@ -311,7 +311,7 @@ data2<-data.frame(status2, time2, treatment2, age2)
 out5M<-try(test.ROCI.survival(formula=as.formula(Surv(time2, status2)~treat(treatment2)+age2), data=data2, 
                               NI.margin=-0.1, reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out5M,"list"))&&(all.equal(out5M$up.bounds.CI[2],0.0695364, tolerance=10^(-4)))&&out5M$optimal.treat==2,1,0)  
 names(correct)[[n.t]]<-"out5M"
@@ -324,7 +324,7 @@ n.t=n.t+1
 out6A<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                                                  NI.margin=0.6, reference=7, se.method="delta", 
                                                  treatment.levels=1:7, summary.measure="RS", 
-                                                 tr.model="FP2.classic",sig.level=0.025,
+                                                 tr.model="FP2.select",sig.level=0.025,
                                                  unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out6A,"list"))&&(all.equal(out6A$up.bounds.CI[2],1.410905, tolerance=10^(-4)))&&out6A$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out6A"
@@ -332,7 +332,7 @@ n.t=n.t+1
 out6B<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=0.6, reference=1, se.method="delta", 
                               treatment.levels=1:7, summary.measure="RS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out6B,"list"))&&(all.equal(out6B$up.bounds.CI[2],1.039852, tolerance=10^(-4)))&&out6B$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out6B"
@@ -342,7 +342,7 @@ out6C<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(trea
                               NI.margin=0.6, reference=1, se.method="bootstrap",
                               M.boot=10, bootCI.type = "basic",
                               treatment.levels=1:7, summary.measure="RS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out6C,"list"))&&(all.equal(out6C$up.bounds.CI[2],1.198023, tolerance=10^(-6)))&&out6C$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out6C"
@@ -358,7 +358,7 @@ n.t=n.t+1
 out6E<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=1.6, reference=1, se.method="delta",
                               treatment.levels=1:7, summary.measure="RS", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=FALSE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out6E,"list"))&&(all.equal(out6E$low.bounds.CI[2],0.8989938, tolerance=10^(-4)))&&out6E$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out6E"
@@ -371,7 +371,7 @@ n.t=n.t+1
 out7A<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=-0.6, reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DRMST", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out7A,"list"))&&(all.equal(out7A$up.bounds.CI[2],1.682833, tolerance=10^(-6)))&&out7A$optimal.treat==4,1,0)  
 names(correct)[[n.t]]<-"out7A"
@@ -379,7 +379,7 @@ n.t=n.t+1
 out7B<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=-0.6, reference=1, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DRMST", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out7B,"list"))&&(all.equal(out7B$up.bounds.CI[2],0.2032345, tolerance=10^(-6)))&&out7B$optimal.treat==3,1,0)  
 names(correct)[[n.t]]<-"out7B"
@@ -396,7 +396,7 @@ n.t=n.t+1
 out7D<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=0.6, reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="DRMST", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=FALSE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out7D,"list"))&&(all.equal(out7D$up.bounds.CI[2],1.682833, tolerance=10^(-6)))&&out7D$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out7D"
@@ -406,7 +406,7 @@ out7E<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(trea
                               NI.margin=-0.6, reference=7, se.method="bootstrap",
                               M.boot=10, bootCI.type = "norm",
                               treatment.levels=1:7, summary.measure="DRMST", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out7E,"list"))&&(all.equal(out7E$low.bounds.CI[2],-0.2421177, tolerance=10^(-6)))&&out7E$optimal.treat==2,1,0)  
 names(correct)[[n.t]]<-"out7E"
@@ -419,7 +419,7 @@ n.t=n.t+1
 out8A<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=1.6, reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="HR", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out8A,"list"))&&(all.equal(out8A$up.bounds.CI[2],1.495758, tolerance=10^(-4)))&&out8A$optimal.treat==2,1,0)  
 names(correct)[[n.t]]<-"out8A"
@@ -427,7 +427,7 @@ n.t=n.t+1
 out8B<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=1.6, reference=1, se.method="delta", 
                               treatment.levels=1:7, summary.measure="HR", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out8B,"list"))&&(all.equal(out8B$up.bounds.CI[2],1.487068, tolerance=10^(-4)))&&out8B$optimal.treat==3,1,0)  
 names(correct)[[n.t]]<-"out8B"
@@ -444,7 +444,7 @@ n.t=n.t+1
 out8D<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(treatment1)), data=data1, 
                               NI.margin=0.6, reference=7, se.method="delta", 
                               treatment.levels=1:7, summary.measure="HR", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=FALSE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out8D,"list"))&&(all.equal(out8D$up.bounds.CI[2], 1.495758, tolerance=10^(-4)))&&out8D$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out8D"
@@ -454,7 +454,7 @@ out8E<-try(test.ROCI.survival(formula=as.formula(Surv(time1, status1)~treat(trea
                               NI.margin=1.6, reference=7, se.method="bootstrap",
                               M.boot=10, bootCI.type = "perc",
                               treatment.levels=1:7, summary.measure="HR", 
-                              tr.model="FP2.classic",sig.level=0.025,
+                              tr.model="FP2.select",sig.level=0.025,
                               unfavourable=TRUE, tau=101))
 correct[[n.t]]<-ifelse((inherits(out8E,"list"))&&(all.equal(out8E$low.bounds.CI[2],0.6447801, tolerance=10^(-4)))&&out8E$optimal.treat==4,1,0)  
 names(correct)[[n.t]]<-"out8E"

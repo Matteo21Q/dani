@@ -406,8 +406,8 @@ test.NI.binary <- function(n.control=NULL, n.experim=NULL, e.control=NULL, e.exp
       estimate<-as.numeric(test[3])
     } else if (test.type=="MOVER") {
       test<-moverci(e.experim,n.experim,e.control,n.control,contrast = "RR", level = 1-2*sig.level)
-      CI<-test[c(1,3)]
-      estimate<-test[2]
+      CI<-test$estimates[,c("lower","upper")]
+      estimate<-test$estimates[,c("est")]
     } else if (test.type=="Gart.Nam") {
       test<-scasci(e.experim,n.experim,e.control,n.control,contrast = "RR", level = 1-2*sig.level)$estimates
       CI<-test[c(1,3)]
@@ -658,8 +658,8 @@ test.NI.binary <- function(n.control=NULL, n.experim=NULL, e.control=NULL, e.exp
       estimate<-as.numeric(test[3])
     } else if (test.type=="MOVER") {
       test<-moverci(e.experim,n.experim,e.control,n.control,contrast = "OR", level = 1-2*sig.level)
-      CI<-as.numeric(test[c(1,3)])
-      estimate<-as.numeric(test[2])
+      CI<-test$estimates[,c("lower","upper")]
+      estimate<-test$estimates[,c("est")]
     } else if (test.type=="Gart.Nam") {
       test<-scasci(e.experim,n.experim,e.control,n.control,contrast = "OR", level = 1-2*sig.level)$estimates
       CI<-as.numeric(test[c(1,3)])

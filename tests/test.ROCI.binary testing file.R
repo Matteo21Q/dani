@@ -214,7 +214,7 @@ data1<-data.frame(outcomes1, treatment1)
 out5A<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.1, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5A,"list"))&&(all.equal(out5A$up.bounds.CI[2],0.1805229, tolerance=10^(-4)))&&out5A$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5A"
@@ -222,7 +222,7 @@ n.t=n.t+1
 out5B<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.1, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.05,
+                            tr.model="FP2.select",sig.level=0.05,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5B,"list"))&&(all.equal(out5B$up.bounds.CI[2],0.1654688, tolerance=10^(-4)))&&out5B$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5B"
@@ -230,7 +230,7 @@ n.t=n.t+1
 out5C<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=c(0.1, 0.095,0.09,0.085,0.08,0.075), reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5C,"list"))&&(all.equal(out5C$up.bounds.CI[2],0.1805229, tolerance=10^(-4)))&&out5C$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out5C"
@@ -238,7 +238,7 @@ n.t=n.t+1
 out5D<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.1, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5D,"list"))&&(all.equal(out5D$up.bounds.CI[6],0.04325390, tolerance=10^(-4)))&&out5D$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5D"
@@ -248,7 +248,7 @@ out5E<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             NI.margin=0.1, reference = 7, se.method="bootstrap",
                             M.boot=100, bootCI.type = "basic",
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5E,"list"))&&(all.equal(out5E$up.bounds.CI[2],0.173634, tolerance=10^(-6)))&&out5E$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out5E"
@@ -258,7 +258,7 @@ out5F<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             NI.margin=0.1, reference=7, se.method="bootstrap",
                             M.boot=100, bootCI.type = "perc",
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5F,"list"))&&(all.equal(out5F$up.bounds.CI[2],0.2201005, tolerance=10^(-6)))&&out5F$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out5F"
@@ -266,7 +266,7 @@ n.t=n.t+1
 out5G<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.1, reference = 7, se.method="delta", 
                             treatment.levels=c(1.5,5.5,7), summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5G,"list"))&&(all.equal(out5G$up.bounds.CI[2], 0.06354068, tolerance=10^(-4)))&&out5G$optimal.treat==5.5,1,0)  
 names(correct)[[n.t]]<-"out5G"
@@ -290,7 +290,7 @@ n.t=n.t+1
 out5J<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.1, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP1.classic",sig.level=0.025,
+                            tr.model="FP1.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5J,"list"))&&(all.equal(out5J$up.bounds.CI[2],0.1805203, tolerance=10^(-4)))&&out5J$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5J"
@@ -298,7 +298,7 @@ n.t=n.t+1
 out5K<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.1, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.05,
+                            tr.model="FP2.select",sig.level=0.05,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5K,"list"))&&(all.equal(out5K$up.bounds.CI[2],0.1654666, tolerance=10^(-4)))&&out5K$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5K"
@@ -306,7 +306,7 @@ n.t=n.t+1
 out5L<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=-0.1, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=FALSE))
 correct[[n.t]]<-ifelse((inherits(out5L,"list"))&&(all.equal(out5L$low.bounds.CI[2],-0.006744666, tolerance=10^(-3)))&&out5L$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out5L"
@@ -319,7 +319,7 @@ data1<-data.frame(outcomes1, treatment1, age)
 out5M<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)+age", data=data1, 
                             NI.margin=0.1, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RD", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out5M,"list"))&&(all.equal(out5M$up.bounds.CI[2],0.1799652, tolerance=10^(-4)))&&out5M$optimal.treat==5,1,0)  
 names(correct)[[n.t]]<-"out5M"
@@ -332,7 +332,7 @@ n.t=n.t+1
 out6A<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=1.5, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RR", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out6A,"list"))&&(all.equal(out6A$up.bounds.CI[2],1.256398, tolerance=10^(-4)))&&out6A$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out6A"
@@ -340,7 +340,7 @@ n.t=n.t+1
 out6B<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=1.5, reference=1, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RR", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out6B,"list"))&&(all.equal(out6B$up.bounds.CI[2],0.9949556, tolerance=10^(-4)))&&out6B$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out6B"
@@ -350,7 +350,7 @@ out6C<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             NI.margin=1.5, reference=7, se.method="bootstrap", 
                             M.boot=100, bootCI.type = "perc",
                             treatment.levels=1:7, summary.measure="RR", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out6C,"list"))&&(all.equal(out6C$up.bounds.CI[2],1.328252, tolerance=10^(-6)))&&out6C$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out6C"
@@ -366,7 +366,7 @@ n.t=n.t+1
 out6E<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.75, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="RR", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=FALSE))
 correct[[n.t]]<-ifelse((inherits(out6E,"list"))&&(all.equal(out6E$low.bounds.CI[2],0.9891393, tolerance=10^(-4)))&&out6E$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out6E"
@@ -379,7 +379,7 @@ n.t=n.t+1
 out7A<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=1.5, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="OR", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out7A,"list"))&&(all.equal(out7A$up.bounds.CI[2],3.09873, tolerance=10^(-6)))&&out7A$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out7A"
@@ -387,7 +387,7 @@ n.t=n.t+1
 out7B<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=1.5, reference=1, se.method="delta", 
                             treatment.levels=1:7, summary.measure="OR", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out7B,"list"))&&(all.equal(out7B$up.bounds.CI[2],1.011653, tolerance=10^(-6)))&&out7B$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out7B"
@@ -397,7 +397,7 @@ out7C<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             NI.margin=1.5, reference=7, se.method="bootstrap", 
                             M.boot=100, bootCI.type = "perc",
                             treatment.levels=1:7, summary.measure="OR", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out7C,"list"))&&(all.equal(out7C$up.bounds.CI[2],5.739898, tolerance=10^(-6)))&&out7C$optimal.treat==6,1,0)  
 names(correct)[[n.t]]<-"out7C"
@@ -413,7 +413,7 @@ n.t=n.t+1
 out7E<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.75, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="OR", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=FALSE))
 correct[[n.t]]<-ifelse((inherits(out7E,"list"))&&(all.equal(out7E$low.bounds.CI[2],0.9714512, tolerance=10^(-6)))&&out7E$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out7E"
@@ -426,7 +426,7 @@ n.t=n.t+1
 out8A<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.8, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="target.risk", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out8A,"list"))&&(all.equal(out8A$up.bounds.CI[2],0.8895169, tolerance=10^(-4)))&&out8A$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out8A"
@@ -434,7 +434,7 @@ n.t=n.t+1
 out8B<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.8, reference=1, se.method="delta", 
                             treatment.levels=1:7, summary.measure="target.risk", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out8B,"list"))&&(all.equal(out8B$up.bounds.CI[2],0.8895169, tolerance=10^(-4)))&&out8B$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out8B"
@@ -444,7 +444,7 @@ out8C<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1,
                             NI.margin=0.8, reference=7, se.method="bootstrap", 
                             M.boot=100, bootCI.type = "perc",
                             treatment.levels=1:7, summary.measure="target.risk", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=TRUE))
 correct[[n.t]]<-ifelse((inherits(out8C,"list"))&&(all.equal(out8C$up.bounds.CI[2], 0.9367394, tolerance=10^(-6)))&&out8C$optimal.treat==7,1,0)  
 names(correct)[[n.t]]<-"out8C"
@@ -460,7 +460,7 @@ n.t=n.t+1
 out8E<-try(test.ROCI.binary(formula="outcomes1~treat(treatment1)", data=data1, 
                             NI.margin=0.75, reference=7, se.method="delta", 
                             treatment.levels=1:7, summary.measure="target.risk", 
-                            tr.model="FP2.classic",sig.level=0.025,
+                            tr.model="FP2.select",sig.level=0.025,
                             unfavourable=FALSE))
 correct[[n.t]]<-ifelse((inherits(out8E,"list"))&&(all.equal(out8E$low.bounds.CI[2],0.7981392, tolerance=10^(-4)))&&out8E$optimal.treat==1,1,0)  
 names(correct)[[n.t]]<-"out8E"
